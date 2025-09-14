@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os, sys, math, json, argparse, getpass, requests, time
+import os, sys, math, json, argparse, getpass, requests, time, subprocess
 
 # Load environment variables from a local .env if present (no external deps)
 def _load_local_env() -> None:
@@ -34,6 +34,15 @@ _load_local_env()
 from typing import Tuple, List, Dict, Any, Optional, TYPE_CHECKING, cast
 
 TIMEOUT = 15
+DATA_DIR_DEFAULT = os.path.join(os.path.dirname(__file__), "data")
+
+def _ensure_parent_dir(path: str) -> None:
+    try:
+        d = os.path.dirname(path)
+        if d:
+            os.makedirs(d, exist_ok=True)
+    except Exception:
+        pass
 UA_DEFAULT = "PlaneTester/2.4 (+requests)"
 
 # Optional Excel deps (pandas + openpyxl or xlsxwriter)
@@ -48,8 +57,8 @@ OSK_CLIENT_SECRET_DEFAULT = ""
 
 # ---------- MIL (ADSB.lol) ----------
 MIL_TTL_DEFAULT = 6 * 3600
-MIL_CACHE_FILE_DEFAULT = "mil_cache.json"
-MIL_LIST_CACHE_FILE_DEFAULT = "mil_list_cache.json"
+MIL_CACHE_FILE_DEFAULT = os.path.join(DATA_DIR_DEFAULT, "mil_cache.json")
+MIL_LIST_CACHE_FILE_DEFAULT = os.path.join(DATA_DIR_DEFAULT, "mil_list_cache.json")
 
 # ---------- Notes text for Excel sheet ----------
 # Moved detailed field notes and cautions to README.md. Keep a minimal pointer here
@@ -147,8 +156,11 @@ def fetch_opensky(lat: float, lon: float, radius_nm: float, client_id: Optional[
     r.raise_for_status()
     js: Dict[str, Any] = r.json()
     if dump:
-        with open("opensky.json","w",encoding="utf-8") as f: json.dump(js, f, ensure_ascii=False, indent=2)
-        print("  wrote opensky.json")
+        path = os.path.join(DATA_DIR_DEFAULT, "opensky.json")
+        _ensure_parent_dir(path)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(js, f, ensure_ascii=False, indent=2)
+        print(f"  wrote {path}")
     return js
 
 def normalize_opensky(js: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -196,8 +208,11 @@ def fetch_adsb(lat: float, lon: float, radius_nm: float, debug: bool, dump: bool
     r.raise_for_status()
     js: Dict[str, Any] = r.json()
     if dump:
-        with open("adsb.json","w",encoding="utf-8") as f: json.dump(js, f, ensure_ascii=False, indent=2)
-        print("  wrote adsb.json")
+        path = os.path.join(DATA_DIR_DEFAULT, "adsb.json")
+        _ensure_parent_dir(path)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(js, f, ensure_ascii=False, indent=2)
+        print(f"  wrote {path}")
     return js
 
 def normalize_adsb(js: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -258,14 +273,18 @@ def fetch_fr24_all(lat: float, lon: float, radius_nm: float, debug: bool, dump: 
     if "json" not in ct:
         body = r.text
         if dump:
-            fname = f"fr24_{FR24_HOST}_https.html"
-            with open(fname,"w",encoding="utf-8") as f: f.write(body)
+            fname = os.path.join(DATA_DIR_DEFAULT, f"fr24_{FR24_HOST}_https.html")
+            _ensure_parent_dir(fname)
+            with open(fname, "w", encoding="utf-8") as f:
+                f.write(body)
             print(f"  wrote {fname} (non-JSON; likely HTML/CF)")
         raise RuntimeError(f"Non-JSON response ({ct})")
     js: Dict[str, Any] = r.json()
     if dump:
-        fname = f"fr24_{FR24_HOST}_https.json"
-        with open(fname,"w",encoding="utf-8") as f: json.dump(js, f, ensure_ascii=False, indent=2)
+        fname = os.path.join(DATA_DIR_DEFAULT, f"fr24_{FR24_HOST}_https.json")
+        _ensure_parent_dir(fname)
+        with open(fname, "w", encoding="utf-8") as f:
+            json.dump(js, f, ensure_ascii=False, indent=2)
         print(f"  wrote {fname}")
     return js
 
@@ -325,6 +344,7 @@ class MilCache:
 
     def _save(self):
         try:
+            _ensure_parent_dir(self.path)
             with open(self.path, "w", encoding="utf-8") as f:
                 json.dump(self.cache, f, ensure_ascii=False, indent=2)
         except Exception:
@@ -383,6 +403,7 @@ class MilListCache:
             return
         try:
             blob = {"ts": self.data["ts"], "hexes": sorted(self.data["hexes"]), "rows": self.data["rows"]}
+            _ensure_parent_dir(self.path)
             with open(self.path, "w", encoding="utf-8") as f:
                 json.dump(blob, f, ensure_ascii=False, indent=2)
         except Exception:
@@ -470,6 +491,17 @@ def main():
                     help="emit compact JSON without whitespace (default is pretty)")
     ap.add_argument("--quiet", action="store_true",
                     help="suppress console tables/logs by redirecting prints to stderr (use with --json-stdout)")
+
+    # Merge handoff (optional): run plane_merge.py directly after retrieval
+    ap.add_argument("--merge", action="store_true",
+                    help="after fetching, run plane_merge.py inline (reads this tool's JSON via stdin)")
+    ap.add_argument("--merge-json-out", default=None, help="path to write merged JSON (passed to plane_merge.py --json-out)")
+    ap.add_argument("--merge-minify", action="store_true", help="minify merged JSON (plane_merge.py --minify)")
+    ap.add_argument("--merge-by-hex", action="store_true", help="include by_hex map in merged JSON")
+    ap.add_argument("--merge-datasets", default=None, help="datasets directory for enrichment (plane_merge.py --datasets)")
+    ap.add_argument("--merge-enrich-all", action="store_true", help="enrich all merged aircraft (plane_merge.py --enrich-all)")
+    ap.add_argument("--merge-enrich-in-radius", action="store_true", help="enrich only within radius (plane_merge.py --enrich-in-radius)")
+    ap.add_argument("--merge-prefer", default=None, help="provider priority string for merge (e.g. 'adsb_lol,fr24,opensky')")
 
     # OpenSky credentials (CLI override)
     ap.add_argument("--osk-client-id", default=None); ap.add_argument("--osk-client-secret", default=None)
@@ -656,6 +688,7 @@ def main():
 
     # write to file if requested
     if args.json_out:
+        _ensure_parent_dir(args.json_out)
         with open(args.json_out, "w", encoding="utf-8") as f:
             json.dump(payload, f, ensure_ascii=False, indent=None if args.json_minify else 2)
         print(f"Wrote JSON: {args.json_out}")
@@ -672,6 +705,43 @@ def main():
     # print to stdout for piping
     if args.json_stdout:
         _ORIG_PRINT(json.dumps(payload, ensure_ascii=False, indent=None if args.json_minify else 2))
+
+    # ---------- Optional inline merge ----------
+    if args.merge:
+        try:
+            merge_script = os.path.join(os.path.dirname(__file__), "plane_merge.py")
+            cmd = [sys.executable, merge_script]
+            # Always print merged JSON to stdout for piping
+            cmd.append("--json-stdout")
+            # Pass through options as requested
+            if args.merge_minify or args.json_minify:
+                cmd.append("--minify")
+            if args.merge_by_hex:
+                cmd.append("--by-hex")
+            if args.merge_datasets:
+                cmd += ["--datasets", args.merge_datasets]
+            if args.merge_enrich_all:
+                cmd.append("--enrich-all")
+            elif args.merge_enrich_in_radius:
+                cmd.append("--enrich-in-radius")
+            if args.merge_json_out:
+                cmd += ["--json-out", args.merge_json_out]
+            if args.merge_prefer:
+                cmd += ["--prefer", args.merge_prefer]
+
+            # Feed our payload to plane_merge via stdin, stream outputs to this process
+            proc = subprocess.run(
+                cmd,
+                input=json.dumps(payload, ensure_ascii=False),
+                text=True,
+                check=False
+            )
+            if proc.returncode != 0:
+                print(f"plane_merge.py exited with code {proc.returncode}", file=sys.stderr)
+        except FileNotFoundError:
+            print("Could not locate plane_merge.py beside this script.", file=sys.stderr)
+        except Exception as e:
+            print(f"Inline merge failed: {e}", file=sys.stderr)
 
     # ---------- Excel export ----------
     if args.xlsx:
@@ -690,6 +760,7 @@ def main():
                 df = pandas.DataFrame(columns=preferred)
             df.to_excel(writer, sheet_name=name, index=False)
 
+        _ensure_parent_dir(args.xlsx)
         with pandas.ExcelWriter(args.xlsx) as writer:
             write_sheet(writer, "OpenSky",  osk_rows, _OSK_FIELDS + ["hex","baro_ft","geo_ft","gs_kt","vs_fpm","mil"])
             write_sheet(writer, "ADSB.lol", lol_rows, ["hex","flight","r","t","lat","lon","alt_baro","alt_geom","gs","track",

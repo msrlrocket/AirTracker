@@ -2,10 +2,27 @@
 
 Compare and merge live aircraft data around a point by querying multiple providers, then export, analyze, and share results.
 
-This repo contains two scripts that work together:
+This repo contains scripts and datasets that work together:
 
 - plane_retreiver.py: Fetches aircraft near a latitude/longitude from OpenSky, ADSB.lol, and the (unofficial) Flightradar24 feed.js endpoint. It prints tables, can tag military aircraft via ADSB.lol, and can export JSON or Excel.
-- plane_merge.py: Takes the JSON output from plane_retreiver.py and merges rows per ICAO hex into a single, human-friendly record, choosing the freshest provider per field. It can output merged JSON and Excel.
+- plane_merge.py: Takes the JSON output from plane_retreiver.py and merges rows per ICAO hex into a single, human-friendly record, choosing the freshest provider per field. It can output merged JSON and Excel, and optionally enrich aircraft with data from local datasets (aircraft types, airports, airlines, countries).
+
+Datasets and converters
+
+- scripts/convert_aircraft_types_to_json.py
+  - Parses datasets/aircraft_types.h into several formats, including JSONL used by the merge step
+  - Key outputs in datasets/:
+    - aircraft_types_full.jsonl — one object per ICAO type with name/manufacturer/model/seats/iata aliases
+    - aircraft_types_lookup.yaml — human-readable map ICAO: {name, seats, manufacturer, model, iata[]}
+    - aircraft_type_map.yaml/json — simple ICAO → display name maps
+
+- scripts/convert_air_catalogs_to_jsonl.py
+  - Parses C++ datasets into JSONL files for lookups:
+    - countries.jsonl — {code, name}
+    - airlines.jsonl — {icao, iata, name, callsign, country_code, country_name}
+    - airports.jsonl — {iata, name, city, region, country_code, country_name, lat, lon, elevation_ft}
+
+Run both converters once (or whenever input datasets change) before using enrichment.
 
 Both scripts aim to be transparent and debuggable: URLs are echoed, optional headers can be tweaked, and data can be dumped for inspection.
 
@@ -47,12 +64,12 @@ Example producer command (stdout → MQTT)
 # Retrieve + merge (stdout), publish nearest (retained)
 python3 plane_retreiver.py <lat> <lon> -r <nm> --json-stdout --quiet \
   | python3 plane_merge.py --json-stdout --minify \
-  | tee /tmp/planes_merged.json \
+  | tee ./data/planes_merged.json \
   | jq -cr '.nearest' \
   | mosquitto_pub -t airtracker/nearest -r -s
 
 # Optionally publish the full merged list (retained)
-cat /tmp/planes_merged.json \
+cat ./data/planes_merged.json \
   | jq -cr '.merged' \
   | mosquitto_pub -t airtracker/planes -r -s
 ```
@@ -171,6 +188,13 @@ JSON handoff (clean stdout) to merge per-hex:
 ```
 python3 plane_retreiver.py 46.168689 -123.020309 -r 50 --json-stdout --quiet \
   | python3 plane_merge.py --json-stdout
+
+Data outputs
+
+- This project now writes caches and debug dumps into `./data` by default:
+  - MIL caches: `./data/mil_cache.json`, `./data/mil_list_cache.json`
+  - Dump files when `--dump` is set: `./data/opensky.json`, `./data/adsb.json`, `./data/fr24_*.json/html`
+- When using `--json-out` or `--xlsx`, it’s recommended to target `./data/...`. The tools auto-create parent folders for provided paths.
 ```
 
 Dump raw provider payloads for debugging:
@@ -178,6 +202,73 @@ Dump raw provider payloads for debugging:
 ```
 python3 plane_retreiver.py 46.168689 -123.020309 -r 50 --dump --debug
 ```
+
+## Run Examples
+
+The commands below cover three common ways to run things: the MQTT publisher script, a one‑shot retrieval+merge via `--merge`, and running the two Python scripts independently. Replace latitude/longitude/radius and MQTT settings as needed.
+
+**MQTT Publisher Script**
+
+- One‑shot publish (useful for testing or HA automations):
+  - `RUN_ONCE=1 bash ./scripts/publish_mqtt.sh`
+- Continuous loop (default behavior):
+  - `bash ./scripts/publish_mqtt.sh`
+- Override settings inline (or via `.env`):
+  - `LAT=46.168689 LON=-123.020309 RADIUS_NM=50 MQTT_HOST=192.168.2.244 MQTT_PREFIX=airtracker RUN_ONCE=1 bash ./scripts/publish_mqtt.sh`
+- Select merge options for the publisher output:
+  - `MERGE_MINIFY=1 MERGE_BY_HEX=0 RUN_ONCE=1 bash ./scripts/publish_mqtt.sh`
+
+Notes
+
+- The publisher retains `nearest` and `planes` at `mqtt://$MQTT_HOST:$MQTT_PORT/$MQTT_PREFIX/{nearest,planes}`.
+- If you only want pretty (non‑minified) JSON on the wire, set `MERGE_MINIFY=0`.
+- You can skip providers with `SKIP_OPENSKY=1`, `SKIP_ADSB=1`, or `SKIP_FR24=1`.
+
+**Home Assistant MQTT Discovery**
+
+- Publish HA discovery configs for all AirTracker sensors:
+  - `bash ./scripts/publish_ha_discovery.sh`
+- Options (CLI or env):
+  - `--dry-run` or `HA_DISCOVERY_DRY_RUN=1` prints intended publishes/removals without changing the broker.
+  - `--prune` or `HA_DISCOVERY_PRUNE=1` removes retained discovery topics that are no longer defined by the script.
+  - `HA_DISCOVERY_PREFIX` (default `homeassistant`), `HA_DEVICE_ID` (default `airtracker`), and `HA_DEVICE_NAME` can be overridden.
+- How prune determines “stale” topics:
+  - Enumerates retained discovery topics under `homeassistant/+/HA_DEVICE_ID/+/config` via `mosquitto_sub`.
+  - Builds the set of topics this script currently publishes for `HA_DEVICE_ID`.
+  - Deletes retained topics that exist on the broker but are not in the expected set, with a safety check that the payload’s `device.identifiers` or `unique_id` matches `HA_DEVICE_ID`.
+- Integrate with the publisher:
+  - The publisher calls discovery once at startup. Set `HA_DISCOVERY_PRUNE=1` in `.env` to also prune stale discovery topics at that time.
+  - Example: `HA_DISCOVERY_PRUNE=1 RUN_ONCE=1 bash ./scripts/publish_mqtt.sh`
+
+**Retriever With Inline Merge (`--merge`)**
+
+- Print merged JSON to stdout in one step (quiet logs):
+  - `python3 plane_retreiver.py 46.168689 -123.020309 -r 50 --json-stdout --quiet --merge --merge-minify`
+- Include a `by_hex` map and write to a file too:
+  - `python3 plane_retreiver.py 46.168689 -123.020309 -r 50 --json-stdout --quiet --merge --merge-minify --merge-by-hex --merge-json-out ./data/planes_merged.json`
+
+This is handy for piping the merged result to other tools, e.g.:
+
+- `python3 plane_retreiver.py 46.168689 -123.020309 -r 50 --json-stdout --quiet --merge --merge-minify | jq -cr '.nearest'`
+
+**Run Each Script Independently**
+
+- Retrieve to a file (quiet stdout):
+  - `python3 plane_retreiver.py 46.168689 -123.020309 -r 50 --json-out ./data/planes_combo.json --json-minify --quiet`
+- Merge from file to stdout, minified:
+  - `python3 plane_merge.py ./data/planes_combo.json --json-stdout --minify`
+- Or pipe directly with `jq` for nearest only:
+  - `python3 plane_retreiver.py 46.168689 -123.020309 -r 50 --json-stdout --quiet | python3 plane_merge.py --json-stdout --minify | jq -cr '.nearest'`
+
+**Using a Virtual Environment (`.venv`)**
+
+- Create and activate, then install deps:
+  - `python3 -m venv .venv && source .venv/bin/activate`
+  - `pip install -U pip requests`  (add `pandas openpyxl` if you plan to export Excel)
+- Run inside the venv (examples):
+  - `(.venv) RUN_ONCE=1 bash ./scripts/publish_mqtt.sh`
+  - `(.venv) python3 plane_retreiver.py 46.168689 -123.020309 -r 50 --json-stdout --quiet --merge --merge-minify`
+  - `(.venv) python3 plane_merge.py ./data/planes_combo.json --json-stdout --minify`
 
 ## OpenSky Credentials
 
@@ -212,6 +303,9 @@ Key features
   - `--json-shm /dev/shm/file` → also write JSON to a tmpfs path
   - `--json-minify` → compact JSON (default is pretty)
   - `--quiet` → redirect console logs/tables to stderr so stdout stays clean
+  - Output JSON keys: `timestamp`, `point`, `mil`, `providers`, `stats`, `all`
+    - `stats.hex_count` is the count of unique ICAO hexes across all providers
+    - `stats.providers_present` lists providers that returned at least one row
 - MIL tagging via ADSB.lol:
   - `--mil-mode perhex` (default): query `/v2/hex/{HEX}` once per new hex (cached with TTL)
   - `--mil-mode list`: fetch `/v2/mil` global list once per TTL and tag via membership
@@ -359,6 +453,43 @@ Enriched fields
 - `within_radius` — boolean, true if within the input `radius_nm`.
 - Top-level `nearest` — convenience object summarizing the closest plane (for low-latency UIs and HA sensors).
 
+Optional dataset enrichment
+
+- The merge can enrich aircraft using local JSONL datasets in `./datasets` (or a custom directory via `--datasets PATH`).
+- Default behavior: the closest aircraft (nearest) in the `merged` list is enriched in-place.
+- `--enrich-all`: enrich every aircraft in `merged` (ignores radius).
+- Added fields when enriched:
+  - `souls_on_board_max` — max seats from the aircraft type catalog or heuristics
+  - `souls_on_board_max_is_estimate` — `false` when from catalog, `true` when inferred via family heuristics
+  - `souls_on_board_max_text` — human-readable value; `"N/A"` when unknown
+  - `lookups.aircraft` — `{ icao, name, manufacturer, model, seats_max, iata_aliases }`
+    - Includes `lookup_status` of `"found"` or `"not_found"`; when not found, `name` falls back to the raw `aircraft_type` code
+  - `lookups.airline` — `{ icao, iata, name, callsign, country_code, country_name }` (from airline_icao or flight number prefix)
+  - `lookups.origin_airport` / `lookups.destination_airport` — details including location and country
+
+Dataset preparation
+
+```
+# Aircraft types (JSON/JSONL/YAML), writes datasets/aircraft_types_full.jsonl
+python3 scripts/convert_aircraft_types_to_json.py
+
+# Countries, airports, airlines (JSONL), writes datasets/*.jsonl
+python3 scripts/convert_air_catalogs_to_jsonl.py
+```
+
+Merge + enrich examples
+
+```
+# Enrich nearest only (default behavior):
+python3 plane_merge.py planes_combo.json --json-out planes_merged.json
+
+# Enrich all merged aircraft (no radius gating):
+python3 plane_merge.py planes_combo.json --enrich-all --json-out planes_merged.json
+
+# Use datasets from a custom directory:
+python3 plane_merge.py planes_combo.json --datasets /path/to/datasets --enrich-all --json-out planes_merged.json
+```
+
 Merged JSON schema (output)
 
 - `timestamp` — unix time (from input payload)
@@ -386,5 +517,5 @@ Excel export (merged)
 This code queries third-party services under their respective terms. Use responsibly and respect rate limits.
 
 To Run:
-python plane_retreiver.py 46.168689192763544, -123.02030882679537 -r 25 --json-out ./planes_combo.json
-python plane_merge.py planes_combo.json --json-out ./planes_merged.json
+python plane_retreiver.py 46.168689192763544, -123.02030882679537 -r 25 --json-out ./data/planes_combo.json
+python plane_merge.py ./data/planes_combo.json --json-out ./data/planes_merged.json

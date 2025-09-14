@@ -1,0 +1,495 @@
+{"icao": "A10", "name": "Fairchild A-10", "seats": 0, "manufacturer": "Fairchild", "model": "A-10", "iata": []}
+{"icao": "A124", "name": "Antonov An-124", "seats": 0, "manufacturer": "Antonov", "model": "An-124 Ruslan", "iata": []}
+{"icao": "A139", "name": "AgustaWestland AW139", "seats": 15, "manufacturer": "AgustaWestland", "model": "AW139", "iata": []}
+{"icao": "A169", "name": "AgustaWestland AW169", "seats": 10, "manufacturer": "AgustaWestland", "model": "AW169", "iata": []}
+{"icao": "A189", "name": "AgustaWestland AW189", "seats": 19, "manufacturer": "AgustaWestland", "model": "AW189", "iata": []}
+{"icao": "A19N", "name": "Airbus A319neo", "seats": 160, "manufacturer": "Airbus", "model": "A319neo", "iata": ["31N"]}
+{"icao": "A20N", "name": "Airbus A320neo", "seats": 194, "manufacturer": "Airbus", "model": "A320neo", "iata": ["32N"]}
+{"icao": "A21N", "name": "Airbus A321neo", "seats": 244, "manufacturer": "Airbus", "model": "A321neo", "iata": ["32Q"]}
+{"icao": "A221", "name": "Airbus A220-100", "seats": 135, "manufacturer": "Airbus", "model": "A220-100", "iata": ["221"]}
+{"icao": "A223", "name": "Airbus A220-300", "seats": 160, "manufacturer": "Airbus", "model": "A220-300", "iata": ["223"]}
+{"icao": "A225", "name": "Antonov An-225", "seats": 0, "manufacturer": "Antonov", "model": "An-225 Mriya", "iata": []}
+{"icao": "A300", "name": "Airbus A300", "seats": 300, "manufacturer": "Airbus", "model": "A300", "iata": ["300"]}
+{"icao": "A300F", "name": "Airbus A300 Freighter (pax eq.)", "seats": 0, "manufacturer": "Airbus", "model": "A300 Freighter (pax eq.)", "iata": []}
+{"icao": "A306", "name": "Airbus A300-600R", "seats": 304, "manufacturer": "Airbus", "model": "A300-600R", "iata": ["306"]}
+{"icao": "A30B", "name": "Airbus A300-600", "seats": 300, "manufacturer": "Airbus", "model": "A300-600", "iata": ["30B"]}
+{"icao": "A310", "name": "Airbus A310", "seats": 220, "manufacturer": "Airbus", "model": "A310", "iata": ["310"]}
+{"icao": "A318", "name": "Airbus A318", "seats": 107, "manufacturer": "Airbus", "model": "A318", "iata": ["318"]}
+{"icao": "A319", "name": "Airbus A319", "seats": 156, "manufacturer": "Airbus", "model": "A319", "iata": ["319"]}
+{"icao": "A320", "name": "Airbus A320", "seats": 186, "manufacturer": "Airbus", "model": "A320", "iata": ["320"]}
+{"icao": "A321", "name": "Airbus A321", "seats": 236, "manufacturer": "Airbus", "model": "A321", "iata": ["321"]}
+{"icao": "A332", "name": "Airbus A330-200", "seats": 260, "manufacturer": "Airbus", "model": "A330-200", "iata": ["332"]}
+{"icao": "A333", "name": "Airbus A330-300", "seats": 300, "manufacturer": "Airbus", "model": "A330-300", "iata": ["333"]}
+{"icao": "A337", "name": "Airbus BelugaXL", "seats": 0, "manufacturer": "Airbus", "model": "A330-700 BelugaXL", "iata": []}
+{"icao": "A338", "name": "Airbus A330-800neo", "seats": 260, "manufacturer": "Airbus", "model": "A330-800neo", "iata": ["338"]}
+{"icao": "A339", "name": "Airbus A330-900neo", "seats": 300, "manufacturer": "Airbus", "model": "A330-900neo", "iata": ["339"]}
+{"icao": "A342", "name": "Airbus A340-200", "seats": 261, "manufacturer": "Airbus", "model": "A340-200", "iata": ["342"]}
+{"icao": "A343", "name": "Airbus A340-300", "seats": 295, "manufacturer": "Airbus", "model": "A340-300", "iata": ["343"]}
+{"icao": "A345", "name": "Airbus A340-500", "seats": 310, "manufacturer": "Airbus", "model": "A340-500", "iata": ["345"]}
+{"icao": "A346", "name": "Airbus A340-600", "seats": 380, "manufacturer": "Airbus", "model": "A340-600", "iata": ["346"]}
+{"icao": "A359", "name": "Airbus A350-900", "seats": 350, "manufacturer": "Airbus", "model": "A350-900", "iata": ["359"]}
+{"icao": "A35F", "name": "Airbus A350F (pax eq.)", "seats": 0, "manufacturer": "Airbus", "model": "A350F (pax eq.)", "iata": []}
+{"icao": "A35K", "name": "Airbus A350-1000", "seats": 410, "manufacturer": "Airbus", "model": "A350-1000", "iata": ["35K"]}
+{"icao": "A388", "name": "Airbus A380-800", "seats": 615, "manufacturer": "Airbus", "model": "A380-800", "iata": ["388"]}
+{"icao": "A3ST", "name": "Airbus BelugaST", "seats": 5, "manufacturer": "Airbus", "model": "BelugaST", "iata": []}
+{"icao": "A400", "name": "Airbus A400M", "seats": 0, "manufacturer": "Airbus", "model": "A400M Atlas", "iata": []}
+{"icao": "A5", "name": "Icon A-5", "seats": 2, "manufacturer": "ICON", "model": "A-5", "iata": []}
+{"icao": "A748", "name": "Hawker Siddeley HS 748", "seats": 60, "manufacturer": "Hawker Siddeley", "model": "HS 748", "iata": ["HS7"]}
+{"icao": "AA1", "name": "Grumman American AA-1", "seats": 2, "manufacturer": "Grumman American", "model": "AA-1", "iata": []}
+{"icao": "AA5", "name": "Grumman American AA-5", "seats": 4, "manufacturer": "Grumman American", "model": "AA-5", "iata": []}
+{"icao": "AC11", "name": "Rockwell Commander 112", "seats": 4, "manufacturer": "Rockwell", "model": "Commander 112", "iata": []}
+{"icao": "AC50", "name": "Aero Commander 500", "seats": 6, "manufacturer": "Aero Commander", "model": "500", "iata": []}
+{"icao": "AC56", "name": "Aero Commander 560", "seats": 6, "manufacturer": "Aero Commander", "model": "560", "iata": []}
+{"icao": "AC68", "name": "Aero Commander 680FP", "seats": 8, "manufacturer": "Aero Commander", "model": "680FP", "iata": []}
+{"icao": "AC6L", "name": "Aero Commander 680FL", "seats": 8, "manufacturer": "Aero Commander", "model": "680FL", "iata": []}
+{"icao": "AC80", "name": "Rockwell Turbo 680", "seats": 8, "manufacturer": "Rockwell", "model": "Turbo 680", "iata": []}
+{"icao": "AC90", "name": "Turbo Commander 690", "seats": 11, "manufacturer": "Gulfstream/Rockwell", "model": "Turbo Commander 690", "iata": ["ACT"]}
+{"icao": "AC95", "name": "Jetprop Commander 1000", "seats": 11, "manufacturer": "Gulfstream/Rockwell", "model": "Jetprop Commander 1000", "iata": []}
+{"icao": "ADSB_ICAO", "name": "ADS-B ICAO Target", "seats": 0, "manufacturer": "", "model": "", "iata": []}
+{"icao": "AEST", "name": "Piper Aerostar", "seats": 6, "manufacturer": "Piper", "model": "Aerostar", "iata": []}
+{"icao": "AJ27", "name": "Comac ARJ21-700", "seats": 90, "manufacturer": "Comac", "model": "ARJ21-700", "iata": ["C27"]}
+{"icao": "AN12", "name": "Antonov An-12", "seats": 0, "manufacturer": "Antonov", "model": "An-12", "iata": ["ANF"]}
+{"icao": "AN148", "name": "Antonov An-148", "seats": 85, "manufacturer": "Antonov", "model": "An-148", "iata": []}
+{"icao": "AN158", "name": "Antonov An-158", "seats": 99, "manufacturer": "Antonov", "model": "An-158", "iata": []}
+{"icao": "AN2", "name": "Antonov An-2", "seats": 12, "manufacturer": "Antonov", "model": "An-2", "iata": []}
+{"icao": "AN24", "name": "Antonov An-24", "seats": 52, "manufacturer": "Antonov", "model": "An-24", "iata": ["AN4"]}
+{"icao": "AN26", "name": "Antonov An-26", "seats": 50, "manufacturer": "Antonov", "model": "An-26", "iata": ["A26"]}
+{"icao": "AN28", "name": "Antonov An-28", "seats": 19, "manufacturer": "Antonov", "model": "An-28", "iata": ["A28"]}
+{"icao": "AN30", "name": "Antonov An-30", "seats": 33, "manufacturer": "Antonov", "model": "An-30", "iata": ["A30"]}
+{"icao": "AN32", "name": "Antonov An-32", "seats": 52, "manufacturer": "Antonov", "model": "An-32", "iata": ["A32"]}
+{"icao": "AN72", "name": "Antonov An-72/74", "seats": 52, "manufacturer": "Antonov", "model": "An-72/74", "iata": ["AN7"]}
+{"icao": "AR11", "name": "Aeronca 11 Chief", "seats": 2, "manufacturer": "Aeronca", "model": "11 Chief", "iata": []}
+{"icao": "ARJ1", "name": "Comac ARJ21-700", "seats": 90, "manufacturer": "Comac", "model": "ARJ21-700", "iata": ["AR1"]}
+{"icao": "ASTR", "name": "IAI Astra 1125", "seats": 9, "manufacturer": "IAI", "model": "Astra 1125", "iata": []}
+{"icao": "AT3T", "name": "Air Tractor AT-402", "seats": 1, "manufacturer": "Air Tractor", "model": "AT-402", "iata": []}
+{"icao": "AT43", "name": "ATR ATR 42-300/320", "seats": 50, "manufacturer": "ATR", "model": "ATR 42-300/320", "iata": ["AT4"]}
+{"icao": "AT44", "name": "ATR 42-400", "seats": 50, "manufacturer": "ATR", "model": "ATR 42-400", "iata": []}
+{"icao": "AT45", "name": "ATR 42-500", "seats": 50, "manufacturer": "ATR", "model": "ATR 42-500", "iata": ["AT5"]}
+{"icao": "AT46", "name": "ATR 42-600", "seats": 50, "manufacturer": "ATR", "model": "ATR 42-600", "iata": ["ATR"]}
+{"icao": "AT5T", "name": "Air Tractor AT-503", "seats": 1, "manufacturer": "Air Tractor", "model": "AT-503", "iata": []}
+{"icao": "AT6T", "name": "Air Tractor AT-602", "seats": 1, "manufacturer": "Air Tractor", "model": "AT-602", "iata": []}
+{"icao": "AT72", "name": "ATR 72", "seats": 78, "manufacturer": "ATR", "model": "ATR 72", "iata": ["AT7"]}
+{"icao": "AT73", "name": "ATR ATR 72-211/212", "seats": 74, "manufacturer": "ATR", "model": "ATR 72-211/212", "iata": ["ATR"]}
+{"icao": "AT75", "name": "ATR ATR 72-500", "seats": 74, "manufacturer": "ATR", "model": "ATR 72-500", "iata": ["ATR"]}
+{"icao": "AT76", "name": "ATR 72-600", "seats": 78, "manufacturer": "ATR", "model": "ATR 72-600", "iata": ["ATR"]}
+{"icao": "AT8T", "name": "Air Tractor AT-802", "seats": 2, "manufacturer": "Air Tractor", "model": "AT-802", "iata": []}
+{"icao": "ATP", "name": "BAe ATP", "seats": 72, "manufacturer": "BAe", "model": "ATP", "iata": ["ATP"]}
+{"icao": "B06", "name": "Bell 206", "seats": 6, "manufacturer": "Bell", "model": "206", "iata": []}
+{"icao": "B18T", "name": "Beech 18 (Turbo)", "seats": 8, "manufacturer": "Beechcraft", "model": "18 (Turbo)", "iata": []}
+{"icao": "B190", "name": "Beechcraft 1900D", "seats": 19, "manufacturer": "Beechcraft", "model": "1900/1900D", "iata": []}
+{"icao": "B2", "name": "B-2 Spirit", "seats": 2, "manufacturer": "Northrop Grumman", "model": "B-2 Spirit", "iata": []}
+{"icao": "B350", "name": "Beech Super King Air 350", "seats": 11, "manufacturer": "Beechcraft", "model": "Super King Air 350", "iata": []}
+{"icao": "B36T", "name": "Turbine Bonanza 36", "seats": 4, "manufacturer": "Beechcraft", "model": "Turbine Bonanza 36", "iata": []}
+{"icao": "B37M", "name": "Boeing 737 MAX 7", "seats": 172, "manufacturer": "Boeing", "model": "737 MAX 7", "iata": ["7M7"]}
+{"icao": "B38M", "name": "Boeing 737 MAX 8", "seats": 197, "manufacturer": "Boeing", "model": "737 MAX 8", "iata": ["7M8"]}
+{"icao": "B39M", "name": "Boeing 737 MAX 9", "seats": 220, "manufacturer": "Boeing", "model": "737 MAX 9", "iata": ["7M9"]}
+{"icao": "B3XM", "name": "Boeing 737 MAX 10", "seats": 230, "manufacturer": "Boeing", "model": "737 MAX 10", "iata": ["7MJ"]}
+{"icao": "B407", "name": "Bell 407", "seats": 6, "manufacturer": "Bell", "model": "407", "iata": []}
+{"icao": "B412", "name": "Bell 412", "seats": 15, "manufacturer": "Bell", "model": "412", "iata": []}
+{"icao": "B461", "name": "BAe 146-100", "seats": 82, "manufacturer": "British Aerospace", "model": "BAe 146-100", "iata": ["141"]}
+{"icao": "B462", "name": "BAe 146-200", "seats": 100, "manufacturer": "British Aerospace", "model": "BAe 146-200", "iata": ["142"]}
+{"icao": "B463", "name": "BAe 146-300", "seats": 116, "manufacturer": "British Aerospace", "model": "BAe 146-300", "iata": ["143"]}
+{"icao": "B52", "name": "B-52 Stratofortress", "seats": 8, "manufacturer": "Boeing", "model": "B-52 Stratofortress", "iata": []}
+{"icao": "B701", "name": "Boeing 707-120", "seats": 179, "manufacturer": "Boeing", "model": "707-120", "iata": ["701"]}
+{"icao": "B703", "name": "Boeing 707-320", "seats": 189, "manufacturer": "Boeing", "model": "707-320", "iata": ["703"]}
+{"icao": "B712", "name": "Boeing 717", "seats": 0, "manufacturer": "", "model": "", "iata": []}
+{"icao": "B720", "name": "Boeing 720", "seats": 149, "manufacturer": "Boeing", "model": "720", "iata": ["720"]}
+{"icao": "B721", "name": "Boeing 727-100", "seats": 131, "manufacturer": "Boeing", "model": "727-100", "iata": ["721"]}
+{"icao": "B722", "name": "Boeing 727-200", "seats": 189, "manufacturer": "Boeing", "model": "727-200", "iata": ["722"]}
+{"icao": "B731", "name": "Boeing 737-100", "seats": 104, "manufacturer": "Boeing", "model": "737-100", "iata": ["731"]}
+{"icao": "B732", "name": "Boeing 737-200", "seats": 130, "manufacturer": "Boeing", "model": "737-200", "iata": ["732"]}
+{"icao": "B733", "name": "Boeing 737-300", "seats": 149, "manufacturer": "Boeing", "model": "737-300", "iata": ["733", "73C", "73Y"]}
+{"icao": "B734", "name": "Boeing 737-400", "seats": 168, "manufacturer": "Boeing", "model": "737-400", "iata": ["734", "73P"]}
+{"icao": "B735", "name": "Boeing 737-500", "seats": 132, "manufacturer": "Boeing", "model": "737-500", "iata": ["735"]}
+{"icao": "B736", "name": "Boeing 737-600", "seats": 132, "manufacturer": "Boeing", "model": "737-600", "iata": ["736"]}
+{"icao": "B737", "name": "Boeing 737-700", "seats": 149, "manufacturer": "Boeing", "model": "737-700", "iata": ["737", "73W"]}
+{"icao": "B738", "name": "Boeing 737-800", "seats": 189, "manufacturer": "Boeing", "model": "737-800", "iata": ["738", "73H", "73K", "73U"]}
+{"icao": "B739", "name": "Boeing 737-900", "seats": 220, "manufacturer": "Boeing", "model": "737-900", "iata": ["739", "73J"]}
+{"icao": "B741", "name": "Boeing 747-100", "seats": 452, "manufacturer": "Boeing", "model": "747-100", "iata": ["741"]}
+{"icao": "B741F", "name": "Boeing 747-100F (pax eq.)", "seats": 0, "manufacturer": "Boeing", "model": "747-100F (pax eq.)", "iata": []}
+{"icao": "B742", "name": "Boeing 747-200", "seats": 452, "manufacturer": "Boeing", "model": "747-200", "iata": ["742"]}
+{"icao": "B743", "name": "Boeing 747-300", "seats": 496, "manufacturer": "Boeing", "model": "747-300", "iata": ["743"]}
+{"icao": "B744", "name": "Boeing 747-400", "seats": 524, "manufacturer": "Boeing", "model": "747-400", "iata": ["744"]}
+{"icao": "B748", "name": "Boeing 747-8", "seats": 467, "manufacturer": "Boeing", "model": "747-8", "iata": ["748", "74H", "74N"]}
+{"icao": "B74R", "name": "Boeing 747SR", "seats": 550, "manufacturer": "Boeing", "model": "747SR", "iata": ["74R", "74V"]}
+{"icao": "B74S", "name": "Boeing 747SP", "seats": 313, "manufacturer": "Boeing", "model": "747SP", "iata": ["74L"]}
+{"icao": "B752", "name": "Boeing 757-200", "seats": 235, "manufacturer": "Boeing", "model": "757-200", "iata": ["752"]}
+{"icao": "B753", "name": "Boeing 757-300", "seats": 295, "manufacturer": "Boeing", "model": "757-300", "iata": ["753"]}
+{"icao": "B762", "name": "Boeing 767-200", "seats": 255, "manufacturer": "Boeing", "model": "767-200", "iata": ["762"]}
+{"icao": "B763", "name": "Boeing 767-300", "seats": 269, "manufacturer": "Boeing", "model": "767-300", "iata": ["763"]}
+{"icao": "B764", "name": "Boeing 767-400ER", "seats": 304, "manufacturer": "Boeing", "model": "767-400ER", "iata": ["764"]}
+{"icao": "B772", "name": "Boeing 777-200", "seats": 396, "manufacturer": "Boeing", "model": "777-200", "iata": ["772"]}
+{"icao": "B773", "name": "Boeing 777-300", "seats": 451, "manufacturer": "Boeing", "model": "777-300", "iata": ["773"]}
+{"icao": "B778", "name": "Boeing 777-8", "seats": 384, "manufacturer": "Boeing", "model": "777-8", "iata": ["778"]}
+{"icao": "B779", "name": "Boeing 777-9", "seats": 426, "manufacturer": "Boeing", "model": "777-9", "iata": ["779"]}
+{"icao": "B77L", "name": "Boeing 777-200LR", "seats": 317, "manufacturer": "Boeing", "model": "777-200LR", "iata": ["77L", "77X"]}
+{"icao": "B77W", "name": "Boeing 777-300ER", "seats": 451, "manufacturer": "Boeing", "model": "777-300ER", "iata": ["77W"]}
+{"icao": "B788", "name": "Boeing 787-8", "seats": 248, "manufacturer": "Boeing", "model": "787-8", "iata": ["788"]}
+{"icao": "B789", "name": "Boeing 787-9", "seats": 296, "manufacturer": "Boeing", "model": "787-9", "iata": ["789"]}
+{"icao": "B78X", "name": "Boeing 787-10", "seats": 330, "manufacturer": "Boeing", "model": "787-10", "iata": ["78X"]}
+{"icao": "BA11", "name": "British Aerospace BAe 146-100", "seats": 82, "manufacturer": "British Aerospace", "model": "BAe 146-100", "iata": []}
+{"icao": "BA12", "name": "British Aerospace BAe 146-200", "seats": 100, "manufacturer": "British Aerospace", "model": "BAe 146-200", "iata": []}
+{"icao": "BA13", "name": "British Aerospace BAe 146-300", "seats": 116, "manufacturer": "British Aerospace", "model": "BAe 146-300", "iata": []}
+{"icao": "BCS1", "name": "Airbus A220-100", "seats": 135, "manufacturer": "Airbus", "model": "A220-100", "iata": ["221"]}
+{"icao": "BCS3", "name": "Airbus A220-300", "seats": 160, "manufacturer": "Airbus", "model": "A220-300", "iata": ["223"]}
+{"icao": "BE10", "name": "Beech King Air 100", "seats": 9, "manufacturer": "Beechcraft", "model": "King Air 100", "iata": []}
+{"icao": "BE18", "name": "Beech 18", "seats": 8, "manufacturer": "Beechcraft", "model": "18", "iata": []}
+{"icao": "BE19", "name": "Beech B19 Musketeer", "seats": 4, "manufacturer": "Beechcraft", "model": "B19 Musketeer", "iata": []}
+{"icao": "BE20", "name": "Beech Super King Air 200", "seats": 13, "manufacturer": "Beechcraft", "model": "Super King Air 200", "iata": []}
+{"icao": "BE23", "name": "Beech 23 Sundowner", "seats": 4, "manufacturer": "Beechcraft", "model": "23 Sundowner", "iata": []}
+{"icao": "BE24", "name": "Beech 24 Sierra", "seats": 4, "manufacturer": "Beechcraft", "model": "24 Sierra", "iata": []}
+{"icao": "BE30", "name": "Beech Super King Air 300/350", "seats": 11, "manufacturer": "Beechcraft", "model": "Super King Air 300/350", "iata": []}
+{"icao": "BE33", "name": "Beech Bonanza 33", "seats": 4, "manufacturer": "Beechcraft", "model": "Bonanza 33", "iata": []}
+{"icao": "BE35", "name": "Beech Bonanza 35", "seats": 4, "manufacturer": "Beechcraft", "model": "Bonanza 35", "iata": []}
+{"icao": "BE36", "name": "Beech Bonanza 36", "seats": 4, "manufacturer": "Beechcraft", "model": "Bonanza 36", "iata": []}
+{"icao": "BE40", "name": "Beechjet 400/T-1 Jayhawk", "seats": 8, "manufacturer": "Raytheon/Beech", "model": "Beechjet 400/T-1", "iata": []}
+{"icao": "BE50", "name": "Beech 50 Twin Bonanza", "seats": 5, "manufacturer": "Beechcraft", "model": "50 Twin Bonanza", "iata": []}
+{"icao": "BE55", "name": "Beech Baron 55", "seats": 6, "manufacturer": "Beechcraft", "model": "Baron 55", "iata": []}
+{"icao": "BE58", "name": "Beechcraft Baron 58", "seats": 6, "manufacturer": "Beechcraft", "model": "Baron 58", "iata": []}
+{"icao": "BE60", "name": "Beech 60 Duke", "seats": 6, "manufacturer": "Beechcraft", "model": "60 Duke", "iata": []}
+{"icao": "BE65", "name": "Beech 65 Queen Air", "seats": 9, "manufacturer": "Beechcraft", "model": "65 Queen Air", "iata": []}
+{"icao": "BE70", "name": "Beech 70 Queen Air", "seats": 8, "manufacturer": "Beechcraft", "model": "70 Queen Air", "iata": []}
+{"icao": "BE76", "name": "Beech 76 Duchess", "seats": 4, "manufacturer": "Beechcraft", "model": "76 Duchess", "iata": []}
+{"icao": "BE77", "name": "Beech 77 Skipper", "seats": 2, "manufacturer": "Beechcraft", "model": "77 Skipper", "iata": []}
+{"icao": "BE80", "name": "Beech 80 Queen Air", "seats": 8, "manufacturer": "Beechcraft", "model": "80 Queen Air", "iata": []}
+{"icao": "BE95", "name": "Beech 95 Travel Air", "seats": 4, "manufacturer": "Beechcraft", "model": "95 Travel Air", "iata": []}
+{"icao": "BE99", "name": "Beechcraft Model 99 Airliner", "seats": 17, "manufacturer": "Beechcraft", "model": "Model 99 Airliner", "iata": []}
+{"icao": "BE9L", "name": "Beech King Air 90", "seats": 9, "manufacturer": "Beechcraft", "model": "King Air 90", "iata": []}
+{"icao": "BE9T", "name": "Beech F90 King Air", "seats": 9, "manufacturer": "Beechcraft", "model": "F90 King Air", "iata": []}
+{"icao": "BELF", "name": "Shorts SC-5 Belfast", "seats": 43, "manufacturer": "Shorts", "model": "SC-5 Belfast", "iata": ["SHB"]}
+{"icao": "BLCF", "name": "Boeing 747 LCF Dreamlifter", "seats": 8, "manufacturer": "Boeing", "model": "747 LCF Dreamlifter", "iata": []}
+{"icao": "BT36", "name": "Beech 36 Bonanza", "seats": 4, "manufacturer": "Beechcraft", "model": "36 Bonanza", "iata": []}
+{"icao": "C120", "name": "Cessna 120", "seats": 2, "manufacturer": "Cessna", "model": "120", "iata": []}
+{"icao": "C130", "name": "C-130 Hercules", "seats": 92, "manufacturer": "Lockheed Martin", "model": "C-130 Hercules", "iata": []}
+{"icao": "C140", "name": "Cessna 140", "seats": 2, "manufacturer": "Cessna", "model": "140", "iata": []}
+{"icao": "C150", "name": "Cessna 150", "seats": 2, "manufacturer": "Cessna", "model": "150", "iata": []}
+{"icao": "C152", "name": "Cessna 152", "seats": 2, "manufacturer": "Cessna", "model": "152", "iata": []}
+{"icao": "C160", "name": "Transall C-160", "seats": 0, "manufacturer": "Transall", "model": "C-160", "iata": []}
+{"icao": "C162", "name": "Cessna 162 Skycatcher", "seats": 2, "manufacturer": "Cessna", "model": "162 Skycatcher", "iata": []}
+{"icao": "C17", "name": "C-17 Globemaster III", "seats": 170, "manufacturer": "Boeing", "model": "C-17 Globemaster III", "iata": []}
+{"icao": "C170", "name": "Cessna 170", "seats": 4, "manufacturer": "Cessna", "model": "170", "iata": []}
+{"icao": "C172", "name": "Cessna 172", "seats": 4, "manufacturer": "Cessna", "model": "172", "iata": []}
+{"icao": "C175", "name": "Cessna 175", "seats": 4, "manufacturer": "Cessna", "model": "175", "iata": []}
+{"icao": "C177", "name": "Cessna 177 Cardinal", "seats": 4, "manufacturer": "Cessna", "model": "177 Cardinal", "iata": []}
+{"icao": "C180", "name": "Cessna 180 Skywagon", "seats": 4, "manufacturer": "Cessna", "model": "180 Skywagon", "iata": []}
+{"icao": "C182", "name": "Cessna 182", "seats": 4, "manufacturer": "Cessna", "model": "182", "iata": []}
+{"icao": "C185", "name": "Cessna 185 Skywagon", "seats": 6, "manufacturer": "Cessna", "model": "185 Skywagon", "iata": []}
+{"icao": "C188", "name": "Cessna 188", "seats": 1, "manufacturer": "Cessna", "model": "188", "iata": []}
+{"icao": "C195", "name": "Cessna 195", "seats": 5, "manufacturer": "Cessna", "model": "195", "iata": []}
+{"icao": "C206", "name": "Cessna 206", "seats": 6, "manufacturer": "Cessna", "model": "206", "iata": []}
+{"icao": "C207", "name": "Cessna 207 Stationair 7", "seats": 7, "manufacturer": "Cessna", "model": "207 Stationair 7", "iata": []}
+{"icao": "C208", "name": "Cessna 208 Caravan", "seats": 12, "manufacturer": "Cessna", "model": "208 Caravan", "iata": []}
+{"icao": "C208A", "name": "Cessna 208 Caravan Amphibian", "seats": 12, "manufacturer": "Cessna", "model": "208 Caravan Amphibian", "iata": []}
+{"icao": "C210", "name": "Cessna 210", "seats": 6, "manufacturer": "Cessna", "model": "210 Centurion", "iata": []}
+{"icao": "C212", "name": "CASA 212 Aviocar", "seats": 26, "manufacturer": "CASA", "model": "212 Aviocar", "iata": []}
+{"icao": "C240", "name": "Cessna TTx T240", "seats": 4, "manufacturer": "Cessna", "model": "TTx T240", "iata": []}
+{"icao": "C25A", "name": "Cessna Citation CJ2", "seats": 8, "manufacturer": "Cessna", "model": "CJ2", "iata": []}
+{"icao": "C25B", "name": "Cessna Citation CJ3", "seats": 8, "manufacturer": "Cessna", "model": "CJ3", "iata": []}
+{"icao": "C25C", "name": "Cessna Citation CJ4", "seats": 9, "manufacturer": "Cessna", "model": "CJ4", "iata": []}
+{"icao": "C27J", "name": "Leonardo C-27J Spartan", "seats": 60, "manufacturer": "Leonardo", "model": "C-27J Spartan", "iata": []}
+{"icao": "C295", "name": "Airbus Military C-295", "seats": 71, "manufacturer": "Airbus Military", "model": "C-295", "iata": []}
+{"icao": "C303", "name": "Cessna 303 Crusader", "seats": 6, "manufacturer": "Cessna", "model": "303 Crusader", "iata": []}
+{"icao": "C30J", "name": "Lockheed Martin C-130J Hercules", "seats": 92, "manufacturer": "Lockheed Martin", "model": "C-130J Hercules", "iata": []}
+{"icao": "C310", "name": "Cessna 310", "seats": 6, "manufacturer": "Cessna", "model": "310", "iata": []}
+{"icao": "C320", "name": "Cessna 320 Skyknight", "seats": 6, "manufacturer": "Cessna", "model": "320 Skyknight", "iata": []}
+{"icao": "C335", "name": "Cessna 335", "seats": 6, "manufacturer": "Cessna", "model": "335", "iata": []}
+{"icao": "C337", "name": "Cessna 337 Skymaster", "seats": 6, "manufacturer": "Cessna", "model": "337 Skymaster", "iata": []}
+{"icao": "C340", "name": "Cessna 340", "seats": 6, "manufacturer": "Cessna", "model": "340", "iata": []}
+{"icao": "C350", "name": "Cessna 350 Corvalis", "seats": 4, "manufacturer": "Cessna", "model": "350 Corvalis", "iata": []}
+{"icao": "C400", "name": "Cessna 400 Corvalis TT", "seats": 4, "manufacturer": "Cessna", "model": "400 Corvalis TT", "iata": []}
+{"icao": "C402", "name": "Cessna 401/402", "seats": 10, "manufacturer": "Cessna", "model": "401/402", "iata": []}
+{"icao": "C404", "name": "Cessna 404 Titan", "seats": 10, "manufacturer": "Cessna", "model": "404 Titan", "iata": []}
+{"icao": "C408", "name": "Cessna 408 SkyCourier", "seats": 19, "manufacturer": "Cessna", "model": "408 SkyCourier", "iata": []}
+{"icao": "C414", "name": "Cessna 414 Chancellor", "seats": 8, "manufacturer": "Cessna", "model": "414 Chancellor", "iata": []}
+{"icao": "C421", "name": "Cessna 421 Golden Eagle", "seats": 8, "manufacturer": "Cessna", "model": "421 Golden Eagle", "iata": []}
+{"icao": "C425", "name": "Cessna 425 Corsair", "seats": 7, "manufacturer": "Cessna", "model": "425 Corsair", "iata": []}
+{"icao": "C441", "name": "Cessna 441 Conquest", "seats": 9, "manufacturer": "Cessna", "model": "441 Conquest", "iata": []}
+{"icao": "C5", "name": "Lockheed Martin C-5 Galaxy", "seats": 345, "manufacturer": "Lockheed Martin", "model": "C-5 Galaxy", "iata": []}
+{"icao": "C500", "name": "Cessna Citation I", "seats": 7, "manufacturer": "Cessna", "model": "Citation I", "iata": []}
+{"icao": "C501", "name": "Cessna Citation I/SP", "seats": 7, "manufacturer": "Cessna", "model": "Citation I/SP", "iata": []}
+{"icao": "C510", "name": "Cessna Citation Mustang", "seats": 5, "manufacturer": "Cessna", "model": "Citation Mustang", "iata": []}
+{"icao": "C525", "name": "Cessna CitationJet CJ1", "seats": 6, "manufacturer": "Cessna", "model": "CitationJet CJ1", "iata": []}
+{"icao": "C526", "name": "Cessna 526 CitationJet", "seats": 2, "manufacturer": "Cessna", "model": "526 CitationJet", "iata": []}
+{"icao": "C550", "name": "Cessna Citation II/Bravo", "seats": 9, "manufacturer": "Cessna", "model": "Citation II/Bravo", "iata": []}
+{"icao": "C551", "name": "Cessna Citation II/SP", "seats": 9, "manufacturer": "Cessna", "model": "Citation II/SP", "iata": []}
+{"icao": "C55B", "name": "Cessna Citation Bravo", "seats": 9, "manufacturer": "Cessna", "model": "Citation Bravo", "iata": []}
+{"icao": "C560", "name": "Cessna Citation V/Ultra/Encore", "seats": 9, "manufacturer": "Cessna", "model": "Citation V/Ultra/Encore", "iata": []}
+{"icao": "C56X", "name": "Cessna Citation Excel/XLS", "seats": 9, "manufacturer": "Cessna", "model": "Citation Excel/XLS", "iata": []}
+{"icao": "C5M", "name": "Lockheed Martin C-5M Super Galaxy", "seats": 345, "manufacturer": "Lockheed Martin", "model": "C-5M Super Galaxy", "iata": []}
+{"icao": "C650", "name": "Cessna Citation III/VI/VII", "seats": 0, "manufacturer": "", "model": "", "iata": []}
+{"icao": "C680", "name": "Cessna Citation Sovereign", "seats": 0, "manufacturer": "", "model": "", "iata": []}
+{"icao": "C68A", "name": "Cessna Citation Latitude", "seats": 12, "manufacturer": "Cessna", "model": "Citation Latitude", "iata": []}
+{"icao": "C700", "name": "Cessna Citation Longitude", "seats": 0, "manufacturer": "", "model": "", "iata": []}
+{"icao": "C72R", "name": "Cessna 172RG Cutlass RG", "seats": 4, "manufacturer": "Cessna", "model": "172RG Cutlass RG", "iata": []}
+{"icao": "C750", "name": "Cessna Citation X", "seats": 0, "manufacturer": "", "model": "", "iata": []}
+{"icao": "C77R", "name": "Cessna 177RG", "seats": 4, "manufacturer": "Cessna", "model": "177RG", "iata": []}
+{"icao": "C82R", "name": "Cessna 182RG", "seats": 4, "manufacturer": "Cessna", "model": "182RG", "iata": []}
+{"icao": "C919", "name": "Comac C919", "seats": 174, "manufacturer": "Comac", "model": "C919", "iata": []}
+{"icao": "CH47", "name": "Boeing CH-47 Chinook", "seats": 55, "manufacturer": "Boeing", "model": "CH-47 Chinook", "iata": []}
+{"icao": "CH7A", "name": "Aeronca 7AC", "seats": 2, "manufacturer": "Aeronca", "model": "7AC", "iata": []}
+{"icao": "CH7B", "name": "Bellanca 7GCBC Citabria", "seats": 2, "manufacturer": "Bellanca", "model": "7GCBC Citabria", "iata": []}
+{"icao": "CL30", "name": "Challenger 300", "seats": 9, "manufacturer": "Bombardier", "model": "Challenger 300", "iata": ["C30"]}
+{"icao": "CL35", "name": "Challenger 350", "seats": 10, "manufacturer": "Bombardier", "model": "Challenger 350", "iata": ["C35"]}
+{"icao": "CL41", "name": "Canadair CT-114 Tutor", "seats": 1, "manufacturer": "Canadair", "model": "CT-114 Tutor", "iata": []}
+{"icao": "CL60", "name": "Challenger 600", "seats": 12, "manufacturer": "Bombardier", "model": "Challenger 600", "iata": ["CRJ"]}
+{"icao": "CN35", "name": "Airbus Military CN-235", "seats": 45, "manufacturer": "Airbus Military", "model": "CN-235", "iata": []}
+{"icao": "COL3", "name": "Lancair LC-40 Columbia 300", "seats": 4, "manufacturer": "Lancair", "model": "LC-40 Columbia 300", "iata": []}
+{"icao": "COL4", "name": "Lancair LC-41 Columbia 400", "seats": 4, "manufacturer": "Lancair", "model": "LC-41 Columbia 400", "iata": []}
+{"icao": "COUR", "name": "Helio U-10 Super Courier", "seats": 6, "manufacturer": "Helio", "model": "U-10 Super Courier", "iata": []}
+{"icao": "CRJ1", "name": "Bombardier CRJ100", "seats": 50, "manufacturer": "Bombardier", "model": "CRJ100", "iata": ["CR1"]}
+{"icao": "CRJ2", "name": "Bombardier CRJ200", "seats": 50, "manufacturer": "Bombardier", "model": "CRJ200", "iata": ["CR2"]}
+{"icao": "CRJ7", "name": "Bombardier CRJ700", "seats": 78, "manufacturer": "Bombardier", "model": "CRJ700", "iata": ["CR7"]}
+{"icao": "CRJ9", "name": "Bombardier CRJ900", "seats": 90, "manufacturer": "Bombardier", "model": "CRJ900", "iata": ["CR9"]}
+{"icao": "CRJX", "name": "Bombardier CRJ1000", "seats": 104, "manufacturer": "Bombardier", "model": "CRJ1000", "iata": ["CRK"]}
+{"icao": "CRUZ", "name": "CZAW SportCruiser", "seats": 2, "manufacturer": "CZAW", "model": "SportCruiser", "iata": []}
+{"icao": "CVLP", "name": "Convair CV-440 Metropolitan", "seats": 86, "manufacturer": "Convair", "model": "CV-440 Metropolitan", "iata": []}
+{"icao": "CVLT", "name": "Convair CV-580/600/640", "seats": 60, "manufacturer": "Convair", "model": "CV-580/600/640", "iata": ["CV5"]}
+{"icao": "D228", "name": "Dornier Do 228", "seats": 19, "manufacturer": "Dornier", "model": "Do 228", "iata": []}
+{"icao": "D328", "name": "Dornier 328-100", "seats": 33, "manufacturer": "Dornier", "model": "Do 328-100", "iata": []}
+{"icao": "DA40", "name": "Diamond DA40", "seats": 4, "manufacturer": "Diamond", "model": "DA40", "iata": []}
+{"icao": "DA42", "name": "Diamond DA42", "seats": 4, "manufacturer": "Diamond", "model": "DA42 Twin Star", "iata": []}
+{"icao": "DA62", "name": "Diamond DA62", "seats": 7, "manufacturer": "Diamond", "model": "DA62", "iata": []}
+{"icao": "DC10", "name": "Douglas DC-10-10/-15 Passenger", "seats": 380, "manufacturer": "Douglas", "model": "DC-10-10/-15 Passenger", "iata": ["D11", "D1C", "D1M", "D1X", "D1Y"]}
+{"icao": "DC3", "name": "Douglas DC-3", "seats": 0, "manufacturer": "", "model": "", "iata": []}
+{"icao": "DC3S", "name": "Douglas Super DC-3", "seats": 28, "manufacturer": "Douglas", "model": "Super DC-3", "iata": []}
+{"icao": "DC3T", "name": "Basler BT-67 Turbo 67", "seats": 0, "manufacturer": "", "model": "", "iata": []}
+{"icao": "DC6", "name": "Douglas DC-6", "seats": 0, "manufacturer": "", "model": "", "iata": []}
+{"icao": "DC85", "name": "Douglas DC-8-50", "seats": 189, "manufacturer": "Douglas", "model": "DC-8-50", "iata": ["D8T"]}
+{"icao": "DC86", "name": "Douglas DC-8-62", "seats": 189, "manufacturer": "Douglas", "model": "DC-8-62", "iata": ["D8L"]}
+{"icao": "DC87", "name": "Douglas DC-8-70", "seats": 189, "manufacturer": "Douglas", "model": "DC-8-72", "iata": ["D8Q"]}
+{"icao": "DC91", "name": "Douglas DC-9-10", "seats": 109, "manufacturer": "Douglas", "model": "DC-9-10", "iata": ["D91"]}
+{"icao": "DC92", "name": "Douglas DC-9-20", "seats": 125, "manufacturer": "Douglas", "model": "DC-9-20", "iata": ["D92"]}
+{"icao": "DC93", "name": "Douglas DC-9-30", "seats": 135, "manufacturer": "Douglas", "model": "DC-9-30", "iata": ["D93"]}
+{"icao": "DC94", "name": "Douglas DC-9-40", "seats": 135, "manufacturer": "Douglas", "model": "DC-9-40", "iata": ["D94"]}
+{"icao": "DC95", "name": "Douglas DC-9-50", "seats": 139, "manufacturer": "Douglas", "model": "DC-9-50", "iata": ["D95"]}
+{"icao": "DH2T", "name": "DHC-2T Turbo Beaver", "seats": 7, "manufacturer": "de Havilland Canada", "model": "DHC-2T Turbo Beaver", "iata": []}
+{"icao": "DH3T", "name": "DHC-3T Turbo Otter", "seats": 11, "manufacturer": "de Havilland Canada", "model": "DHC-3T Turbo Otter", "iata": []}
+{"icao": "DH8A", "name": "DHC-8-100", "seats": 39, "manufacturer": "De Havilland Canada", "model": "Dash 8-100", "iata": ["DH1"]}
+{"icao": "DH8B", "name": "DHC-8-200", "seats": 40, "manufacturer": "De Havilland Canada", "model": "Dash 8-200", "iata": ["DH2"]}
+{"icao": "DH8C", "name": "DHC-8-300", "seats": 56, "manufacturer": "De Havilland Canada", "model": "Dash 8-300", "iata": ["DH3"]}
+{"icao": "DH8D", "name": "DHC-8-400 (Q400)", "seats": 90, "manufacturer": "De Havilland Canada", "model": "Dash 8 Q400", "iata": ["DH4"]}
+{"icao": "DHC2", "name": "DHC-2 Beaver", "seats": 7, "manufacturer": "de Havilland Canada", "model": "DHC-2 Beaver", "iata": []}
+{"icao": "DHC3", "name": "DHC-3 Otter", "seats": 11, "manufacturer": "de Havilland Canada", "model": "DHC-3 Otter", "iata": []}
+{"icao": "DHC5", "name": "De Havilland Canada DHC-5 Buffalo", "seats": 0, "manufacturer": "De Havilland Canada", "model": "DHC-5 Buffalo", "iata": ["DHC"]}
+{"icao": "DHC6", "name": "DHC-6 Twin Otter", "seats": 19, "manufacturer": "de Havilland Canada", "model": "DHC-6 Twin Otter", "iata": []}
+{"icao": "DHC7", "name": "DHC-7 Dash 7", "seats": 54, "manufacturer": "De Havilland Canada", "model": "DHC-7 Dash 7", "iata": ["DH7"]}
+{"icao": "DV20", "name": "Diamond DA20 Katana", "seats": 2, "manufacturer": "Diamond", "model": "DA20 Katana", "iata": []}
+{"icao": "E110", "name": "Embraer EMB-110 Bandeirante", "seats": 0, "manufacturer": "", "model": "", "iata": []}
+{"icao": "E120", "name": "Embraer EMB-120 Brasilia", "seats": 0, "manufacturer": "", "model": "", "iata": []}
+{"icao": "E135", "name": "Embraer ERJ 135", "seats": 37, "manufacturer": "Embraer", "model": "ERJ 135", "iata": []}
+{"icao": "E140", "name": "Embraer ERJ 140", "seats": 44, "manufacturer": "Embraer", "model": "ERJ 140", "iata": []}
+{"icao": "E145", "name": "Embraer ERJ 145", "seats": 50, "manufacturer": "Embraer", "model": "ERJ 145", "iata": []}
+{"icao": "E170", "name": "Embraer E170", "seats": 78, "manufacturer": "Embraer", "model": "E170", "iata": ["E70"]}
+{"icao": "E175", "name": "Embraer E175", "seats": 88, "manufacturer": "Embraer", "model": "E175", "iata": ["E75"]}
+{"icao": "E190", "name": "Embraer E190", "seats": 114, "manufacturer": "Embraer", "model": "E190", "iata": ["E90"]}
+{"icao": "E195", "name": "Embraer E195", "seats": 132, "manufacturer": "Embraer", "model": "E195", "iata": ["E95"]}
+{"icao": "E290", "name": "Embraer E190-E2", "seats": 120, "manufacturer": "Embraer", "model": "E190-E2", "iata": []}
+{"icao": "E295", "name": "Embraer E195-E2", "seats": 146, "manufacturer": "Embraer", "model": "E195-E2", "iata": []}
+{"icao": "E35L", "name": "Embraer Legacy 600", "seats": 16, "manufacturer": "Embraer", "model": "Legacy 600/650", "iata": ["ER3"]}
+{"icao": "E3TF", "name": "Boeing E-3 Sentry AWACS", "seats": 19, "manufacturer": "Boeing", "model": "E-3 Sentry AWACS", "iata": []}
+{"icao": "E45X", "name": "Embraer ERJ 145XR", "seats": 50, "manufacturer": "Embraer", "model": "ERJ 145XR", "iata": []}
+{"icao": "E50P", "name": "Embraer Phenom 100", "seats": 6, "manufacturer": "Embraer", "model": "Phenom 100", "iata": []}
+{"icao": "E545", "name": "Embraer Legacy 450", "seats": 9, "manufacturer": "Embraer", "model": "Legacy 450 / Praetor 500", "iata": []}
+{"icao": "E550", "name": "Embraer Legacy 500/Praetor 600", "seats": 12, "manufacturer": "Embraer", "model": "Legacy 500 / Praetor 600", "iata": []}
+{"icao": "E55P", "name": "Embraer Phenom 300", "seats": 9, "manufacturer": "Embraer", "model": "Phenom 300", "iata": []}
+{"icao": "E7", "name": "Boeing E-7 Wedgetail", "seats": 12, "manufacturer": "Boeing", "model": "E-7 Wedgetail", "iata": []}
+{"icao": "E75L", "name": "Embraer E175", "seats": 88, "manufacturer": "Embraer", "model": "E175 (long wing)", "iata": ["E75"]}
+{"icao": "E75S", "name": "Embraer E175", "seats": 88, "manufacturer": "Embraer", "model": "E175 (short wing)", "iata": ["E75"]}
+{"icao": "EA50", "name": "Eclipse 500", "seats": 5, "manufacturer": "Eclipse", "model": "Eclipse 500", "iata": []}
+{"icao": "EC35", "name": "Airbus H135/EC135", "seats": 7, "manufacturer": "Airbus Helicopters", "model": "H135/EC135", "iata": []}
+{"icao": "EC55", "name": "Airbus H155/EC155", "seats": 13, "manufacturer": "Airbus Helicopters", "model": "H155/EC155", "iata": []}
+{"icao": "ERCO", "name": "ERCO Ercoupe 415", "seats": 0, "manufacturer": "", "model": "", "iata": []}
+{"icao": "EUFI", "name": "Eurofighter Typhoon", "seats": 2, "manufacturer": "Eurofighter", "model": "Typhoon", "iata": []}
+{"icao": "EVOT", "name": "Lancair Evolution Turbine", "seats": 0, "manufacturer": "", "model": "", "iata": []}
+{"icao": "F100", "name": "Fokker 100", "seats": 109, "manufacturer": "Fokker", "model": "100", "iata": ["100"]}
+{"icao": "F15", "name": "Boeing F-15 Eagle", "seats": 0, "manufacturer": "", "model": "", "iata": []}
+{"icao": "F16", "name": "F-16 Fighting Falcon", "seats": 2, "manufacturer": "General Dynamics", "model": "F-16 Fighting Falcon", "iata": []}
+{"icao": "F18", "name": "F/A-18 Hornet", "seats": 2, "manufacturer": "McDonnell Douglas/Boeing", "model": "F/A-18 Hornet", "iata": []}
+{"icao": "F18H", "name": "F/A-18 Hornet", "seats": 0, "manufacturer": "", "model": "", "iata": []}
+{"icao": "F18S", "name": "F/A-18E/F Super Hornet", "seats": 0, "manufacturer": "", "model": "", "iata": []}
+{"icao": "F22", "name": "F-22 Raptor", "seats": 1, "manufacturer": "Lockheed Martin", "model": "F-22 Raptor", "iata": []}
+{"icao": "F27", "name": "Fokker F27 Friendship", "seats": 56, "manufacturer": "Fokker", "model": "F27 Friendship", "iata": ["F27"]}
+{"icao": "F28", "name": "Fokker F28 Fellowship", "seats": 85, "manufacturer": "Fokker", "model": "F28 Fellowship", "iata": ["F21"]}
+{"icao": "F2TH", "name": "Dassault Falcon 2000", "seats": 12, "manufacturer": "Dassault", "model": "Falcon 2000", "iata": []}
+{"icao": "F2TP", "name": "Falcon 2000S/LXS", "seats": 12, "manufacturer": "Dassault", "model": "Falcon 2000S/LXS", "iata": []}
+{"icao": "F35", "name": "F-35 Lightning II", "seats": 2, "manufacturer": "Lockheed Martin", "model": "F-35 Lightning II", "iata": []}
+{"icao": "F406", "name": "Reims-Cessna F406 Caravan II", "seats": 9, "manufacturer": "Reims/Cessna", "model": "F406 Caravan II", "iata": []}
+{"icao": "F50", "name": "Fokker 50", "seats": 62, "manufacturer": "Fokker", "model": "50", "iata": []}
+{"icao": "F70", "name": "Fokker 70", "seats": 85, "manufacturer": "Fokker", "model": "70", "iata": ["F70"]}
+{"icao": "F900", "name": "Dassault Falcon 900", "seats": 16, "manufacturer": "Dassault", "model": "Falcon 900", "iata": []}
+{"icao": "FA10", "name": "Dassault Falcon 10", "seats": 8, "manufacturer": "Dassault", "model": "Falcon 10", "iata": []}
+{"icao": "FA20", "name": "Dassault Falcon 20", "seats": 12, "manufacturer": "Dassault", "model": "Falcon 20", "iata": []}
+{"icao": "FA50", "name": "Dassault Falcon 50", "seats": 9, "manufacturer": "Dassault", "model": "Falcon 50", "iata": []}
+{"icao": "FA6X", "name": "Dassault Falcon 6X", "seats": 16, "manufacturer": "Dassault", "model": "Falcon 6X", "iata": []}
+{"icao": "FA7X", "name": "Dassault Falcon 7X", "seats": 16, "manufacturer": "Dassault", "model": "Falcon 7X", "iata": []}
+{"icao": "FA8X", "name": "Dassault Falcon 8X", "seats": 19, "manufacturer": "Dassault", "model": "Falcon 8X", "iata": []}
+{"icao": "FDCT", "name": "Flight Design CT", "seats": 2, "manufacturer": "Flight Design", "model": "CT", "iata": []}
+{"icao": "G150", "name": "Gulfstream G150", "seats": 8, "manufacturer": "Gulfstream", "model": "G150", "iata": []}
+{"icao": "G164", "name": "Grumman American G-164", "seats": 1, "manufacturer": "Grumman American", "model": "G-164", "iata": []}
+{"icao": "G280", "name": "Gulfstream G280", "seats": 10, "manufacturer": "Gulfstream", "model": "G280", "iata": []}
+{"icao": "GA5C", "name": "Gulfstream G500", "seats": 19, "manufacturer": "Gulfstream", "model": "G500", "iata": []}
+{"icao": "GA6C", "name": "Gulfstream G600", "seats": 19, "manufacturer": "Gulfstream", "model": "G600", "iata": []}
+{"icao": "GA7", "name": "Gulfstream American GA-7", "seats": 6, "manufacturer": "Gulfstream American", "model": "GA-7", "iata": []}
+{"icao": "GA7C", "name": "Gulfstream G700", "seats": 19, "manufacturer": "Gulfstream", "model": "G700", "iata": []}
+{"icao": "GALX", "name": "IAI 1126 Galaxy/Gulfstream G200", "seats": 10, "manufacturer": "IAI/Gulfstream", "model": "1126 Galaxy/G200", "iata": []}
+{"icao": "GC1", "name": "Globe GC-1 Swift", "seats": 2, "manufacturer": "Globe", "model": "GC-1 Swift", "iata": []}
+{"icao": "GL5T", "name": "Bombardier Global 5000", "seats": 17, "manufacturer": "Bombardier", "model": "Global 5000", "iata": []}
+{"icao": "GL7T", "name": "Bombardier Global 7500", "seats": 19, "manufacturer": "Bombardier", "model": "Global 7500", "iata": []}
+{"icao": "GLEX", "name": "Bombardier Global Express", "seats": 17, "manufacturer": "Bombardier", "model": "Global Express", "iata": []}
+{"icao": "GLF2", "name": "Gulfstream II", "seats": 19, "manufacturer": "Gulfstream", "model": "GII", "iata": []}
+{"icao": "GLF3", "name": "Gulfstream III", "seats": 19, "manufacturer": "Gulfstream", "model": "GIII", "iata": []}
+{"icao": "GLF4", "name": "Gulfstream IV", "seats": 19, "manufacturer": "Gulfstream", "model": "GIV", "iata": []}
+{"icao": "GLF5", "name": "Gulfstream V", "seats": 19, "manufacturer": "Gulfstream", "model": "GV", "iata": []}
+{"icao": "GLF6", "name": "Gulfstream G650", "seats": 19, "manufacturer": "Gulfstream", "model": "G650/G650ER", "iata": []}
+{"icao": "H160", "name": "Airbus H160", "seats": 12, "manufacturer": "Airbus Helicopters", "model": "H160", "iata": []}
+{"icao": "H25A", "name": "Hawker Siddeley HS-125 (early)", "seats": 8, "manufacturer": "Hawker Siddeley", "model": "HS-125 (early)", "iata": []}
+{"icao": "H25B", "name": "BAe HS-125/Hawker 800", "seats": 8, "manufacturer": "BAe/Hawker", "model": "HS-125/800", "iata": []}
+{"icao": "H25C", "name": "BAe/Raytheon HS-125-1000", "seats": 8, "manufacturer": "BAe/Raytheon", "model": "HS-125-1000", "iata": []}
+{"icao": "HA4T", "name": "Hawker 4000", "seats": 9, "manufacturer": "Hawker", "model": "4000", "iata": []}
+{"icao": "HAWK", "name": "BAe T-45 Goshawk", "seats": 1, "manufacturer": "BAe", "model": "T-45 Goshawk", "iata": []}
+{"icao": "HDJT", "name": "HondaJet HA-420", "seats": 5, "manufacturer": "Honda Aircraft", "model": "HondaJet HA-420", "iata": []}
+{"icao": "HUSK", "name": "Aviat Husky", "seats": 2, "manufacturer": "Aviat", "model": "Husky", "iata": []}
+{"icao": "IL18", "name": "Ilyushin Il-18", "seats": 120, "manufacturer": "Ilyushin", "model": "Il-18", "iata": ["IL8"]}
+{"icao": "IL62", "name": "Ilyushin Il-62", "seats": 192, "manufacturer": "Ilyushin", "model": "Il-62", "iata": ["IL6"]}
+{"icao": "IL76", "name": "Ilyushin Il-76", "seats": 0, "manufacturer": "Ilyushin", "model": "Il-76", "iata": ["IL7"]}
+{"icao": "IL86", "name": "Ilyushin Il-86", "seats": 350, "manufacturer": "Ilyushin", "model": "Il-86", "iata": ["ILW"]}
+{"icao": "IL96", "name": "Ilyushin Il-96", "seats": 300, "manufacturer": "Ilyushin", "model": "Il-96", "iata": ["I93"]}
+{"icao": "J328", "name": "Fairchild Dornier 328JET", "seats": 33, "manufacturer": "Fairchild Dornier", "model": "328JET", "iata": []}
+{"icao": "JS31", "name": "BAe Jetstream 31", "seats": 19, "manufacturer": "British Aerospace", "model": "Jetstream 31", "iata": []}
+{"icao": "JS32", "name": "BAe Jetstream 32", "seats": 19, "manufacturer": "BAe", "model": "Jetstream 32", "iata": []}
+{"icao": "JS41", "name": "BAe Jetstream 41", "seats": 30, "manufacturer": "British Aerospace", "model": "Jetstream 41", "iata": []}
+{"icao": "K35R", "name": "Boeing KC-135 Stratotanker", "seats": 0, "manufacturer": "Boeing", "model": "KC-135 Stratotanker", "iata": ["K35"]}
+{"icao": "KA32", "name": "Kamov Ka-32", "seats": 16, "manufacturer": "Kamov", "model": "Ka-32", "iata": []}
+{"icao": "KC10", "name": "McDonnell Douglas KC-10 Extender", "seats": 75, "manufacturer": "McDonnell Douglas", "model": "KC-10 Extender", "iata": []}
+{"icao": "KC46", "name": "Boeing KC-46 Pegasus", "seats": 65, "manufacturer": "Boeing", "model": "KC-46 Pegasus", "iata": []}
+{"icao": "KODI", "name": "Quest Kodiak 100", "seats": 10, "manufacturer": "Quest", "model": "Kodiak 100", "iata": []}
+{"icao": "L101", "name": "Lockheed L-1011 TriStar", "seats": 400, "manufacturer": "Lockheed", "model": "L-1011 TriStar", "iata": ["L10"]}
+{"icao": "L188", "name": "Lockheed L-188 Electra", "seats": 98, "manufacturer": "Lockheed", "model": "L-188 Electra", "iata": ["LOE"]}
+{"icao": "L29B", "name": "Lockheed JetStar 2/731", "seats": 10, "manufacturer": "Lockheed", "model": "JetStar 2/731", "iata": []}
+{"icao": "L410", "name": "LET L-410", "seats": 19, "manufacturer": "LET", "model": "L-410", "iata": ["L4T"]}
+{"icao": "L5", "name": "Stinson L-5 Sentinel", "seats": 2, "manufacturer": "Stinson", "model": "L-5 Sentinel", "iata": []}
+{"icao": "L8", "name": "Luscombe 8", "seats": 2, "manufacturer": "Luscombe", "model": "8", "iata": []}
+{"icao": "LA4", "name": "Lake LA-4", "seats": 4, "manufacturer": "Lake", "model": "LA-4", "iata": []}
+{"icao": "LA8", "name": "Lake LA-8", "seats": 6, "manufacturer": "Lake Aircraft", "model": "LA-8", "iata": []}
+{"icao": "LJ23", "name": "Learjet 23", "seats": 6, "manufacturer": "Learjet", "model": "23", "iata": []}
+{"icao": "LJ24", "name": "Learjet 24", "seats": 6, "manufacturer": "Learjet", "model": "24", "iata": []}
+{"icao": "LJ25", "name": "Learjet 25", "seats": 8, "manufacturer": "Learjet", "model": "25", "iata": []}
+{"icao": "LJ31", "name": "Learjet 31", "seats": 8, "manufacturer": "Learjet", "model": "31", "iata": []}
+{"icao": "LJ40", "name": "Learjet 40", "seats": 7, "manufacturer": "Learjet", "model": "40", "iata": []}
+{"icao": "LJ45", "name": "Learjet 45", "seats": 8, "manufacturer": "Learjet", "model": "45", "iata": []}
+{"icao": "LJ55", "name": "Learjet 55", "seats": 10, "manufacturer": "Learjet", "model": "55", "iata": []}
+{"icao": "LJ60", "name": "Learjet 60", "seats": 8, "manufacturer": "Learjet", "model": "60", "iata": []}
+{"icao": "LJ70", "name": "Learjet 70", "seats": 9, "manufacturer": "Learjet", "model": "70", "iata": []}
+{"icao": "LJ75", "name": "Learjet 75", "seats": 9, "manufacturer": "Learjet", "model": "75", "iata": []}
+{"icao": "LNC4", "name": "Lancair IV", "seats": 4, "manufacturer": "Lancair", "model": "IV", "iata": []}
+{"icao": "LNP4", "name": "Lancair PropJet IV", "seats": 4, "manufacturer": "Lancair", "model": "PropJet IV", "iata": []}
+{"icao": "LR35", "name": "Learjet 35", "seats": 8, "manufacturer": "Learjet", "model": "35", "iata": []}
+{"icao": "LR45", "name": "Learjet 45", "seats": 8, "manufacturer": "Learjet", "model": "45", "iata": []}
+{"icao": "LR60", "name": "Learjet 60", "seats": 8, "manufacturer": "Learjet", "model": "60", "iata": []}
+{"icao": "M20P", "name": "Mooney M20", "seats": 4, "manufacturer": "Mooney", "model": "M20J", "iata": []}
+{"icao": "M20T", "name": "Mooney M20K/M20M", "seats": 4, "manufacturer": "Mooney", "model": "M20K/M20M", "iata": []}
+{"icao": "M5", "name": "Maule M-5", "seats": 4, "manufacturer": "Maule", "model": "M-5", "iata": []}
+{"icao": "M600", "name": "Piper M600", "seats": 6, "manufacturer": "Piper", "model": "M600", "iata": []}
+{"icao": "MD11", "name": "McDonnell Douglas MD-11", "seats": 410, "manufacturer": "McDonnell Douglas", "model": "MD-11", "iata": ["M11", "M1F", "M1M"]}
+{"icao": "MD81", "name": "MD-81", "seats": 155, "manufacturer": "McDonnell Douglas", "model": "MD-81", "iata": ["M81"]}
+{"icao": "MD82", "name": "MD-82", "seats": 165, "manufacturer": "McDonnell Douglas", "model": "MD-82", "iata": ["M82"]}
+{"icao": "MD83", "name": "MD-83", "seats": 165, "manufacturer": "McDonnell Douglas", "model": "MD-83", "iata": ["M83"]}
+{"icao": "MD87", "name": "MD-87", "seats": 130, "manufacturer": "McDonnell Douglas", "model": "MD-87", "iata": ["M87"]}
+{"icao": "MD88", "name": "MD-88", "seats": 165, "manufacturer": "McDonnell Douglas", "model": "MD-88", "iata": ["M88"]}
+{"icao": "MD90", "name": "MD-90", "seats": 172, "manufacturer": "McDonnell Douglas", "model": "MD-90", "iata": ["M90"]}
+{"icao": "MI8", "name": "Mil Mi-8/17 Hip", "seats": 36, "manufacturer": "Mil", "model": "Mi-8/17 Hip", "iata": []}
+{"icao": "MRJ9", "name": "Mitsubishi SpaceJet M90", "seats": 92, "manufacturer": "Mitsubishi", "model": "SpaceJet M90", "iata": ["M90"]}
+{"icao": "MU30", "name": "Mitsubishi Diamond/MU-300", "seats": 8, "manufacturer": "Mitsubishi", "model": "MU-300 Diamond", "iata": []}
+{"icao": "NAVI", "name": "North American Navion", "seats": 4, "manufacturer": "North American", "model": "Navion", "iata": []}
+{"icao": "P180", "name": "Piaggio P.180 Avanti", "seats": 9, "manufacturer": "Piaggio", "model": "P.180 Avanti", "iata": ["P18"]}
+{"icao": "P206", "name": "Cessna P206 Pressurized Stationair", "seats": 6, "manufacturer": "Cessna", "model": "P206 Pressurized Stationair", "iata": []}
+{"icao": "P210", "name": "Cessna P210", "seats": 4, "manufacturer": "Cessna", "model": "P210", "iata": []}
+{"icao": "P28A", "name": "Piper PA-28 Archer", "seats": 4, "manufacturer": "Piper", "model": "PA-28 Archer", "iata": []}
+{"icao": "P28B", "name": "Piper Turbo Dakota", "seats": 4, "manufacturer": "Piper", "model": "Turbo Dakota", "iata": []}
+{"icao": "P28R", "name": "Piper PA-28R Arrow", "seats": 4, "manufacturer": "Piper", "model": "PA-28R Arrow", "iata": []}
+{"icao": "P28T", "name": "Piper PA-28T Arrow IV", "seats": 4, "manufacturer": "Piper", "model": "PA-28T Arrow IV", "iata": []}
+{"icao": "P3", "name": "Lockheed P-3 Orion", "seats": 11, "manufacturer": "Lockheed", "model": "P-3 Orion", "iata": []}
+{"icao": "P32R", "name": "Piper PA-32R Lance/Saratoga", "seats": 6, "manufacturer": "Piper", "model": "PA-32R Lance/Saratoga", "iata": []}
+{"icao": "P32T", "name": "Piper PA-32T Turbo Lance II", "seats": 6, "manufacturer": "Piper", "model": "PA-32T Turbo Lance II", "iata": []}
+{"icao": "P46T", "name": "Piper Malibu Meridian", "seats": 6, "manufacturer": "Piper", "model": "Malibu Meridian", "iata": []}
+{"icao": "P51", "name": "North American P-51 Mustang", "seats": 1, "manufacturer": "North American", "model": "P-51 Mustang", "iata": []}
+{"icao": "P68", "name": "Vulcanair P68", "seats": 6, "manufacturer": "Vulcanair", "model": "P68", "iata": []}
+{"icao": "P750", "name": "Pacific Aerospace P-750 XSTOL", "seats": 10, "manufacturer": "Pacific Aerospace", "model": "P-750 XSTOL", "iata": []}
+{"icao": "P8", "name": "Boeing P-8 Poseidon", "seats": 11, "manufacturer": "Boeing", "model": "P-8 Poseidon", "iata": []}
+{"icao": "PA11", "name": "Piper PA-11 Cub Special", "seats": 2, "manufacturer": "Piper", "model": "PA-11 Cub Special", "iata": []}
+{"icao": "PA12", "name": "Piper PA-12 Super Cruiser", "seats": 3, "manufacturer": "Piper", "model": "PA-12 Super Cruiser", "iata": []}
+{"icao": "PA16", "name": "Piper PA-16 Clipper", "seats": 4, "manufacturer": "Piper", "model": "PA-16 Clipper", "iata": []}
+{"icao": "PA18", "name": "Piper PA-18 Super Cub", "seats": 2, "manufacturer": "Piper", "model": "PA-18 Super Cub", "iata": []}
+{"icao": "PA20", "name": "Piper PA-20 Pacer", "seats": 4, "manufacturer": "Piper", "model": "PA-20 Pacer", "iata": []}
+{"icao": "PA22", "name": "Piper PA-22 Tri-Pacer", "seats": 4, "manufacturer": "Piper", "model": "PA-22 Tri-Pacer", "iata": []}
+{"icao": "PA23", "name": "Piper PA-23 Apache", "seats": 6, "manufacturer": "Piper", "model": "PA-23 Apache", "iata": []}
+{"icao": "PA24", "name": "Piper PA-24 Comanche", "seats": 4, "manufacturer": "Piper", "model": "PA-24 Comanche", "iata": []}
+{"icao": "PA25", "name": "Piper PA-25 Pawnee", "seats": 0, "manufacturer": "", "model": "", "iata": []}
+{"icao": "PA27", "name": "Piper PA-27 Aztec", "seats": 6, "manufacturer": "Piper", "model": "PA-27 Aztec", "iata": []}
+{"icao": "PA30", "name": "Piper PA-30 Twin Comanche", "seats": 4, "manufacturer": "Piper", "model": "PA-30 Twin Comanche", "iata": []}
+{"icao": "PA31", "name": "Piper Navajo/Chieftain", "seats": 9, "manufacturer": "Piper", "model": "Navajo/Chieftain", "iata": []}
+{"icao": "PA32", "name": "Piper PA-32 Cherokee Six", "seats": 6, "manufacturer": "Piper", "model": "PA-32 Cherokee Six", "iata": []}
+{"icao": "PA34", "name": "Piper Seneca", "seats": 6, "manufacturer": "Piper", "model": "Seneca", "iata": []}
+{"icao": "PA36", "name": "Piper PA-36 Pawnee Brave", "seats": 1, "manufacturer": "Piper", "model": "PA-36 Pawnee Brave", "iata": []}
+{"icao": "PA38", "name": "Piper PA-38 Tomahawk", "seats": 2, "manufacturer": "Piper", "model": "PA-38 Tomahawk", "iata": []}
+{"icao": "PA44", "name": "Piper Seminole", "seats": 4, "manufacturer": "Piper", "model": "Seminole", "iata": []}
+{"icao": "PA46", "name": "Piper Malibu/Mirage/Meridian", "seats": 6, "manufacturer": "Piper", "model": "Malibu/Mirage/Meridian", "iata": []}
+{"icao": "PAT4", "name": "Piper T-1040", "seats": 37, "manufacturer": "Piper", "model": "T-1040", "iata": []}
+{"icao": "PAY1", "name": "Piper Cheyenne I", "seats": 6, "manufacturer": "Piper", "model": "Cheyenne I", "iata": []}
+{"icao": "PAY2", "name": "Piper Cheyenne II", "seats": 9, "manufacturer": "Piper", "model": "Cheyenne II", "iata": []}
+{"icao": "PAY3", "name": "Piper PA-42-720 Cheyenne III", "seats": 9, "manufacturer": "Piper", "model": "PA-42-720 Cheyenne III", "iata": []}
+{"icao": "PAY4", "name": "Piper Cheyenne 400LS", "seats": 9, "manufacturer": "Piper", "model": "Cheyenne 400LS", "iata": []}
+{"icao": "PC12", "name": "Pilatus PC-12", "seats": 9, "manufacturer": "Pilatus", "model": "PC-12", "iata": []}
+{"icao": "PC24", "name": "Pilatus PC-24", "seats": 10, "manufacturer": "Pilatus", "model": "PC-24", "iata": []}
+{"icao": "PRM1", "name": "Raytheon Premier I", "seats": 6, "manufacturer": "Raytheon", "model": "Premier I", "iata": []}
+{"icao": "R22", "name": "Robinson R22", "seats": 2, "manufacturer": "Robinson", "model": "R22", "iata": []}
+{"icao": "R44", "name": "Robinson R44", "seats": 4, "manufacturer": "Robinson", "model": "R44", "iata": []}
+{"icao": "R66", "name": "Robinson R66", "seats": 5, "manufacturer": "Robinson", "model": "R66", "iata": []}
+{"icao": "R721", "name": "Boeing 727-100RE Super 27", "seats": 131, "manufacturer": "Boeing", "model": "727-100RE Super 27", "iata": []}
+{"icao": "R722", "name": "Boeing 727-200RE Super 27", "seats": 189, "manufacturer": "Boeing", "model": "727-200RE Super 27", "iata": []}
+{"icao": "RJ1H", "name": "Avro RJ100", "seats": 116, "manufacturer": "Avro", "model": "RJ100", "iata": ["AR1"]}
+{"icao": "RJ70", "name": "Avro RJ70", "seats": 82, "manufacturer": "Avro", "model": "RJ70", "iata": ["AR7"]}
+{"icao": "RJ85", "name": "Avro RJ85", "seats": 100, "manufacturer": "Avro", "model": "RJ85", "iata": ["AR8"]}
+{"icao": "RV12", "name": "Vans RV-12", "seats": 2, "manufacturer": "Van's Aircraft", "model": "RV-12", "iata": []}
+{"icao": "S108", "name": "Stinson 108 Voyager", "seats": 4, "manufacturer": "Stinson", "model": "108 Voyager", "iata": []}
+{"icao": "S22T", "name": "Cirrus SR22 Turbo", "seats": 4, "manufacturer": "Cirrus", "model": "SR22 Turbo", "iata": []}
+{"icao": "S76", "name": "Sikorsky S-76", "seats": 13, "manufacturer": "Sikorsky", "model": "S-76", "iata": []}
+{"icao": "S92", "name": "Sikorsky S-92", "seats": 19, "manufacturer": "Sikorsky", "model": "S-92", "iata": []}
+{"icao": "SB20", "name": "Saab 2000", "seats": 58, "manufacturer": "Saab", "model": "2000", "iata": ["S20"]}
+{"icao": "SBR1", "name": "Rockwell Sabre 40/60", "seats": 8, "manufacturer": "Rockwell", "model": "Sabre 40/60", "iata": []}
+{"icao": "SBR2", "name": "Rockwell Sabre 75", "seats": 8, "manufacturer": "Rockwell", "model": "Sabre 75", "iata": []}
+{"icao": "SC7", "name": "Shorts Skyvan", "seats": 19, "manufacturer": "Shorts", "model": "SC-7 Skyvan", "iata": ["SHS"]}
+{"icao": "SF34", "name": "Saab 340B", "seats": 36, "manufacturer": "Saab", "model": "340B", "iata": ["SF3"]}
+{"icao": "SF50", "name": "Cirrus Vision Jet SF50", "seats": 7, "manufacturer": "Cirrus", "model": "Vision Jet SF50", "iata": []}
+{"icao": "SH33", "name": "Shorts 330", "seats": 36, "manufacturer": "Shorts", "model": "SD-330", "iata": ["SH3"]}
+{"icao": "SH36", "name": "Shorts 360", "seats": 40, "manufacturer": "Shorts", "model": "SD-360", "iata": ["SH6"]}
+{"icao": "SR20", "name": "Cirrus SR20", "seats": 4, "manufacturer": "Cirrus", "model": "SR20", "iata": []}
+{"icao": "SR22", "name": "Cirrus SR22", "seats": 5, "manufacturer": "Cirrus", "model": "SR22", "iata": []}
+{"icao": "SU95", "name": "Sukhoi Superjet 100", "seats": 108, "manufacturer": "Sukhoi", "model": "Superjet 100", "iata": ["SU9"]}
+{"icao": "SW3", "name": "Fairchild Swearingen SA-226", "seats": 11, "manufacturer": "Fairchild Swearingen", "model": "SA-226", "iata": []}
+{"icao": "SW4", "name": "Swearingen Metroliner", "seats": 19, "manufacturer": "Swearingen", "model": "Metroliner", "iata": ["SW4"]}
+{"icao": "T134", "name": "Tupolev Tu-134", "seats": 84, "manufacturer": "Tupolev", "model": "Tu-134", "iata": ["TU3"]}
+{"icao": "T154", "name": "Tupolev Tu-154", "seats": 180, "manufacturer": "Tupolev", "model": "Tu-154", "iata": ["T54"]}
+{"icao": "T204", "name": "Tupolev Tu-204", "seats": 210, "manufacturer": "Tupolev", "model": "Tu-204/214", "iata": ["T20"]}
+{"icao": "T206", "name": "Cessna T206 Turbo Stationair", "seats": 6, "manufacturer": "Cessna", "model": "T206 Turbo Stationair", "iata": []}
+{"icao": "T210", "name": "Cessna T210 Turbo Centurion", "seats": 6, "manufacturer": "Cessna", "model": "T210 Turbo Centurion", "iata": []}
+{"icao": "T28", "name": "North American T-28 Trojan", "seats": 2, "manufacturer": "North American", "model": "T-28 Trojan", "iata": []}
+{"icao": "T34P", "name": "Beech T-34/45 Mentor", "seats": 2, "manufacturer": "Beech", "model": "T-34/45 Mentor", "iata": []}
+{"icao": "T38", "name": "Northrop T-38 Talon", "seats": 2, "manufacturer": "Northrop", "model": "T-38 Talon", "iata": []}
+{"icao": "T6", "name": "North American T-6 Texan", "seats": 2, "manufacturer": "North American", "model": "T-6 Texan", "iata": []}
+{"icao": "TAYB", "name": "Taylorcraft BC", "seats": 2, "manufacturer": "Taylorcraft", "model": "BC", "iata": []}
+{"icao": "TB20", "name": "Socata TB-20 Trinidad", "seats": 4, "manufacturer": "Socata", "model": "TB-20 Trinidad", "iata": []}
+{"icao": "TBM7", "name": "Daher TBM 700", "seats": 6, "manufacturer": "Daher", "model": "TBM 700", "iata": []}
+{"icao": "TBM8", "name": "Daher TBM 850", "seats": 6, "manufacturer": "Daher", "model": "TBM 850", "iata": []}
+{"icao": "TBM9", "name": "Daher TBM 900", "seats": 6, "manufacturer": "Daher", "model": "TBM 900", "iata": []}
+{"icao": "TEX2", "name": "Raytheon T-6 Texan II", "seats": 2, "manufacturer": "Raytheon", "model": "Texan II", "iata": []}
+{"icao": "TISB_OTHER", "name": "TIS-B Other", "seats": 6, "manufacturer": "TIS-B", "model": "TIS-B Other", "iata": []}
+{"icao": "TOBA", "name": "Socata TB-10 Tobago", "seats": 4, "manufacturer": "Socata", "model": "TB-10 Tobago", "iata": []}
+{"icao": "U206", "name": "Cessna U206 Stationair", "seats": 6, "manufacturer": "Cessna", "model": "U206 Stationair", "iata": []}
+{"icao": "UH60", "name": "Sikorsky UH-60 Black Hawk", "seats": 14, "manufacturer": "Sikorsky", "model": "UH-60 Black Hawk", "iata": []}
+{"icao": "V22", "name": "Bell-Boeing V-22 Osprey", "seats": 24, "manufacturer": "Bell-Boeing", "model": "V-22 Osprey", "iata": []}
+{"icao": "WW24", "name": "IAI Westwind", "seats": 10, "manufacturer": "IAI", "model": "1124 Westwind", "iata": ["WWP"]}
+{"icao": "Y12", "name": "Harbin Y-12", "seats": 19, "manufacturer": "Harbin", "model": "Y-12", "iata": ["YN2"]}
+{"icao": "YK40", "name": "Yakovlev Yak-40", "seats": 32, "manufacturer": "Yakovlev", "model": "Yak-40", "iata": ["YK4"]}
+{"icao": "YK42", "name": "Yakovlev Yak-42", "seats": 120, "manufacturer": "Yakovlev", "model": "Yak-42", "iata": ["YK2"]}
+{"icao": "YS11", "name": "NAMC YS-11", "seats": 64, "manufacturer": "NAMC", "model": "YS-11", "iata": []}

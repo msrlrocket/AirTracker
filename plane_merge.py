@@ -40,6 +40,257 @@ def looks_like_iata_flight(s: Optional[str]) -> bool:
     s = _clean_str(s)
     return bool(s and IATA_FLIGHT_RE.match(s))
 
+# ---------- dataset lookups (JSONL) ----------
+def _datasets_root() -> str:
+    here = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(here, "datasets")
+
+def _load_jsonl_map(path: str, key_field: str) -> Dict[str, dict]:
+    m: Dict[str, dict] = {}
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            for ln in f:
+                ln = ln.strip()
+                if not ln:
+                    continue
+                try:
+                    obj = json.loads(ln)
+                except Exception:
+                    continue
+                k = obj.get(key_field)
+                if isinstance(k, str) and k:
+                    m[k] = obj
+    except FileNotFoundError:
+        pass
+    return m
+
+def _ensure_parent_dir(path: str) -> None:
+    try:
+        d = os.path.dirname(path)
+        if d:
+            os.makedirs(d, exist_ok=True)
+    except Exception:
+        pass
+
+def _load_catalogs(ds_root: Optional[str] = None) -> Dict[str, Dict[str, dict]]:
+    ds = ds_root or _datasets_root()
+    cats = {
+        "aircraft": _load_jsonl_map(os.path.join(ds, "aircraft_types_full.jsonl"), "icao"),
+        "airlines_by_icao": _load_jsonl_map(os.path.join(ds, "airlines.jsonl"), "icao"),
+        "airlines_by_iata": {},
+        "airports": _load_jsonl_map(os.path.join(ds, "airports.jsonl"), "iata"),
+        "countries": _load_jsonl_map(os.path.join(ds, "countries.jsonl"), "code"),
+    }
+    # Build IATA index for airlines
+    for icao, a in cats["airlines_by_icao"].items():
+        iata = a.get("iata")
+        if isinstance(iata, str) and iata:
+            cats["airlines_by_iata"][iata] = a
+    return cats
+
+def _estimate_seat_max(icao: Optional[str]) -> Optional[int]:
+    if not icao:
+        return None
+    t = icao.upper()
+    # Heuristics inspired by aircraft_types.h family rules
+    if t.startswith(("A31", "A32")):
+        return 244  # A321neo upper bound
+    if t.startswith("B70"):
+        return 189  # 707 family
+    if t.startswith("B72"):
+        return 189  # 727 family
+    if t.startswith("B73"):
+        return 230  # 737 family upper bound
+    if t.startswith("B78"):
+        return 330  # 787 family
+    if t.startswith(("E17", "E19", "E29", "E75")):
+        return 146  # E-Jets / E2 upper bound
+    if t.startswith("CRJ"):
+        return 104
+    if t.startswith(("AT4", "AT7")):
+        return 78  # ATR 42/72
+    if t.startswith("DH8"):
+        return 90
+    if t.startswith("DH2"):
+        return 7   # Beaver
+    if t.startswith("TISB"):
+        return 6
+    # GA / Bizjet common types (prefix or exact)
+    if t.startswith(("BE33", "BE35", "BE36")):
+        return 4
+    if t.startswith(("BE55", "BE56", "BE58")):
+        return 6
+    if t.startswith(("BE76", "BE77", "BE80", "BE95")):
+        return 4
+    if t.startswith("BE9") or t.startswith("BE10"):
+        return 9  # King Air 90/100
+    if t == "B350":
+        return 11
+    if t.startswith("LJ"):
+        return 9
+    if t == "PRM1":
+        return 6
+    if t == "GALX":
+        return 10
+    if t == "MU30":
+        return 8
+    if t in ("H25A", "H25B", "H25C"):
+        return 8
+    if t == "FA10":
+        return 8
+    if t == "FA20":
+        return 12
+    if t == "FA8X":
+        return 19
+    # Cessna singles/twins common
+    if t in ("C120", "C140"):
+        return 2
+    if t.startswith(("C17", "C15", "C19")):
+        return 4
+    if t == "C180":
+        return 4
+    if t == "C185":
+        return 6
+    if t == "C188":
+        return 1
+    if t == "C195":
+        return 5
+    if t == "C210":
+        return 6
+    if t == "C310":
+        return 6
+    return None
+
+def _airline_from_flight_no(flight_no: Optional[str], cats: Dict[str, Dict[str, dict]]) -> Optional[dict]:
+    if not looks_like_iata_flight(flight_no):
+        return None
+    # Prefix is 2 or 3 alnum chars before the digits
+    s = flight_no.strip()
+    m2 = re.match(r"^([A-Z0-9]{2,3})\d", s)
+    if not m2:
+        return None
+    pref = m2.group(1)
+    return cats.get("airlines_by_iata", {}).get(pref)
+
+def enrich_with_catalogs(row: Dict[str, Any], cats: Dict[str, Dict[str, dict]]) -> Dict[str, Any]:
+    """Returns a shallow copy of row with additional 'lookups' info and select flat fields such as
+    souls_on_board_max. When the aircraft type is not found in the dataset, explicitly indicate that
+    and fall back to the raw type code for display. Also always publish a text value for souls
+    (e.g., 'N/A' when unknown)."""
+    out = dict(row)
+    lookups: Dict[str, Any] = {}
+
+    # Aircraft by ICAO type
+    icao_type = _clean_str(row.get("aircraft_type"))
+    if icao_type:
+        a = cats.get("aircraft", {}).get(icao_type)
+        seat_actual: Optional[int] = None
+        if a:
+            lookups["aircraft"] = {
+                "icao": icao_type,
+                "name": a.get("name") or a.get("model") or icao_type,
+                "manufacturer": a.get("manufacturer"),
+                "model": a.get("model"),
+                "seats_max": a.get("seats"),
+                "iata_aliases": a.get("iata") or [],
+                "lookup_status": "found",
+            }
+            if isinstance(a.get("seats"), int) and a.get("seats", 0) > 0:
+                seat_actual = int(a["seats"])
+        else:
+            # Explicitly indicate that this ICAO type was not found in the dataset; fall back to code
+            lookups["aircraft"] = {
+                "icao": icao_type,
+                "name": icao_type,  # fallback display to the raw code
+                "manufacturer": None,
+                "model": None,
+                "seats_max": None,
+                "iata_aliases": [],
+                "lookup_status": "not_found",
+            }
+        # Fallback estimate when catalog does not provide seats
+        seat_est = _estimate_seat_max(icao_type) if not seat_actual else None
+        if seat_actual is not None:
+            out["souls_on_board_max"] = seat_actual
+            out["souls_on_board_max_is_estimate"] = False
+            out["souls_on_board_max_text"] = str(seat_actual)
+        elif seat_est is not None:
+            out["souls_on_board_max"] = seat_est
+            out["souls_on_board_max_is_estimate"] = True
+            out["souls_on_board_max_text"] = str(seat_est)
+        else:
+            # Publish explicit N/A when unknown
+            out["souls_on_board_max"] = None
+            out["souls_on_board_max_is_estimate"] = False
+            out["souls_on_board_max_text"] = "N/A"
+    else:
+        # No aircraft_type provided; still publish explicit N/A for souls
+        out["souls_on_board_max"] = None
+        out["souls_on_board_max_is_estimate"] = False
+        out["souls_on_board_max_text"] = "N/A"
+
+    # Airline by ICAO, else by IATA prefix of flight number
+    al_icao = _clean_str(row.get("airline_icao"))
+    airline = None
+    if al_icao:
+        airline = cats.get("airlines_by_icao", {}).get(al_icao)
+    if not airline:
+        airline = _airline_from_flight_no(_clean_str(row.get("flight_no")), cats)
+    if airline:
+        lookups["airline"] = {
+            "icao": airline.get("icao"),
+            "iata": airline.get("iata"),
+            "name": airline.get("name"),
+            "callsign": airline.get("callsign"),
+            "country_code": airline.get("country_code"),
+            "country_name": airline.get("country_name"),
+        }
+
+    # Origin/Destination airports (IATA)
+    def airport_info(iata_code: Optional[str]) -> Optional[dict]:
+        i = _clean_str(iata_code)
+        if not i:
+            return None
+        a = cats.get("airports", {}).get(i)
+        if not a:
+            return None
+        return {
+            "iata": a.get("iata"),
+            "name": a.get("name"),
+            "city": a.get("city"),
+            "region": a.get("region"),
+            "country_code": a.get("country_code"),
+            "country_name": a.get("country_name"),
+            "lat": a.get("lat"),
+            "lon": a.get("lon"),
+            "elevation_ft": a.get("elevation_ft"),
+        }
+
+    ori = airport_info(row.get("origin_iata"))
+    dst = airport_info(row.get("destination_iata"))
+    if ori:
+        lookups["origin_airport"] = ori
+    if dst:
+        lookups["destination_airport"] = dst
+
+    # Country by code (fallback if not present via airport)
+    if ori and not ori.get("country_name"):
+        cc = ori.get("country_code")
+        if cc:
+            c = cats.get("countries", {}).get(cc)
+            if c:
+                ori["country_name"] = c.get("name")
+    if dst and not dst.get("country_name"):
+        cc = dst.get("country_code")
+        if cc:
+            c = cats.get("countries", {}).get(cc)
+            if c:
+                dst["country_name"] = c.get("name")
+
+    if lookups:
+        out["lookups"] = lookups
+    return out
+
 def provider_age(now_ts: int, p: str, row: Dict[str, Any]) -> Optional[float]:
     """Freshness age in seconds. Lower is fresher."""
     try:
@@ -386,6 +637,11 @@ def main():
                     help="Provider priority for tie-breaks, e.g. adsb_lol,fr24,opensky")
     ap.add_argument("--xlsx", default=None, help="Export an Excel workbook to this path")
     ap.add_argument("--xlsx-raw", action="store_true", help="Include raw provider sheets in the Excel workbook")
+    ap.add_argument("--datasets", default=None, help="Optional path to datasets directory (defaults to ./datasets)")
+    ap.add_argument("--enrich-all", action="store_true",
+                    help="Enrich all merged aircraft using JSONL datasets (aircraft/airlines/airports/countries)")
+    ap.add_argument("--enrich-in-radius", action="store_true",
+                    help="[Deprecated] Enrich only aircraft within the provided radius")
     args = ap.parse_args()
 
     # Load input
@@ -464,14 +720,56 @@ def main():
         return float(d) if isinstance(d, (int, float)) else float("inf")
     merged_internal.sort(key=lambda m: (min_age(m), dist_key(m), m.get("hex","")))
 
+    # Optional enrichment
+    if args.enrich_all or args.enrich_in_radius:
+        catalogs = _load_catalogs(args.datasets)
+        for m in merged_internal:
+            if args.enrich_all or m.get("within_radius") is True:
+                e = enrich_with_catalogs(m, catalogs)
+                if "souls_on_board_max" in e:
+                    m["souls_on_board_max"] = e["souls_on_board_max"]
+                    if "souls_on_board_max_is_estimate" in e:
+                        m["souls_on_board_max_is_estimate"] = e["souls_on_board_max_is_estimate"]
+                    if "souls_on_board_max_text" in e:
+                        m["souls_on_board_max_text"] = e["souls_on_board_max_text"]
+                if "lookups" in e:
+                    m["lookups"] = e["lookups"]
+
+    cats_for_eta = None
+    for m in merged_internal:
+        try:
+            lat = m.get("latitude")
+            lon = m.get("longitude")
+            spd = m.get("ground_speed_kt")
+            dst_iata = _clean_str(m.get("destination_iata"))
+            if not (isinstance(lat, (int,float)) and isinstance(lon, (int,float)) and isinstance(spd, (int,float)) and spd > 0 and dst_iata):
+                continue
+            d_lookup = (m.get("lookups") or {}).get("destination_airport") if isinstance(m.get("lookups"), dict) else None
+            d_lat = (d_lookup or {}).get("lat") if isinstance(d_lookup, dict) else None
+            d_lon = (d_lookup or {}).get("lon") if isinstance(d_lookup, dict) else None
+            if not (isinstance(d_lat, (int,float)) and isinstance(d_lon, (int,float))):
+                if cats_for_eta is None:
+                    cats_for_eta = _load_catalogs(args.datasets)
+                ap = cats_for_eta.get("airports", {}).get(dst_iata)
+                d_lat = (ap or {}).get("lat")
+                d_lon = (ap or {}).get("lon")
+            if not (isinstance(d_lat, (int,float)) and isinstance(d_lon, (int,float))):
+                continue
+            rem_nm = gc_distance_nm(float(lat), float(lon), float(d_lat), float(d_lon))
+            m["remaining_nm"] = round(rem_nm, 3)
+            m["eta_min"] = round((rem_nm / float(spd)) * 60.0, 1)
+        except Exception:
+            pass
+
+    # Build top-level JSON with stats near the top for quick visibility
     out = {
         "timestamp": now_ts,
-        "point": payload.get("point"),
-        "merged": merged_internal,
         "stats": {
             "hex_count": len(merged_internal),
             "providers_present": sorted([k for k,v in providers.items() if v]),
-        }
+        },
+        "point": payload.get("point"),
+        "merged": merged_internal,
     }
     # Nearest aircraft summary (if distances computed)
     try:
@@ -479,7 +777,7 @@ def main():
     except ValueError:
         nearest = None
     if nearest:
-        out["nearest"] = {
+        base_nearest = {
             k: nearest.get(k) for k in [
                 "hex","distance_nm","bearing_deg","latitude","longitude","altitude_ft",
                 "ground_speed_kt","track_deg","squawk","on_ground","vertical_rate_fpm",
@@ -487,12 +785,51 @@ def main():
                 "origin_iata","destination_iata","origin_country","is_military","position_timestamp","position_age_sec"
             ]
         }
+        out["nearest"] = base_nearest
+        # Also enrich the nearest aircraft within the main merged list (no separate object)
+        try:
+            catalogs = _load_catalogs(args.datasets)
+            enriched = enrich_with_catalogs(nearest, catalogs)
+            if "souls_on_board_max" in enriched:
+                nearest["souls_on_board_max"] = enriched["souls_on_board_max"]
+                # Mirror enriched fields into the top-level nearest summary for ESP32 consumers
+                base_nearest["souls_on_board_max"] = enriched["souls_on_board_max"]
+                if "souls_on_board_max_is_estimate" in enriched:
+                    base_nearest["souls_on_board_max_is_estimate"] = enriched["souls_on_board_max_is_estimate"]
+                if "souls_on_board_max_text" in enriched:
+                    nearest["souls_on_board_max_text"] = enriched["souls_on_board_max_text"]
+                    base_nearest["souls_on_board_max_text"] = enriched["souls_on_board_max_text"]
+            if "lookups" in enriched:
+                nearest["lookups"] = enriched["lookups"]
+                base_nearest["lookups"] = enriched["lookups"]
+            try:
+                plat = nearest.get("latitude"); plon = nearest.get("longitude")
+                spd = nearest.get("ground_speed_kt")
+                dst = (enriched.get("lookups") or {}).get("destination_airport") if isinstance(enriched.get("lookups"), dict) else None
+                dlat = (dst or {}).get("lat") if isinstance(dst, dict) else None
+                dlon = (dst or {}).get("lon") if isinstance(dst, dict) else None
+                if not (isinstance(dlat, (int,float)) and isinstance(dlon, (int,float))):
+                    diata = _clean_str(nearest.get("destination_iata"))
+                    if diata:
+                        ap = catalogs.get("airports", {}).get(diata)
+                        dlat = (ap or {}).get("lat"); dlon = (ap or {}).get("lon")
+                if isinstance(plat, (int,float)) and isinstance(plon, (int,float)) and isinstance(spd, (int,float)) and spd > 0 and isinstance(dlat, (int,float)) and isinstance(dlon, (int,float)):
+                    rem_nm = gc_distance_nm(float(plat), float(plon), float(dlat), float(dlon))
+                    nearest["remaining_nm"] = round(rem_nm, 3)
+                    base_nearest["remaining_nm"] = round(rem_nm, 3)
+                    nearest["eta_min"] = round((rem_nm / float(spd)) * 60.0, 1)
+                    base_nearest["eta_min"] = round((rem_nm / float(spd)) * 60.0, 1)
+            except Exception:
+                pass
+        except Exception:
+            pass
     if args.by_hex:
         out["by_hex"] = by_hex_map
 
     text = json.dumps(out, ensure_ascii=False, indent=None if args.minify else 2)
 
     if args.json_out:
+        _ensure_parent_dir(args.json_out)
         with open(args.json_out, "w", encoding="utf-8") as f:
             f.write(text)
         print(f"Wrote merged JSON: {args.json_out}", file=sys.stderr)
@@ -500,6 +837,7 @@ def main():
         print(text)
 
     if args.xlsx:
+        _ensure_parent_dir(args.xlsx)
         write_excel(args.xlsx, payload, merged_internal, include_raw=args.xlsx_raw)
         print(f"Wrote Excel workbook: {args.xlsx}", file=sys.stderr)
 
