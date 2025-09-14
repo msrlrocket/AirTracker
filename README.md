@@ -105,6 +105,7 @@ Payloads for consumers
     "destination_iata": "SEA",
     "origin_country": "United States",
     "is_military": false,
+    "classification": "Commercial",
     "position_timestamp": 1757743600,
     "position_age_sec": 0.1
   }
@@ -440,6 +441,7 @@ Merge rules (summary)
   - callsign: `ADSB.lol.flight/callsign > FR24.callsign > OpenSky.callsign`
   - flight_no: `FR24.flight` if it looks like a commercial number (IATA/ICAO); else use `ADSB.lol.flight`
 - `is_military`: True if any provider True; False if any provider False and none True; else None
+- `classification`: "Military" when `is_military` is True; otherwise "Private" when seat count ≤ threshold, else "Commercial". Seat count is taken from `souls_on_board_max` (if enriched) or a heuristic by `aircraft_type`. The threshold is `PRIVATE_DESIGNATION_SEATS` from `.env` (default 8).
 - `extras_*` fields retain provider-specific keys that aren’t telemetry duplicates
 - `age_*_sec` columns show how old each provider’s latest report is (lower = fresher)
 
@@ -455,9 +457,9 @@ Enriched fields
 
 Optional dataset enrichment
 
-- The merge can enrich aircraft using local JSONL datasets in `./datasets` (or a custom directory via `--datasets PATH`).
-- Default behavior: the closest aircraft (nearest) in the `merged` list is enriched in-place.
-- `--enrich-all`: enrich every aircraft in `merged` (ignores radius).
+- The merge enriches every aircraft using local JSONL datasets in `./datasets` (or a custom directory via `--datasets PATH`).
+- The top-level `nearest` remains as a convenient summary of the closest aircraft.
+- `--enrich-in-radius`: optionally gate enrichment so only aircraft within the input radius are enriched.
 - Added fields when enriched:
   - `souls_on_board_max` — max seats from the aircraft type catalog or heuristics
   - `souls_on_board_max_is_estimate` — `false` when from catalog, `true` when inferred via family heuristics
@@ -480,14 +482,11 @@ python3 scripts/convert_air_catalogs_to_jsonl.py
 Merge + enrich examples
 
 ```
-# Enrich nearest only (default behavior):
+# By default, enrich all merged aircraft (no radius gating):
 python3 plane_merge.py planes_combo.json --json-out planes_merged.json
 
-# Enrich all merged aircraft (no radius gating):
-python3 plane_merge.py planes_combo.json --enrich-all --json-out planes_merged.json
-
 # Use datasets from a custom directory:
-python3 plane_merge.py planes_combo.json --datasets /path/to/datasets --enrich-all --json-out planes_merged.json
+python3 plane_merge.py planes_combo.json --datasets /path/to/datasets --json-out planes_merged.json
 ```
 
 Merged JSON schema (output)

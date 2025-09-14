@@ -233,7 +233,7 @@ publish_device_tracker() {
   # Attributes template: publish only the keys map consumers care about
   # HA will use latitude/longitude attributes for map position
   local attrs_tmpl
-  attrs_tmpl='{{ {"latitude": value_json.latitude, "longitude": value_json.longitude, "altitude_ft": value_json.altitude_ft, "ground_speed_kt": value_json.ground_speed_kt, "track_deg": value_json.track_deg, "registration": value_json.registration, "hex": value_json.hex, "callsign": value_json.callsign} | tojson }}'
+  attrs_tmpl='{{ {"latitude": value_json.latitude, "longitude": value_json.longitude, "altitude_ft": value_json.altitude_ft, "ground_speed_kt": value_json.ground_speed_kt, "track_deg": value_json.track_deg, "registration": value_json.registration, "hex": value_json.hex, "callsign": value_json.callsign, "classification": value_json.classification} | tojson }}'
 
   local state_tmpl
   # Show callsign/hex as state for readability
@@ -289,6 +289,7 @@ publish_sensor "callsign"       "Callsign"        "" "{{ value_json.callsign }}"
 publish_sensor "flight_no"      "Flight Number"   "" "{{ value_json.flight_no }}"      "" "" "mdi:airplane"
 publish_sensor "airline_icao"   "Airline ICAO"    "" "{{ value_json.airline_icao }}"   "" "" "mdi:office-building"
 publish_sensor "aircraft_type"  "Aircraft Type"   "" "{{ value_json.aircraft_type }}"  "" "" "mdi:airplane"
+publish_sensor "classification"  "Classification"   "" "{{ value_json.classification }}"  "" "" "mdi:account-badge"
 publish_sensor "origin_iata"    "Origin IATA"     "" "{{ value_json.origin_iata }}"    "" "" "mdi:airplane-takeoff"
 publish_sensor "destination_iata" "Destination IATA" "" "{{ value_json.destination_iata }}" "" "" "mdi:airplane-landing"
 publish_sensor "squawk"         "Squawk"          "" "{{ value_json.squawk }}"         "" "" "mdi:numeric"

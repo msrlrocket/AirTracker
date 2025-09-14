@@ -40,6 +40,39 @@ def looks_like_iata_flight(s: Optional[str]) -> bool:
     s = _clean_str(s)
     return bool(s and IATA_FLIGHT_RE.match(s))
 
+# ---------- classification helpers ----------
+def _private_threshold_default() -> int:
+    try:
+        return int(os.getenv("PRIVATE_DESIGNATION_SEATS", "8").strip())
+    except Exception:
+        return 8
+
+def classify_aircraft(row: Dict[str, Any], private_threshold: Optional[int] = None) -> Optional[str]:
+    """Return 'Military', 'Private', or 'Commercial' based on:
+    - is_military True → 'Military'
+    - else seats_max (souls_on_board_max or heuristic from aircraft_type)
+      ≤ threshold → 'Private'; > threshold → 'Commercial'
+    - return None when insufficient data
+    """
+    try:
+        if row.get("is_military") is True:
+            return "Military"
+
+        # Determine seat count preference: explicit souls_on_board_max else heuristic by type
+        seats = row.get("souls_on_board_max")
+        if not isinstance(seats, int):
+            seats = None
+        if seats is None:
+            seats = _estimate_seat_max(_clean_str(row.get("aircraft_type")))
+
+        if seats is None:
+            return None
+
+        thr = private_threshold if isinstance(private_threshold, int) else _private_threshold_default()
+        return "Private" if seats <= thr else "Commercial"
+    except Exception:
+        return None
+
 # ---------- dataset lookups (JSONL) ----------
 def _datasets_root() -> str:
     here = os.path.dirname(os.path.abspath(__file__))
@@ -600,7 +633,7 @@ def write_excel(path: str,
             "position_timestamp","position_age_sec",
             "distance_nm","bearing_deg","within_radius",
             "registration","aircraft_type","airline_icao","callsign","flight_no","origin_iata","destination_iata",
-            "is_military",
+            "is_military","classification",
             "age_adsb_lol_sec","age_fr24_sec","age_opensky_sec",
         ]
         df_from_rows(merged_rows, merged_pref).to_excel(writer, sheet_name="Merged", index=False)
@@ -720,20 +753,27 @@ def main():
         return float(d) if isinstance(d, (int, float)) else float("inf")
     merged_internal.sort(key=lambda m: (min_age(m), dist_key(m), m.get("hex","")))
 
-    # Optional enrichment
-    if args.enrich_all or args.enrich_in_radius:
+    # Enrichment: apply lookups for every merged aircraft by default
+    # Still honor legacy flags; enrichment now happens for all planes regardless,
+    # matching the desired behavior to include airports/type/seats for each entry.
+    try:
         catalogs = _load_catalogs(args.datasets)
-        for m in merged_internal:
-            if args.enrich_all or m.get("within_radius") is True:
-                e = enrich_with_catalogs(m, catalogs)
-                if "souls_on_board_max" in e:
-                    m["souls_on_board_max"] = e["souls_on_board_max"]
-                    if "souls_on_board_max_is_estimate" in e:
-                        m["souls_on_board_max_is_estimate"] = e["souls_on_board_max_is_estimate"]
-                    if "souls_on_board_max_text" in e:
-                        m["souls_on_board_max_text"] = e["souls_on_board_max_text"]
-                if "lookups" in e:
-                    m["lookups"] = e["lookups"]
+    except Exception:
+        catalogs = _load_catalogs(None)
+    for m in merged_internal:
+        # If legacy flags are used, they can only restrict enrichment when explicitly
+        # asked to gate by radius; otherwise enrich everything.
+        if args.enrich_in_radius and not (m.get("within_radius") is True):
+            continue
+        e = enrich_with_catalogs(m, catalogs)
+        if "souls_on_board_max" in e:
+            m["souls_on_board_max"] = e["souls_on_board_max"]
+            if "souls_on_board_max_is_estimate" in e:
+                m["souls_on_board_max_is_estimate"] = e["souls_on_board_max_is_estimate"]
+            if "souls_on_board_max_text" in e:
+                m["souls_on_board_max_text"] = e["souls_on_board_max_text"]
+        if "lookups" in e:
+            m["lookups"] = e["lookups"]
 
     cats_for_eta = None
     for m in merged_internal:
@@ -760,6 +800,16 @@ def main():
             m["eta_min"] = round((rem_nm / float(spd)) * 60.0, 1)
         except Exception:
             pass
+
+    # Derive simple classification for each merged aircraft
+    try:
+        _thr = _private_threshold_default()
+    except Exception:
+        _thr = 8
+    for m in merged_internal:
+        c = classify_aircraft(m, _thr)
+        if c:
+            m["classification"] = c
 
     # Build top-level JSON with stats near the top for quick visibility
     out = {
@@ -819,6 +869,15 @@ def main():
                     base_nearest["remaining_nm"] = round(rem_nm, 3)
                     nearest["eta_min"] = round((rem_nm / float(spd)) * 60.0, 1)
                     base_nearest["eta_min"] = round((rem_nm / float(spd)) * 60.0, 1)
+            except Exception:
+                pass
+            # Compute classification for nearest after enrichment
+            try:
+                _thr2 = _thr if isinstance(_thr, int) else _private_threshold_default()
+                c = classify_aircraft(nearest, _thr2)
+                if c:
+                    nearest["classification"] = c
+                    base_nearest["classification"] = c
             except Exception:
                 pass
         except Exception:
