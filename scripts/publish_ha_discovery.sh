@@ -358,12 +358,21 @@ if [[ "$PRUNE" == "1" ]]; then
   need mosquitto_sub
   echo "Pruning stale discovery topics under '${HA_DISCOVERY_PREFIX}/+/$(printf %s "$HA_DEVICE_ID")/+/config' (wait ${PRUNE_WAIT_SEC}s)"
 
-  # Build expected set
-  declare -A expected_map
-  for t in "${expected_topics[@]}"; do expected_map["$t"]=1; done
+  # Membership helper compatible with Bash 3.2 (no associative arrays)
+  topic_in_expected() {
+    local needle="$1"
+    local t
+    for t in "${expected_topics[@]}"; do
+      [[ "$t" == "$needle" ]] && return 0
+    done
+    return 1
+  }
 
-  # Collect existing retained topics for this device
-  mapfile -t existing_lines < <(
+  # Collect existing retained topics for this device (Bash 3.2 compatible)
+  existing_lines=()
+  while IFS= read -r __line; do
+    existing_lines+=("$__line")
+  done < <(
     mosquitto_sub "${mosq_args[@]}" -v \
       -t "${HA_DISCOVERY_PREFIX}/+/$(printf %s "$HA_DEVICE_ID")/+/config" \
       -W "$PRUNE_WAIT_SEC" 2>/dev/null || true
@@ -378,7 +387,7 @@ if [[ "$PRUNE" == "1" ]]; then
     [[ "$payload" == "$topic" ]] && payload=""
 
     # Only consider topics not republished in this run
-    if [[ -z "${expected_map[$topic]:-}" ]]; then
+    if ! topic_in_expected "$topic"; then
       # Extra safety: ensure payload claims our device id
       if echo "$payload" | jq -e --arg id "$HA_DEVICE_ID" '((.device.identifiers // []) | index($id)) or ((.unique_id // "") | startswith($id + "_"))' >/dev/null 2>&1; then
         stale_topics+=("$topic")
