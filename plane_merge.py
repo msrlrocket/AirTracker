@@ -78,6 +78,10 @@ def _datasets_root() -> str:
     here = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(here, "datasets")
 
+def _datasets_path(*parts: str, override: Optional[str] = None) -> str:
+    base = override if isinstance(override, str) and override else _datasets_root()
+    return os.path.join(base, *parts)
+
 def _load_jsonl_map(path: str, key_field: str) -> Dict[str, dict]:
     m: Dict[str, dict] = {}
     try:
@@ -658,6 +662,42 @@ def write_excel(path: str,
             df_raw(prov.get("adsb_lol") or prov.get("adsb") or []).to_excel(writer, sheet_name="ADSB.lol", index=False)
             df_raw(prov.get("fr24") or []).to_excel(writer, sheet_name="FR24", index=False)
 
+def _airline_logo_fields(airline_icao: Optional[str],
+                        airline_iata: Optional[str],
+                        catalogs: Optional[Dict[str, Dict[str, dict]]] = None,
+                        datasets_override: Optional[str] = None) -> Dict[str, Any]:
+    """Return fields for nearest payload with airline logo details if found.
+    Tries ICAO first (logo files are named airline_logo_<ICAO>.png). If ICAO is missing,
+    uses IATA → ICAO mapping via catalogs. Produces:
+      - airline_logo_code: the ICAO code used for lookup
+      - airline_logo_path: repo-relative path like datasets/airline_logos/airline_logo_AAL.png
+      - airline_logo_url: external URL (raw GitHub) for clients to fetch
+    """
+    out: Dict[str, Any] = {}
+    code = _clean_str(airline_icao)
+    if (not code) and airline_iata and catalogs:
+        try:
+            ai = catalogs.get("airlines_by_iata", {}).get(_clean_str(airline_iata) or "")
+            icao2 = ai.get("icao") if isinstance(ai, dict) else None
+            if isinstance(icao2, str) and icao2:
+                code = icao2
+        except Exception:
+            pass
+    if not code:
+        return out
+    code = code.upper()
+    rel_path = os.path.join("datasets", "airline_logos", f"airline_logo_{code}.png")
+    abs_path = _datasets_path("airline_logos", f"airline_logo_{code}.png", override=datasets_override)
+    if os.path.exists(abs_path):
+        out["airline_logo_code"] = code
+        out["airline_logo_path"] = rel_path
+        base_url = os.getenv(
+            "AIRLINE_LOGO_BASE_URL",
+            "https://raw.githubusercontent.com/rzeldent/esp32-flightradar24-ttgo/main/images/airline_logos",
+        ).rstrip("/")
+        out["airline_logo_url"] = f"{base_url}/airline_logo_{code}.png"
+    return out
+
 # ---------- main ----------
 def main():
     ap = argparse.ArgumentParser(description="Merge OpenSky/ADSB.lol/FR24 rows into one record per hex; export JSON/Excel.")
@@ -675,6 +715,13 @@ def main():
                     help="Enrich all merged aircraft using JSONL datasets (aircraft/airlines/airports/countries)")
     ap.add_argument("--enrich-in-radius", action="store_true",
                     help="[Deprecated] Enrich only aircraft within the provided radius")
+    # Nearest-media enrichment via planelookerupper (JetPhotos + FlightRadar): optional and network-bound
+    ap.add_argument("--nearest-scrape", action="store_true",
+                    help="Also scrape media/history for the nearest registration via planelookerupper.py (JetPhotos + FR)")
+    ap.add_argument("--nearest-photos", type=int, default=4,
+                    help="How many JetPhotos images to fetch for nearest (default: 4)")
+    ap.add_argument("--nearest-flights", type=int, default=5,
+                    help="How many recent flights to include for nearest (default: 5)")
     args = ap.parse_args()
 
     # Load input
@@ -827,14 +874,37 @@ def main():
     except ValueError:
         nearest = None
     if nearest:
-        base_nearest = {
-            k: nearest.get(k) for k in [
-                "hex","distance_nm","bearing_deg","latitude","longitude","altitude_ft",
-                "ground_speed_kt","track_deg","squawk","on_ground","vertical_rate_fpm",
-                "registration","aircraft_type","airline_icao","callsign","flight_no",
-                "origin_iata","destination_iata","origin_country","is_military","position_timestamp","position_age_sec"
-            ]
-        }
+        # Build a cleaned, readable nearest payload with logical field order
+        base_nearest: Dict[str, Any] = {}
+        # Identity
+        base_nearest["hex"] = nearest.get("hex")
+        base_nearest["registration"] = nearest.get("registration")
+        base_nearest["callsign"] = nearest.get("callsign")
+        base_nearest["flight_no"] = nearest.get("flight_no")
+        # Aircraft + airline
+        base_nearest["aircraft_type"] = nearest.get("aircraft_type")
+        base_nearest["airline_icao"] = nearest.get("airline_icao")
+        # Route
+        base_nearest["origin_iata"] = nearest.get("origin_iata")
+        base_nearest["destination_iata"] = nearest.get("destination_iata")
+        # Position/geometry
+        base_nearest["distance_nm"] = nearest.get("distance_nm")
+        base_nearest["bearing_deg"] = nearest.get("bearing_deg")
+        base_nearest["latitude"] = nearest.get("latitude")
+        base_nearest["longitude"] = nearest.get("longitude")
+        # Performance
+        base_nearest["ground_speed_kt"] = nearest.get("ground_speed_kt")
+        base_nearest["track_deg"] = nearest.get("track_deg")
+        base_nearest["altitude_ft"] = nearest.get("altitude_ft")
+        base_nearest["vertical_rate_fpm"] = nearest.get("vertical_rate_fpm")
+        base_nearest["on_ground"] = nearest.get("on_ground")
+        base_nearest["squawk"] = nearest.get("squawk")
+        # Timing
+        base_nearest["position_timestamp"] = nearest.get("position_timestamp")
+        base_nearest["position_age_sec"] = nearest.get("position_age_sec")
+        # Misc flags
+        base_nearest["origin_country"] = nearest.get("origin_country")
+        base_nearest["is_military"] = nearest.get("is_military")
         out["nearest"] = base_nearest
         # Also enrich the nearest aircraft within the main merged list (no separate object)
         try:
@@ -852,6 +922,28 @@ def main():
             if "lookups" in enriched:
                 nearest["lookups"] = enriched["lookups"]
                 base_nearest["lookups"] = enriched["lookups"]
+                # Provide a flattened airline_iata for convenience if available
+                try:
+                    ai = (enriched.get("lookups") or {}).get("airline") or {}
+                    iata = ai.get("iata")
+                    if isinstance(iata, str) and iata:
+                        base_nearest["airline_iata"] = iata
+                except Exception:
+                    pass
+            # Airline logo lookup (prefer ICAO; fallback via IATA mapping)
+            try:
+                logo_fields = _airline_logo_fields(
+                    airline_icao=_clean_str(base_nearest.get("airline_icao")) or _clean_str(nearest.get("airline_icao")),
+                    airline_iata=_clean_str(base_nearest.get("airline_iata")),
+                    catalogs=catalogs,
+                    datasets_override=args.datasets,
+                )
+                if logo_fields:
+                    base_nearest.update(logo_fields)
+                    # Also mirror to the internal nearest for consumers of merged list
+                    nearest.update(logo_fields)
+            except Exception:
+                pass
             try:
                 plat = nearest.get("latitude"); plon = nearest.get("longitude")
                 spd = nearest.get("ground_speed_kt")
@@ -882,6 +974,100 @@ def main():
                 pass
         except Exception:
             pass
+
+        # Fallback logo lookup even if enrichment failed
+        try:
+            if not base_nearest.get("airline_logo_url") and not base_nearest.get("airline_logo_path"):
+                logo_fields2 = _airline_logo_fields(
+                    airline_icao=_clean_str(base_nearest.get("airline_icao")),
+                    airline_iata=_clean_str(base_nearest.get("airline_iata")),
+                    catalogs=None,
+                    datasets_override=args.datasets,
+                )
+                if logo_fields2:
+                    base_nearest.update(logo_fields2)
+                    nearest.update(logo_fields2)
+        except Exception:
+            pass
+
+        # Optionally enrich nearest with media and history from planelookerupper
+        if args.nearest_scrape:
+            reg = _clean_str(base_nearest.get("registration"))
+            if reg:
+                try:
+                    try:
+                        # Try importing as a top-level module under ./display/
+                        import importlib, types
+                        here = os.path.dirname(os.path.abspath(__file__))
+                        disp_dir = os.path.join(here, "display")
+                        if disp_dir not in sys.path:
+                            sys.path.insert(0, disp_dir)
+                        pl = importlib.import_module("planelookerupper")
+                        get_info = getattr(pl, "get_aircraft_info")
+                    except Exception:
+                        get_info = None
+                    media: Dict[str, Any] = {}
+                    if get_info:
+                        info = get_info(registration=reg, photos=max(0, int(args.nearest_photos)), flights=max(0, int(args.nearest_flights)))
+                        # JetPhotos → primary image + up to N thumbnails
+                        jp = info.get("JetPhotos") if isinstance(info, dict) else None
+                        if isinstance(jp, dict):
+                            imgs = jp.get("Images") or []
+                            if isinstance(imgs, list) and imgs:
+                                # Primary is first image's full URL
+                                first = imgs[0] if isinstance(imgs[0], dict) else {}
+                                media["plane_image"] = first.get("Image") or first.get("Thumbnail")
+                                # Up to 4 thumbnails
+                                thumbs: List[str] = []
+                                for it in imgs[: max(1, int(args.nearest_photos)) ]:
+                                    if isinstance(it, dict) and it.get("Thumbnail"):
+                                        thumbs.append(it.get("Thumbnail"))
+                                if thumbs:
+                                    media["thumbnails"] = thumbs
+                        # FlightRadar → compact last flights list
+                        fr = info.get("FlightRadar") if isinstance(info, dict) else None
+                        hist: List[Dict[str, Any]] = []
+                        if isinstance(fr, dict):
+                            fls = fr.get("Flights") or []
+                            for f in fls[: max(0, int(args.nearest_flights)) ]:
+                                if not isinstance(f, dict):
+                                    continue
+                                # Map to UI-friendly fields
+                                row = {
+                                    "flight": _clean_str(f.get("Flight")),
+                                    "origin": _clean_str(f.get("From")),
+                                    "destination": _clean_str(f.get("To")) or "Unknown",
+                                    "date_yyyy_mm_dd": _clean_str(f.get("Date")),
+                                    "block_time_hhmm": _clean_str(f.get("FlightTime")),
+                                    # Additional timing fields
+                                    "departure_time_hhmm": _clean_str(f.get("STD")),
+                                    "actual_departure_time_hhmm": _clean_str(f.get("ATD")),
+                                    "arrival_time_hhmm": _clean_str(f.get("STA")),
+                                }
+                                # Arr/ETA heuristic from Status and STA
+                                sta = _clean_str(f.get("STA")) or _clean_str(f.get("STD"))
+                                status = (_clean_str(f.get("Status")) or "").lower()
+                                if "arr" in status:
+                                    row["arr_or_eta_hhmm"] = f"Arr {sta}" if sta else "Arr"
+                                else:
+                                    row["arr_or_eta_hhmm"] = f"ETA {sta}" if sta else "ETA"
+                                hist.append(row)
+                        if media:
+                            base_nearest["media"] = media
+                        if hist:
+                            base_nearest["history"] = hist
+                    # Keys for local/static assets selection on device
+                    # Prefer airline IATA if present, else airline_icao
+                    ak = base_nearest.get("airline_iata") or base_nearest.get("airline_icao")
+                    if ak:
+                        base_nearest["airline_key"] = ak
+                    # Plane key can be registration (preferred) else aircraft_type
+                    pk = reg or _clean_str(base_nearest.get("aircraft_type"))
+                    if pk:
+                        base_nearest["plane_key"] = pk
+                except Exception as e:
+                    # Do not fail the whole pipeline; just skip media enrichment
+                    base_nearest.setdefault("media_errors", []).append(str(e))
     if args.by_hex:
         out["by_hex"] = by_hex_map
 

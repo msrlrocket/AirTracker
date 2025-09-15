@@ -82,6 +82,15 @@ fi
 [[ -n "${MERGE_DATASETS:-}" ]] && merge_flags+=( --datasets "$MERGE_DATASETS" )
 [[ -n "${MERGE_PREFER:-}" ]] && merge_flags+=( --prefer "$MERGE_PREFER" )
 
+# Nearest media enrichment via planelookerupper (optional; network-bound)
+if [[ "${MERGE_NEAREST_SCRAPE:-0}" == "1" || "${MERGE_NEAREST_SCRAPE:-0}" == "true" ]]; then
+  merge_flags+=( --nearest-scrape )
+  : "${MERGE_NEAREST_PHOTOS:=4}"
+  : "${MERGE_NEAREST_FLIGHTS:=5}"
+  merge_flags+=( --nearest-photos "$MERGE_NEAREST_PHOTOS" )
+  merge_flags+=( --nearest-flights "$MERGE_NEAREST_FLIGHTS" )
+fi
+
 # jq output formatting mirrors MERGE_MINIFY: compact when minified, pretty otherwise
 jq_flags=( )
 if [[ "${MERGE_MINIFY}" == "1" || "${MERGE_MINIFY}" == "true" ]]; then

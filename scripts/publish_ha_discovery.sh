@@ -233,7 +233,31 @@ publish_device_tracker() {
   # Attributes template: publish only the keys map consumers care about
   # HA will use latitude/longitude attributes for map position
   local attrs_tmpl
-  attrs_tmpl='{{ {"latitude": value_json.latitude, "longitude": value_json.longitude, "altitude_ft": value_json.altitude_ft, "ground_speed_kt": value_json.ground_speed_kt, "track_deg": value_json.track_deg, "registration": value_json.registration, "hex": value_json.hex, "callsign": value_json.callsign, "classification": value_json.classification} | tojson }}'
+  attrs_tmpl='{{ {
+    "latitude": value_json.latitude,
+    "longitude": value_json.longitude,
+    "altitude_ft": value_json.altitude_ft,
+    "ground_speed_kt": value_json.ground_speed_kt,
+    "track_deg": value_json.track_deg,
+    "distance_nm": value_json.distance_nm,
+    "bearing_deg": value_json.bearing_deg,
+    "remaining_nm": value_json.remaining_nm,
+    "eta_min": value_json.eta_min,
+    "within_radius": value_json.within_radius,
+    "registration": value_json.registration,
+    "hex": value_json.hex,
+    "callsign": value_json.callsign,
+    "classification": value_json.classification,
+    "origin_iata": value_json.origin_iata,
+    "destination_iata": value_json.destination_iata,
+    "airline_key": value_json.airline_key,
+    "plane_key": value_json.plane_key,
+    "airline_logo_code": value_json.airline_logo_code,
+    "airline_logo_path": value_json.airline_logo_path,
+    "airline_logo_url": value_json.airline_logo_url,
+    "media": value_json.media,
+    "history": value_json.history
+  } | tojson }}'
 
   local state_tmpl
   # Show callsign/hex as state for readability
@@ -269,6 +293,7 @@ echo "Publishing HA discovery configs to '${HA_DISCOVERY_PREFIX}' for device '${
 
 # Numeric telemetry
 publish_sensor "distance_nm"       "Nearest Distance"   "nm" "{{ value_json.distance_nm }}"     ""           "measurement" "mdi:map-marker-distance"
+publish_sensor "distance_km"       "Nearest Distance"   "km" "{{ ((value_json.distance_nm | float) * 1.852) | round(1) }}" "" "measurement" "mdi:map-marker-distance"
 publish_sensor "bearing_deg"       "Nearest Bearing"    "°"  "{{ value_json.bearing_deg }}"     ""           "measurement" "mdi:compass"
 publish_sensor "altitude_ft"       "Altitude"           "ft" "{{ value_json.altitude_ft }}"      ""           "measurement" "mdi:arrow-collapse-down"
 publish_sensor "ground_speed_kt"   "Ground Speed"       "kt" "{{ value_json.ground_speed_kt }}" ""           "measurement" "mdi:speedometer"
@@ -278,6 +303,7 @@ publish_sensor "position_age_sec"  "Position Age"       "s"  "{{ value_json.posi
 publish_sensor "latitude"          "Latitude"           "°"  "{{ value_json.latitude }}"        ""           "measurement" "mdi:latitude"
 publish_sensor "longitude"         "Longitude"          "°"  "{{ value_json.longitude }}"       ""           "measurement" "mdi:longitude"
 publish_sensor "position_timestamp" "Position Timestamp" "s"  "{{ value_json.position_timestamp }}" ""        "measurement" "mdi:clock-outline"
+publish_binary_sensor "within_radius" "Within Radius" "{{ value_json.within_radius }}" "" "mdi:radar"
 publish_sensor "remaining_nm"      "Remaining Distance" "nm" "{{ value_json.remaining_nm }}"     ""           "measurement" "mdi:map-marker-distance"
 publish_sensor "eta_min"           "ETA"                "min" "{{ value_json.eta_min }}"        ""           "measurement" "mdi:clock-end"
 publish_sensor "souls_on_board_max" "Souls On Board (Max)" "people" "{{ value_json.souls_on_board_max }}" "" "measurement" "mdi:account-group"
@@ -288,6 +314,8 @@ publish_sensor "registration"   "Registration"    "" "{{ value_json.registration
 publish_sensor "callsign"       "Callsign"        "" "{{ value_json.callsign }}"       "" "" "mdi:account-voice"
 publish_sensor "flight_no"      "Flight Number"   "" "{{ value_json.flight_no }}"      "" "" "mdi:airplane"
 publish_sensor "airline_icao"   "Airline ICAO"    "" "{{ value_json.airline_icao }}"   "" "" "mdi:office-building"
+publish_sensor "airline_logo_code" "Airline Logo Code" "" "{{ value_json.airline_logo_code }}" "" "" "mdi:office-building"
+publish_sensor "airline_logo_url"  "Airline Logo URL"  "" "{{ value_json.airline_logo_url }}"  "" "" "mdi:link"
 publish_sensor "aircraft_type"  "Aircraft Type"   "" "{{ value_json.aircraft_type }}"  "" "" "mdi:airplane"
 publish_sensor "classification"  "Classification"   "" "{{ value_json.classification }}"  "" "" "mdi:account-badge"
 publish_sensor "origin_iata"    "Origin IATA"     "" "{{ value_json.origin_iata }}"    "" "" "mdi:airplane-takeoff"
@@ -301,6 +329,27 @@ publish_sensor "route" "Route" "" "{{ ((value_json.origin_iata | default('', tru
 
 # Verbose route "City (IATA) → City (IATA)", with graceful fallbacks
 publish_sensor "route_verbose" "Route (Verbose)" "" "{{ ( (((value_json.lookups.origin_airport.city | default('', true)) or (value_json.lookups.origin_airport.name | default('', true))) ~ ( ' (' ~ (value_json.origin_iata | default(value_json.lookups.origin_airport.iata | default('', true), true)) ~ ')' ) if (value_json.origin_iata | default(value_json.lookups.origin_airport.iata | default('', true), true)) else ((value_json.lookups.origin_airport.city | default('', true)) or (value_json.lookups.origin_airport.name | default('', true))) ) or (value_json.origin_iata | default(value_json.lookups.origin_airport.iata | default('', true), true)) or '?' ) ~ ' → ' ~ ( (((value_json.lookups.destination_airport.city | default('', true)) or (value_json.lookups.destination_airport.name | default('', true))) ~ ( ' (' ~ (value_json.destination_iata | default(value_json.lookups.destination_airport.iata | default('', true), true)) ~ ')' ) if (value_json.destination_iata | default(value_json.lookups.destination_airport.iata | default('', true), true)) else ((value_json.lookups.destination_airport.city | default('', true)) or (value_json.lookups.destination_airport.name | default('', true))) ) or (value_json.destination_iata | default(value_json.lookups.destination_airport.iata | default('', true), true)) or '?' ) }}" "" "" "mdi:airplane"
+
+# History as attributes for easier HA templating (array preserved)
+publish_sensor_attrs "history" "History (Attributes)" "" "{{ (value_json.history | default([], true)) | length }}" "$STATE_TOPIC_NEAREST" "{{ {'history': (value_json.history | default([], true))} | tojson }}" "" "" "mdi:history"
+
+# Media (URLs) and asset keys
+publish_sensor "media_plane_image"    "Plane Image URL"    "" "{{ value_json.media.plane_image | default('', true) }}" "" "" "mdi:image"
+publish_sensor "media_thumbnails_csv" "Thumbnails (CSV)"   "" "{{ (value_json.media.thumbnails | default([], true)) | join(',') }}" "" "" "mdi:image-multiple"
+publish_sensor "airline_key"          "Airline Key"        "" "{{ value_json.airline_key | default('', true) }}" "" "" "mdi:label"
+publish_sensor "plane_key"            "Plane Key"          "" "{{ value_json.plane_key | default('', true) }}"   "" "" "mdi:label"
+
+# Last flight details from history[0]
+publish_sensor "history_0_line"                         "Last Flight (Line)"  "" "{{ (value_json.history[0].flight | default('', true)) ~ '  ' ~ (value_json.history[0].origin | default('', true)) ~ '→' ~ (value_json.history[0].destination | default('Unknown', true)) ~ '  ' ~ (value_json.history[0].date_yyyy_mm_dd | default('', true)) ~ '  ' ~ (value_json.history[0].block_time_hhmm | default('', true)) ~ '  ' ~ (value_json.history[0].arr_or_eta_hhmm | default('', true)) }}" "" "" "mdi:airplane-clock"
+publish_sensor "history_0_flight"                       "Last Flight"         "" "{{ value_json.history[0].flight | default('', true) }}" "" "" "mdi:airplane"
+publish_sensor "history_0_origin"                       "Last Origin"         "" "{{ value_json.history[0].origin | default('', true) }}" "" "" "mdi:airplane-takeoff"
+publish_sensor "history_0_destination"                  "Last Destination"    "" "{{ value_json.history[0].destination | default('Unknown', true) }}" "" "" "mdi:airplane-landing"
+publish_sensor "history_0_date"                         "Last Date"           "" "{{ value_json.history[0].date_yyyy_mm_dd | default('', true) }}" "" "" "mdi:calendar"
+publish_sensor "history_0_block_time_hhmm"              "Last Block Time"     "" "{{ value_json.history[0].block_time_hhmm | default('', true) }}" "" "" "mdi:timer"
+publish_sensor "history_0_departure_time_hhmm"          "Last Dep (STD)"      "" "{{ value_json.history[0].departure_time_hhmm | default('', true) }}" "" "" "mdi:clock-time-five-outline"
+publish_sensor "history_0_actual_departure_time_hhmm"   "Last Dep (ATD)"      "" "{{ value_json.history[0].actual_departure_time_hhmm | default('', true) }}" "" "" "mdi:clock-time-five"
+publish_sensor "history_0_arrival_time_hhmm"            "Last Arr (STA)"      "" "{{ value_json.history[0].arrival_time_hhmm | default('', true) }}" "" "" "mdi:clock-time-eight"
+publish_sensor "history_0_arr_or_eta_hhmm"              "Last Arr/ETA"        "" "{{ value_json.history[0].arr_or_eta_hhmm | default('', true) }}" "" "" "mdi:clock-outline"
 
 # Origin airport details (from lookups.origin_airport, when available)
 publish_sensor "origin_airport_name"           "Origin Airport Name"         ""  "{{ value_json.lookups.origin_airport.name | default(\"\", true) }}"                    "" "" "mdi:airport"
