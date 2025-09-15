@@ -4,8 +4,8 @@ Compare and merge live aircraft data around a point by querying multiple provide
 
 This repo contains scripts and datasets that work together:
 
-- plane_retreiver.py: Fetches aircraft near a latitude/longitude from OpenSky, ADSB.lol, and the (unofficial) Flightradar24 feed.js endpoint. It prints tables, can tag military aircraft via ADSB.lol, and can export JSON or Excel.
-- plane_merge.py: Takes the JSON output from plane_retreiver.py and merges rows per ICAO hex into a single, human-friendly record, choosing the freshest provider per field. It can output merged JSON and Excel, and optionally enrich aircraft with data from local datasets (aircraft types, airports, airlines, countries).
+- mqtt/producer/plane_retreiver.py: Fetches aircraft near a latitude/longitude from OpenSky, ADSB.lol, and the (unofficial) Flightradar24 feed.js endpoint. It prints tables, can tag military aircraft via ADSB.lol, and can export JSON or Excel.
+- mqtt/producer/plane_merge.py: Takes the JSON output from plane_retreiver.py and merges rows per ICAO hex into a single, human-friendly record, choosing the freshest provider per field. It can output merged JSON and Excel, and optionally enrich aircraft with data from local datasets (aircraft types, airports, airlines, countries).
 
 Datasets and converters
 
@@ -36,7 +36,7 @@ High-level flow
 
 1) Producer (runs on HA or a nearby host)
 
-- Runs `plane_retreiver.py` for a point and radius, then pipes into `plane_merge.py`.
+- Runs `mqtt/producer/plane_retreiver.py` for a point and radius, then pipes into `mqtt/producer/plane_merge.py`.
 - Publishes compact MQTT topics for consumers, e.g.:
   - `airtracker/nearest` (retained): a tiny JSON with only the closest plane.
   - `airtracker/planes` (optional snapshot): the full merged list for map/logging.
@@ -62,8 +62,8 @@ Example producer command (stdout → MQTT)
 
 ```bash
 # Retrieve + merge (stdout), publish nearest (retained)
-python3 plane_retreiver.py <lat> <lon> -r <nm> --json-stdout --quiet \
-  | python3 plane_merge.py --json-stdout --minify \
+python3 mqtt/producer/plane_retreiver.py <lat> <lon> -r <nm> --json-stdout --quiet \
+  | python3 mqtt/producer/plane_merge.py --json-stdout --minify \
   | tee ./data/planes_merged.json \
   | jq -cr '.nearest' \
   | mosquitto_pub -t airtracker/nearest -r -s
@@ -76,7 +76,7 @@ cat ./data/planes_merged.json \
 
 Notes
 
-- If you prefer HTTP/file instead of MQTT, write `--json-out planes_merged.json` and have consumers read it. MQTT is recommended for push updates and low-latency ESP32 updates.
+- If you prefer HTTP/file instead of MQTT, write `--json-out planes_merged.json` and have consumers read it. A pretty-formatted companion file `planes_merged_pretty.json` is also written for readability. MQTT is recommended for push updates and low-latency ESP32 updates.
 - `--by-hex` adds a `by_hex` object for O(1) lookups by hex (handy in HA templates). It duplicates the list data, so keep it off for the ESP32 to save memory.
 
 Payloads for consumers
@@ -156,39 +156,39 @@ Home Assistant tips
 Run a retrieval around a point (default wide tables):
 
 ```
-python3 plane_retreiver.py 46.168689 -123.020309 -r 50
+python3 mqtt/producer/plane_retreiver.py 46.168689 -123.020309 -r 50
 ```
 
 Compact tables (legacy view):
 
 ```
-python3 plane_retreiver.py 46.168689 -123.020309 -r 50 --narrow
+python3 mqtt/producer/plane_retreiver.py 46.168689 -123.020309 -r 50 --narrow
 ```
 
 Export to Excel (one sheet per provider + Notes):
 
 ```
-python3 plane_retreiver.py 46.168689 -123.020309 -r 50 --xlsx flights.xlsx
+python3 mqtt/producer/plane_retreiver.py 46.168689 -123.020309 -r 50 --xlsx flights.xlsx
 ```
 
 MIL tagging options:
 
 ```
 # Per-hex lookups (default), 3h TTL, custom cache, then print cache summary
-python3 plane_retreiver.py 46.168689 -123.020309 -r 50 --mil-ttl 10800 --mil-cache my_mil_cache.json --print-mil-cache
+python3 mqtt/producer/plane_retreiver.py 46.168689 -123.020309 -r 50 --mil-ttl 10800 --mil-cache my_mil_cache.json --print-mil-cache
 
 # Use the global MIL list once per TTL; also export a 'MIL' sheet to Excel
-python3 plane_retreiver.py 46.168689 -123.020309 -r 50 --mil-mode list --xlsx flights.xlsx
+python3 mqtt/producer/plane_retreiver.py 46.168689 -123.020309 -r 50 --mil-mode list --xlsx flights.xlsx
 
 # Purge the per-hex cache before running
-python3 plane_retreiver.py 46.168689 -123.020309 -r 50 --purge-mil-cache
+python3 mqtt/producer/plane_retreiver.py 46.168689 -123.020309 -r 50 --purge-mil-cache
 ```
 
 JSON handoff (clean stdout) to merge per-hex:
 
 ```
-python3 plane_retreiver.py 46.168689 -123.020309 -r 50 --json-stdout --quiet \
-  | python3 plane_merge.py --json-stdout
+python3 mqtt/producer/plane_retreiver.py 46.168689 -123.020309 -r 50 --json-stdout --quiet \
+  | python3 mqtt/producer/plane_merge.py --json-stdout
 
 Data outputs
 
@@ -201,7 +201,7 @@ Data outputs
 Dump raw provider payloads for debugging:
 
 ```
-python3 plane_retreiver.py 46.168689 -123.020309 -r 50 --dump --debug
+python3 mqtt/producer/plane_retreiver.py 46.168689 -123.020309 -r 50 --dump --debug
 ```
 
 ## Run Examples
@@ -211,24 +211,25 @@ The commands below cover three common ways to run things: the MQTT publisher scr
 **MQTT Publisher Script**
 
 - One‑shot publish (useful for testing or HA automations):
-  - `RUN_ONCE=1 bash ./scripts/publish_mqtt.sh`
+  - `RUN_ONCE=1 bash ./mqtt/producer/publish_mqtt.sh`
 - Continuous loop (default behavior):
-  - `bash ./scripts/publish_mqtt.sh`
+  - `bash ./mqtt/producer/publish_mqtt.sh`
 - Override settings inline (or via `.env`):
-  - `LAT=46.168689 LON=-123.020309 RADIUS_NM=50 MQTT_HOST=192.168.2.244 MQTT_PREFIX=airtracker RUN_ONCE=1 bash ./scripts/publish_mqtt.sh`
+  - `LAT=46.168689 LON=-123.020309 RADIUS_NM=50 MQTT_HOST=192.168.2.244 MQTT_PREFIX=airtracker RUN_ONCE=1 bash ./mqtt/producer/publish_mqtt.sh`
 - Select merge options for the publisher output:
-  - `MERGE_MINIFY=1 MERGE_BY_HEX=0 RUN_ONCE=1 bash ./scripts/publish_mqtt.sh`
+  - `MERGE_MINIFY=1 MERGE_BY_HEX=0 RUN_ONCE=1 bash ./mqtt/producer/publish_mqtt.sh`
 
 Notes
 
 - The publisher retains `nearest` and `planes` at `mqtt://$MQTT_HOST:$MQTT_PORT/$MQTT_PREFIX/{nearest,planes}`.
 - If you only want pretty (non‑minified) JSON on the wire, set `MERGE_MINIFY=0`.
 - You can skip providers with `SKIP_OPENSKY=1`, `SKIP_ADSB=1`, or `SKIP_FR24=1`.
+- If you set `WRITE_JSON_PATH=./data/planes_merged.json`, the script also writes a human‑readable `./data/planes_merged_pretty.json` alongside it.
 
 **Home Assistant MQTT Discovery**
 
 - Publish HA discovery configs for all AirTracker sensors:
-  - `bash ./scripts/publish_ha_discovery.sh`
+  - `bash ./mqtt/producer/publish_ha_discovery.sh`
 - Options (CLI or env):
   - `--dry-run` or `HA_DISCOVERY_DRY_RUN=1` prints intended publishes/removals without changing the broker.
   - `--prune` or `HA_DISCOVERY_PRUNE=1` removes retained discovery topics that are no longer defined by the script.
@@ -239,27 +240,28 @@ Notes
   - Deletes retained topics that exist on the broker but are not in the expected set, with a safety check that the payload’s `device.identifiers` or `unique_id` matches `HA_DEVICE_ID`.
 - Integrate with the publisher:
   - The publisher calls discovery once at startup. Set `HA_DISCOVERY_PRUNE=1` in `.env` to also prune stale discovery topics at that time.
-  - Example: `HA_DISCOVERY_PRUNE=1 RUN_ONCE=1 bash ./scripts/publish_mqtt.sh`
+  - Example: `HA_DISCOVERY_PRUNE=1 RUN_ONCE=1 bash ./mqtt/producer/publish_mqtt.sh`
 
 **Retriever With Inline Merge (`--merge`)**
 
 - Print merged JSON to stdout in one step (quiet logs):
-  - `python3 plane_retreiver.py 46.168689 -123.020309 -r 50 --json-stdout --quiet --merge --merge-minify`
+  - `python3 mqtt/producer/plane_retreiver.py 46.168689 -123.020309 -r 50 --json-stdout --quiet --merge --merge-minify`
 - Include a `by_hex` map and write to a file too:
-  - `python3 plane_retreiver.py 46.168689 -123.020309 -r 50 --json-stdout --quiet --merge --merge-minify --merge-by-hex --merge-json-out ./data/planes_merged.json`
+  - `python3 mqtt/producer/plane_retreiver.py 46.168689 -123.020309 -r 50 --json-stdout --quiet --merge --merge-minify --merge-by-hex --merge-json-out ./data/planes_merged.json`
+    - Also writes `./data/planes_merged_pretty.json` for easy reading.
 
 This is handy for piping the merged result to other tools, e.g.:
 
-- `python3 plane_retreiver.py 46.168689 -123.020309 -r 50 --json-stdout --quiet --merge --merge-minify | jq -cr '.nearest'`
+- `python3 mqtt/producer/plane_retreiver.py 46.168689 -123.020309 -r 50 --json-stdout --quiet --merge --merge-minify | jq -cr '.nearest'`
 
 **Run Each Script Independently**
 
 - Retrieve to a file (quiet stdout):
-  - `python3 plane_retreiver.py 46.168689 -123.020309 -r 50 --json-out ./data/planes_combo.json --json-minify --quiet`
+  - `python3 mqtt/producer/plane_retreiver.py 46.168689 -123.020309 -r 50 --json-out ./data/planes_combo.json --json-minify --quiet`
 - Merge from file to stdout, minified:
-  - `python3 plane_merge.py ./data/planes_combo.json --json-stdout --minify`
+  - `python3 mqtt/producer/plane_merge.py ./data/planes_combo.json --json-stdout --minify`
 - Or pipe directly with `jq` for nearest only:
-  - `python3 plane_retreiver.py 46.168689 -123.020309 -r 50 --json-stdout --quiet | python3 plane_merge.py --json-stdout --minify | jq -cr '.nearest'`
+- `python3 mqtt/producer/plane_retreiver.py 46.168689 -123.020309 -r 50 --json-stdout --quiet | python3 mqtt/producer/plane_merge.py --json-stdout --minify | jq -cr '.nearest'`
 
 **Using a Virtual Environment (`.venv`)**
 
@@ -267,9 +269,9 @@ This is handy for piping the merged result to other tools, e.g.:
   - `python3 -m venv .venv && source .venv/bin/activate`
   - `pip install -U pip requests`  (add `pandas openpyxl` if you plan to export Excel)
 - Run inside the venv (examples):
-  - `(.venv) RUN_ONCE=1 bash ./scripts/publish_mqtt.sh`
-  - `(.venv) python3 plane_retreiver.py 46.168689 -123.020309 -r 50 --json-stdout --quiet --merge --merge-minify`
-  - `(.venv) python3 plane_merge.py ./data/planes_combo.json --json-stdout --minify`
+  - `(.venv) RUN_ONCE=1 bash ./mqtt/producer/publish_mqtt.sh`
+  - `(.venv) python3 mqtt/producer/plane_retreiver.py 46.168689 -123.020309 -r 50 --json-stdout --quiet --merge --merge-minify`
+  - `(.venv) python3 mqtt/producer/plane_merge.py ./data/planes_combo.json --json-stdout --minify`
 
 ## OpenSky Credentials
 
@@ -472,21 +474,24 @@ Optional dataset enrichment
 Dataset preparation
 
 ```
-# Aircraft types (JSON/JSONL/YAML), writes datasets/aircraft_types_full.jsonl
-python3 scripts/convert_aircraft_types_to_json.py
+# Aircraft types (JSON/JSONL/YAML), expected under mqtt/producer/datasets/
+# (If you maintain conversion scripts, point their outputs to mqtt/producer/datasets)
+# python3 scripts/convert_aircraft_types_to_json.py
 
-# Countries, airports, airlines (JSONL), writes datasets/*.jsonl
-python3 scripts/convert_air_catalogs_to_jsonl.py
+# Countries, airports, airlines (JSONL), expected under mqtt/producer/datasets/
+# python3 scripts/convert_air_catalogs_to_jsonl.py
 ```
 
 Merge + enrich examples
 
 ```
 # By default, enrich all merged aircraft (no radius gating):
-python3 plane_merge.py planes_combo.json --json-out planes_merged.json
+python3 mqtt/producer/plane_merge.py planes_combo.json --json-out planes_merged.json
+# Also writes planes_merged_pretty.json next to the output
 
 # Use datasets from a custom directory:
-python3 plane_merge.py planes_combo.json --datasets /path/to/datasets --json-out planes_merged.json
+python3 mqtt/producer/plane_merge.py planes_combo.json --datasets /path/to/datasets --json-out planes_merged.json
+# Also writes planes_merged_pretty.json next to the output
 ```
 
 Merged JSON schema (output)
@@ -516,5 +521,5 @@ Excel export (merged)
 This code queries third-party services under their respective terms. Use responsibly and respect rate limits.
 
 To Run:
-python plane_retreiver.py 46.168689192763544, -123.02030882679537 -r 25 --json-out ./data/planes_combo.json
-python plane_merge.py ./data/planes_combo.json --json-out ./data/planes_merged.json
+python mqtt/producer/plane_retreiver.py 46.168689192763544, -123.02030882679537 -r 25 --json-out ./data/planes_combo.json
+python mqtt/producer/plane_merge.py ./data/planes_combo.json --json-out ./data/planes_merged.json

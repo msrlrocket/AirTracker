@@ -37,6 +37,11 @@ Edit `include/config.h`:
 
 You can override any `#define` at build time with `-D` flags in `platformio.ini` if desired.
 
+Config and version control
+- The repo includes `include/config.example.h` with placeholders.
+- On build, a missing `include/config.h` is auto-created from the example (see `tools/check_config.py`).
+- `include/config.h` is gitignored to keep your Wi‑Fi/MQTT secrets out of Git.
+
 ## Build and Upload (PlatformIO)
 
 - Install the PlatformIO extension in VS Code (or use `pio` CLI)
@@ -45,6 +50,11 @@ You can override any `#define` at build time with `-D` flags in `platformio.ini`
 - Build: `pio run -d display/esp32-airtracker`
 - Upload: `pio run -d display/esp32-airtracker -t upload`
 - Serial monitor: `pio device monitor -b 115200`
+
+## Prebuilt Image
+
+- A ready-to-flash single image is in `display/esp32-airtracker/release/factory.bin` with Windows scripts.
+- See `display/esp32-airtracker/release/README-Windows.md` for flashing instructions.
 
 ## What it shows
 
@@ -61,7 +71,7 @@ Screen 2 (Gallery):
 Screen 3 (Radar):
 - Simple scope with range rings and a plotted target using `bearing_deg` and `distance_nm`
 
-All fields are derived from the `nearest` JSON published by `scripts/publish_mqtt.sh`. The keys match the YAML logic (e.g. `origin_iata`, `destination_iata`, `distance_nm`, `remaining_nm`, `eta_min`, `ground_speed_kt`, `altitude_ft`, `vertical_rate_fpm`, `bearing_deg`, `track_deg`, `lookups.airline.name`, `lookups.aircraft.name`).
+All fields are derived from the `nearest` JSON published by `mqtt/producer/publish_mqtt.sh`. The keys match the YAML logic (e.g. `origin_iata`, `destination_iata`, `distance_nm`, `remaining_nm`, `eta_min`, `ground_speed_kt`, `altitude_ft`, `vertical_rate_fpm`, `bearing_deg`, `track_deg`, `lookups.airline.name`, `lookups.aircraft.name`).
 
 ## Notes
 

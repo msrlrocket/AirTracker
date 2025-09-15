@@ -16,7 +16,7 @@
 set -u -o pipefail
 
 # Load repository .env if present (exports vars)
-ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 if [[ -f "$ROOT_DIR/.env" ]]; then
   set -a
   # shellcheck source=/dev/null
@@ -37,12 +37,14 @@ fi
 : "${MQTT_PREFIX:=airtracker}"
 
 # Cadence controls
-# How often to fetch from providers (limits network usage)
-: "${FETCH_INTERVAL_SEC:=30}"
-# How often to publish the cached nearest snapshot to MQTT
-: "${NEAREST_INTERVAL_SEC:=2}"
-# How often to publish the cached full planes list to MQTT
-: "${PLANES_INTERVAL_SEC:=30}"
+# Option A: fixed fetch interval (seconds)
+: "${FETCH_INTERVAL_SEC:=}"
+# Option B: jittered fetch interval range (seconds)
+: "${FETCH_INTERVAL_MIN_SEC:=80}"
+: "${FETCH_INTERVAL_MAX_SEC:=100}"
+# Publish cadences (default to fetch min interval to avoid spamming broker)
+: "${NEAREST_INTERVAL_SEC:=${FETCH_INTERVAL_MIN_SEC}}"
+: "${PLANES_INTERVAL_SEC:=${FETCH_INTERVAL_MIN_SEC}}"
 
 # Run once and exit (good for HA automations). Set to 1 for one-shot.
 : "${RUN_ONCE:=0}"
@@ -79,6 +81,8 @@ if [[ "${MERGE_ENRICH_ALL:-}" == "1" || "${MERGE_ENRICH_ALL:-}" == "true" ]]; th
 elif [[ "${MERGE_ENRICH_IN_RADIUS:-}" == "1" || "${MERGE_ENRICH_IN_RADIUS:-}" == "true" ]]; then
   merge_flags+=( --enrich-in-radius )
 fi
+:
+"${MERGE_DATASETS:=$ROOT_DIR/datasets}"
 [[ -n "${MERGE_DATASETS:-}" ]] && merge_flags+=( --datasets "$MERGE_DATASETS" )
 [[ -n "${MERGE_PREFER:-}" ]] && merge_flags+=( --prefer "$MERGE_PREFER" )
 
@@ -104,28 +108,65 @@ retriever_flags=( --json-stdout --quiet )
 
 echo "Starting AirTracker MQTT publisher → mqtt://${MQTT_HOST}:${MQTT_PORT}/${MQTT_PREFIX}"
 echo "  Point: lat=${LAT}, lon=${LON}, radius_nm=${RADIUS_NM}"
-echo "  Fetch every ${FETCH_INTERVAL_SEC}s | publish nearest every ${NEAREST_INTERVAL_SEC}s | planes every ${PLANES_INTERVAL_SEC}s"
+if [[ -n "${FETCH_INTERVAL_SEC}" ]]; then
+  echo "  Fetch every ${FETCH_INTERVAL_SEC}s | nearest ${NEAREST_INTERVAL_SEC}s | planes ${PLANES_INTERVAL_SEC}s"
+else
+  echo "  Fetch jitter ${FETCH_INTERVAL_MIN_SEC}-${FETCH_INTERVAL_MAX_SEC}s | nearest ${NEAREST_INTERVAL_SEC}s | planes ${PLANES_INTERVAL_SEC}s"
+fi
 
 last_fetch_ts=0
 last_nearest_pub_ts=0
 last_planes_pub_ts=0
 payload=""
+# Next fetch delay (seconds)
+FETCH_INTERVAL_NEXT=${FETCH_INTERVAL_SEC:-$FETCH_INTERVAL_MIN_SEC}
+
+compute_next_fetch() {
+  if [[ -n "${FETCH_INTERVAL_SEC}" ]]; then
+    FETCH_INTERVAL_NEXT=${FETCH_INTERVAL_SEC}
+  else
+    local min=${FETCH_INTERVAL_MIN_SEC}
+    local max=${FETCH_INTERVAL_MAX_SEC}
+    if (( max < min )); then
+      local tmp=$min; min=$max; max=$tmp
+    fi
+    local span=$(( max - min + 1 ))
+    # $RANDOM: 0..32767 → scale to span
+    local r=$RANDOM
+    FETCH_INTERVAL_NEXT=$(( min + (r % span) ))
+  fi
+}
 
 # Optional: write merged JSON to this path on every fetch (empty to disable)
 : "${WRITE_JSON_PATH:=}"
 
 run_fetch() {
   local out
-  out=$(python3 "$(dirname "$0")/../plane_retreiver.py" "$LAT" "$LON" -r "$RADIUS_NM" "${retriever_flags[@]}" 2>/dev/null \
-    | python3 "$(dirname "$0")/../plane_merge.py" "${merge_flags[@]}" 2>/dev/null) || out=""
+  out=$(python3 "$(dirname "$0")/plane_retreiver.py" "$LAT" "$LON" -r "$RADIUS_NM" "${retriever_flags[@]}" 2>/dev/null \
+    | python3 "$(dirname "$0")/plane_merge.py" "${merge_flags[@]}" 2>/dev/null) || out=""
   if [[ -n "$out" ]]; then
     payload="$out"
     last_fetch_ts=$(date +%s)
-    if [[ -n "${WRITE_JSON_PATH}" ]]; then
-      mkdir -p "$(dirname "${WRITE_JSON_PATH}")" 2>/dev/null || true
-      printf '%s\n' "$payload" > "${WRITE_JSON_PATH}" || true
+  if [[ -n "${WRITE_JSON_PATH}" ]]; then
+      local dest="$WRITE_JSON_PATH"
+      if [[ "$dest" != /* ]]; then
+        dest="$ROOT_DIR/$dest"
+      fi
+      mkdir -p "$(dirname "$dest")" 2>/dev/null || true
+      printf '%s\n' "$payload" > "$dest" || true
+
+      # Also write a pretty-formatted companion for easy reading
+      # Derive a *_pretty.json name when extension is .json, else append .pretty.json
+      local pretty_dest
+      if [[ "$dest" == *.json ]]; then
+        pretty_dest="${dest%.json}_pretty.json"
+      else
+        pretty_dest="${dest}.pretty.json"
+      fi
+      printf '%s\n' "$payload" | jq '.' > "$pretty_dest" 2>/dev/null || true
     fi
   fi
+  compute_next_fetch
 }
 
 publish_nearest() {
@@ -170,7 +211,7 @@ while :; do
   now=$(date +%s)
 
   # Fetch when interval elapsed or payload is empty
-  if (( now - last_fetch_ts >= FETCH_INTERVAL_SEC )) || [[ -z "$payload" ]]; then
+  if (( now - last_fetch_ts >= FETCH_INTERVAL_NEXT )) || [[ -z "$payload" ]]; then
     run_fetch
   fi
 

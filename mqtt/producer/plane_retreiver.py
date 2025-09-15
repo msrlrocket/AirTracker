@@ -6,9 +6,13 @@ import os, sys, math, json, argparse, getpass, requests, time, subprocess
 # Load environment variables from a local .env if present (no external deps)
 def _load_local_env() -> None:
     try:
+        here = os.path.dirname(os.path.abspath(__file__))
+        # repo root candidates: ., script dir, parent dirs
         paths = [
             ".env",
-            os.path.join(os.path.dirname(__file__), ".env"),
+            os.path.join(here, ".env"),
+            os.path.join(os.path.dirname(here), ".env"),
+            os.path.join(os.path.dirname(os.path.dirname(here)), ".env"),
         ]
         seen = set()
         for path in paths:

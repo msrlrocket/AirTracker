@@ -75,7 +75,19 @@ def classify_aircraft(row: Dict[str, Any], private_threshold: Optional[int] = No
 
 # ---------- dataset lookups (JSONL) ----------
 def _datasets_root() -> str:
+    """Return a best-effort path to the repo-level datasets directory.
+    Tries common locations relative to this file and CWD.
+    """
     here = os.path.dirname(os.path.abspath(__file__))
+    cands = [
+        os.path.join(here, "datasets"),
+        os.path.join(os.path.dirname(here), "datasets"),
+        os.path.join(os.path.dirname(os.path.dirname(here)), "datasets"),
+        os.path.join(os.getcwd(), "datasets"),
+    ]
+    for p in cands:
+        if os.path.isdir(p):
+            return p
     return os.path.join(here, "datasets")
 
 def _datasets_path(*parts: str, override: Optional[str] = None) -> str:
@@ -996,12 +1008,10 @@ def main():
             if reg:
                 try:
                     try:
-                        # Try importing as a top-level module under ./display/
-                        import importlib, types
+                        import importlib
                         here = os.path.dirname(os.path.abspath(__file__))
-                        disp_dir = os.path.join(here, "display")
-                        if disp_dir not in sys.path:
-                            sys.path.insert(0, disp_dir)
+                        if here not in sys.path:
+                            sys.path.insert(0, here)
                         pl = importlib.import_module("planelookerupper")
                         get_info = getattr(pl, "get_aircraft_info")
                     except Exception:
@@ -1068,16 +1078,83 @@ def main():
                 except Exception as e:
                     # Do not fail the whole pipeline; just skip media enrichment
                     base_nearest.setdefault("media_errors", []).append(str(e))
+
+        # Ensure the nearest payload always contains the keys expected by consumers,
+        # even when unknown, so subscribers can clear stale values.
+        def _ensure_nearest_defaults(obj: Dict[str, Any]) -> None:
+            # Strings: set to "" when missing/None
+            str_keys = [
+                "hex","registration","callsign","flight_no","aircraft_type",
+                "airline_icao","airline_iata","origin_iata","destination_iata",
+                "classification","airline_logo_url","airline_logo_path","airline_logo_code",
+            ]
+            for k in str_keys:
+                if obj.get(k) is None:
+                    obj[k] = ""
+            # Int-like fields: default to 0
+            int_keys = ["altitude_ft","vertical_rate_fpm","ground_speed_kt","souls_on_board"]
+            for k in int_keys:
+                if obj.get(k) is None:
+                    obj[k] = 0
+            # Float-like fields: default to 0.0
+            float_keys = [
+                "distance_nm","remaining_nm","eta_min","latitude","longitude",
+                "track_deg","bearing_deg","position_age_sec"
+            ]
+            for k in float_keys:
+                if obj.get(k) is None:
+                    obj[k] = 0.0
+            # Boolean-like fields
+            if obj.get("on_ground") is None:
+                obj["on_ground"] = False
+            # Lookups stub with empty names to force UI to clear
+            lk = obj.get("lookups")
+            if not isinstance(lk, dict):
+                lk = {}
+                obj["lookups"] = lk
+            al = lk.get("airline")
+            if not isinstance(al, dict):
+                al = {}
+                lk["airline"] = al
+            if al.get("name") is None:
+                al["name"] = ""
+            ac = lk.get("aircraft")
+            if not isinstance(ac, dict):
+                ac = {}
+                lk["aircraft"] = ac
+            if ac.get("name") is None:
+                ac["name"] = ""
+            if "seats_max" not in ac:
+                ac["seats_max"] = None
+
+        _ensure_nearest_defaults(base_nearest)
     if args.by_hex:
         out["by_hex"] = by_hex_map
 
+    # Primary JSON payload (minified or pretty based on --minify)
     text = json.dumps(out, ensure_ascii=False, indent=None if args.minify else 2)
+    # Always prepare a pretty-printed variant for human reading
+    pretty_text = json.dumps(out, ensure_ascii=False, indent=2)
 
     if args.json_out:
         _ensure_parent_dir(args.json_out)
         with open(args.json_out, "w", encoding="utf-8") as f:
             f.write(text)
         print(f"Wrote merged JSON: {args.json_out}", file=sys.stderr)
+
+        # Also write a human-readable pretty JSON alongside the primary file.
+        try:
+            base, ext = os.path.splitext(args.json_out)
+            if ext.lower() == ".json":
+                pretty_path = f"{base}_pretty{ext}"
+            else:
+                pretty_path = f"{args.json_out}.pretty.json"
+            _ensure_parent_dir(pretty_path)
+            with open(pretty_path, "w", encoding="utf-8") as pf:
+                pf.write(pretty_text)
+            print(f"Wrote pretty JSON: {pretty_path}", file=sys.stderr)
+        except Exception as e:
+            print(f"Warning: could not write pretty JSON alongside output: {e}", file=sys.stderr)
     if args.json_stdout or not args.json_out:
         print(text)
 

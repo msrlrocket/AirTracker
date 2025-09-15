@@ -37,7 +37,7 @@ EOF
 # Note: we load .env first, then compute flag defaults from env, then parse CLI
 
 # Load repository .env if present (exports vars like MQTT_* and defaults)
-ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 if [[ -f "$ROOT_DIR/.env" ]]; then
   set -a
   # shellcheck source=/dev/null

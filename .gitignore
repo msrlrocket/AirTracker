@@ -211,6 +211,21 @@ mil_cache.json
 planes_combo.json
 planes_merged.json
 
+# Runtime data and caches (safe to regenerate)
+data/
+
+# macOS / Windows noise
+.DS_Store
+Thumbs.db
+
+# PlatformIO (catch-all, any nested project)
+**/.pio/
+**/.pioenvs/
+**/.piolibdeps/
+**/.pio-build/
+**/.sconsign.dblite
+**/.pio-home/
+
 # PlatformIO (ESP32 project)
 # Core dir and SCons state
 .pio-home/
@@ -230,3 +245,5 @@ display/esp32-airtracker/.pio-build/
 display/esp32-airtracker/.vscode/.browse.VC.db*
 display/esp32-airtracker/.clang_complete
 display/esp32-airtracker/.gcc-flags.json
+# Firmware local config (keep secrets out of VCS)
+display/esp32-airtracker/include/config.h

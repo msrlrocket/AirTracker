@@ -1,4 +1,7 @@
 #include <Arduino.h>
+#if defined(ARDUINO_USB_CDC_ON_BOOT)
+#include <USB.h>
+#endif
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include <SPI.h>
@@ -67,6 +70,9 @@ static bool fetching_plane = false;
 static String last_logo_url;
 static String last_plane_url;
 
+// Select debug stream: always use Serial. On ESP32, Serial maps to USB CDC when enabled.
+#define DBG Serial
+
 // TJpg_Decoder callback to push decoded blocks to the display
 static bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* bitmap) {
   if (y >= tft.height() || x >= tft.width()) return false;
@@ -75,7 +81,8 @@ static bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* b
   if (y + h > tft.height()) h = tft.height() - y;
   tft.startWrite();
   tft.setAddrWindow(x, y, w, h);
-  tft.pushColors(bitmap, (uint32_t)w * h, true);
+  // Adafruit_SPITFT no longer has pushColors; use writePixels
+  tft.writePixels(bitmap, (uint32_t)w * h, true);
   tft.endWrite();
   return true;
 }
@@ -303,7 +310,8 @@ static inline void drawGallery() {
   tft.setCursor(8, 40);
   tft.print("Registration / Type / Airline:");
   tft.setCursor(8, 64);
-  tft.print(ellipsize((g.callsign.length()?g.callsign:String("(hex)"))) + "  (" + ") - ");
+  // Limit callsign/hex length to keep within screen width
+  tft.print(ellipsize((g.callsign.length()?g.callsign:String("(hex)")), 16));
   tft.setCursor(8, 88);
   tft.print(ellipsize(g.airline_name + " | " + g.aircraft_name, 30));
   tft.setCursor(8, 120);
@@ -382,7 +390,7 @@ static void onMqtt(char* topic, byte* payload, unsigned int length) {
   StaticJsonDocument<4096> doc;
   DeserializationError err = deserializeJson(doc, payload, length);
   if (err) {
-    Serial.print("JSON parse error: "); Serial.println(err.f_str());
+    DBG.print("JSON parse error: "); DBG.println(err.f_str());
     return;
   }
   JsonObject x = doc.as<JsonObject>();
@@ -417,9 +425,11 @@ static void onMqtt(char* topic, byte* payload, unsigned int length) {
         if (x.containsKey("airline_logo_url")) {
           const char* url = x["airline_logo_url"].as<const char*>();
           g.airline_logo_url = url ? String(url) : String("");
+          if (g.airline_logo_url.length() == 0) { g.airline_logo_path = ""; last_logo_url = ""; }
         } else if (al.containsKey("logo_url")) {
           const char* url = al["logo_url"].as<const char*>();
           g.airline_logo_url = url ? String(url) : String("");
+          if (g.airline_logo_url.length() == 0) { g.airline_logo_path = ""; last_logo_url = ""; }
         }
       }
       if (lk.containsKey("aircraft")) {
@@ -448,6 +458,9 @@ static void onMqtt(char* topic, byte* payload, unsigned int length) {
     } else {
       g.eta_local_hhmm = String("--:--");
     }
+  } else {
+    // Clear stale ETA when not provided
+    g.eta_local_hhmm = String("--:--");
   }
 
   if (x.containsKey("distance_nm")) g.radar_range_km = x["distance_nm"].as<float>() * 1.852f;
@@ -471,6 +484,7 @@ static void onMqtt(char* topic, byte* payload, unsigned int length) {
         if (u) g.plane_image_url = String(u);
       }
     }
+    if (g.plane_image_url.length() == 0) { g.plane_image_path = ""; last_plane_url = ""; }
   }
 
   invalidate = true;
@@ -479,29 +493,29 @@ static void onMqtt(char* topic, byte* payload, unsigned int length) {
 static void ensureMqtt() {
   if (mqtt.connected()) return;
   String clientId = String("airtracker-") + String((uint32_t)ESP.getEfuseMac(), HEX);
-  Serial.print("MQTT connecting as "); Serial.println(clientId);
+    DBG.print("MQTT connecting as "); DBG.println(clientId);
   if (mqtt.connect(clientId.c_str(), MQTT_USER, MQTT_PASS)) {
-    Serial.println("MQTT connected");
+    DBG.println("MQTT connected");
     mqtt.subscribe(MQTT_TOPIC_NEAREST);
-    Serial.print("Subscribed to "); Serial.println(MQTT_TOPIC_NEAREST);
+    DBG.print("Subscribed to "); DBG.println(MQTT_TOPIC_NEAREST);
   }
 }
 
 static void connectWiFi() {
   if (WiFi.status() == WL_CONNECTED) return;
-  Serial.printf("Connecting to WiFi SSID '%s'...\n", WIFI_SSID);
+  DBG.printf("Connecting to WiFi SSID '%s'...\n", WIFI_SSID);
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASS);
   unsigned long start = millis();
   while (WiFi.status() != WL_CONNECTED && millis() - start < 20000) {
     delay(250);
-    Serial.print(".");
+    DBG.print(".");
   }
-  Serial.println();
+  DBG.println();
   if (WiFi.status() == WL_CONNECTED) {
-    Serial.print("WiFi connected. IP: "); Serial.println(WiFi.localIP());
+    DBG.print("WiFi connected. IP: "); DBG.println(WiFi.localIP());
   } else {
-    Serial.println("WiFi connection failed.");
+    DBG.println("WiFi connection failed.");
   }
 }
 
@@ -513,7 +527,7 @@ static void syncTimeOnce() {
     if (now > 100000) { timeReady = true; break; }
     delay(250);
   }
-  Serial.printf("Time sync: %s\n", timeReady ? "OK" : "not ready");
+  DBG.printf("Time sync: %s\n", timeReady ? "OK" : "not ready");
 }
 
 static void initButtons() {
@@ -553,9 +567,9 @@ static void pollButtons() {
 }
 
 void setup() {
-  Serial.begin(115200);
+  DBG.begin(115200);
   delay(50);
-  Serial.println("\nAirTracker ESP32 starting");
+  DBG.println("\nAirTracker ESP32 starting");
 
   // SPI and TFT
   SPI.begin(TFT_SCLK, TFT_MISO, TFT_MOSI, TFT_CS);
@@ -573,7 +587,7 @@ void setup() {
 
   // SPIFFS for cached JPEGs
   if (!SPIFFS.begin(true)) {
-    Serial.println("SPIFFS mount failed");
+    DBG.println("SPIFFS mount failed");
   }
 
   // WiFi + time

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# NOTE: moved from display/ to mqtt/producer/
 # -*- coding: utf-8 -*-
 
 """
@@ -66,19 +67,34 @@ class TLSAdapter(HTTPAdapter):
 
 def get_session(timeout_s: int = 10) -> requests.Session:
     s = requests.Session()
-    s.headers.update({"User-Agent": UA})
+    # Emulate a real browser a bit more closely to reduce 403s
+    s.headers.update(
+        {
+            "User-Agent": UA,
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Upgrade-Insecure-Requests": "1",
+            "Pragma": "no-cache",
+            "Cache-Control": "no-cache",
+        }
+    )
     s.mount("https://", TLSAdapter())
     s.mount("http://", HTTPAdapter())
     s.request_timeout = timeout_s
     return s
 
 
-def fetch_html(url: str, session: Optional[requests.Session] = None) -> str:
+def fetch_html(url: str, session: Optional[requests.Session] = None, *, referer: Optional[str] = None, headers: Optional[Dict[str, str]] = None) -> str:
     s = session or get_session()
     last_err: Optional[Exception] = None
     for attempt in range(3):
         try:
-            resp = s.get(url, timeout=s.request_timeout)
+            req_headers: Dict[str, str] = {}
+            if referer:
+                req_headers["Referer"] = referer
+            if headers:
+                req_headers.update(headers)
+            resp = s.get(url, timeout=s.request_timeout, headers=req_headers or None)
             if resp.status_code == 200:
                 ctype = resp.headers.get("Content-Type", "")
                 if not ctype.startswith("text/html"):
@@ -523,7 +539,7 @@ def scrape_jetphotos(q: APIQueries, session: Optional[requests.Session] = None) 
         return JetPhotosResult(Reg=reg.upper(), Images=[]), None
 
     search_url = f"{JP_HOME_URL}/photo/keyword/{reg}"
-    html = fetch_html(search_url, session=session)
+    html = fetch_html(search_url, session=session, referer=JP_HOME_URL)
     s = Scraper(html)
 
     page_links: List[str] = []
@@ -556,7 +572,8 @@ def scrape_jetphotos(q: APIQueries, session: Optional[requests.Session] = None) 
         thumb = thumbnails[i]
         images[i].Thumbnail = ("https:" + thumb) if thumb.startswith("//") else thumb
 
-        phtml = fetch_html(photo_url, session=session)
+        # Set referer to the search page to better mimic real navigation
+        phtml = fetch_html(photo_url, session=session, referer=search_url)
         ps = Scraper(phtml)
 
         images[i].Image = ps.scrape_links("img", "large-photo__img", 1)[0]
