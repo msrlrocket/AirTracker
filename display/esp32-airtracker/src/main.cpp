@@ -60,8 +60,7 @@ struct FlightData {
   String plane_image_path;
 } g;
 
-// Screens: 0=overview, 1=gallery, 2=radar
-volatile int currentScreen = 0;
+// Single screen (overview only)
 volatile bool invalidate = true;
 
 // Minimal asset fetch state
@@ -163,11 +162,7 @@ static bool drawJpegFileBox(const char* path, int x, int y, int w, int h) {
   return ok;
 }
 
-// Button handling
-struct Btn { int pin; bool state; bool last; unsigned long lastTs; };
-Btn btnA{BTN_A_PIN, true, true, 0};
-Btn btnB{BTN_B_PIN, true, true, 0};
-Btn btnBack{BTN_BACK_PIN, true, true, 0};
+// No hardware buttons while focusing on one screen
 
 // Time sync flag
 volatile bool timeReady = false;
@@ -203,14 +198,16 @@ static inline String fmtIntComma(int v) {
 }
 
 static inline void drawHeader(const String &left, const String &right) {
+  // Draw header snug to the top corners with small margin
+  const int margin = 4;
   tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
-  tft.setTextSize(2);
-  tft.setCursor(8, 8);
+  tft.setTextSize(1);
+  tft.setCursor(margin, margin);
   tft.print(left);
 
   int16_t x1, y1; uint16_t w, h;
   tft.getTextBounds(right, 0, 0, &x1, &y1, &w, &h);
-  tft.setCursor(tft.width() - 8 - w, 8);
+  tft.setCursor(tft.width() - margin - w, margin);
   tft.print(right);
 }
 
@@ -231,8 +228,7 @@ static inline void drawOverview() {
   drawHeader(route, right);
 
   // Center block — aircraft — airline — callsign
-  // Airline logo tile (64x64)
-  tft.drawRect(8, 52, 64, 64, ILI9341_DARKGREY);
+  // Airline logo area (64x64) — no decorative box
   if (g.airline_logo_path.length() && SPIFFS.exists(g.airline_logo_path)) {
     drawJpegFileBox(g.airline_logo_path.c_str(), 8, 52, 64, 64);
   } else {
@@ -243,7 +239,7 @@ static inline void drawOverview() {
     tft.setCursor(8 + (64 - w)/2, 52 + (64 - h)/2);
     tft.print("Unknown");
   }
-  tft.setTextSize(2);
+  tft.setTextSize(1);
   tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
   tft.setCursor(80, 56);
   String line1 = g.aircraft_name.length() ? (g.aircraft_name + " — " + g.airline_name) : g.airline_name;
@@ -253,42 +249,36 @@ static inline void drawOverview() {
     tft.setTextColor(ILI9341_LIGHTGREY, ILI9341_BLACK);
     tft.print("Callsign: "); tft.print(g.callsign);
   }
-  // Plane photo tile (80x64)
-  tft.drawRect(232, 56, 80, 64, ILI9341_DARKGREY);
+  // Plane photo area (80x64) — no decorative box
   if (g.plane_image_path.length() && SPIFFS.exists(g.plane_image_path)) {
     drawJpegFileBox(g.plane_image_path.c_str(), 232, 56, 80, 64);
   }
 
-  // Soft label for radar
-  tft.setTextSize(1);
-  tft.setTextColor(ILI9341_LIGHTGREY, ILI9341_BLACK);
-  int16_t x1,y1; uint16_t w,h; tft.getTextBounds("RADAR ▶", 0, 0, &x1, &y1, &w, &h);
-  tft.setCursor(tft.width() - 8 - w, 52 + 64 + 6);
-  tft.print("RADAR ▶");
+  // No soft RADAR label
 
-  // Bottom bars
+  // Bottom bars (anchor to corners, no boxes)
+  const int margin = 4;
   // Left: distance now / dir / GS
-  tft.setTextSize(2);
+  tft.setTextSize(1);
   tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
-  tft.setCursor(8, 196 + 8);
   char left[64];
   snprintf(left, sizeof(left), "%.1f km - %s | %d km/h", g.distance_now_km, g.direction_cardinal.c_str(), g.ground_speed_kmh);
+  int16_t x1, y1; uint16_t w, h;
+  tft.getTextBounds(left, 0, 0, &x1, &y1, &w, &h);
+  tft.setCursor(margin, tft.height() - margin - h);
   tft.print(left);
 
-  // Middle: souls in a box
-  tft.drawRect(132, 196, 56, 36, ILI9341_DARKGREY);
-  tft.setTextSize(3);
+  // Middle: souls (no box, smaller font)
+  tft.setTextSize(1);
   tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
-  // Centered in 56x36 box roughly
   String souls = fmtInt(g.souls_on_board);
   tft.getTextBounds(souls, 0, 0, &x1, &y1, &w, &h);
-  tft.setCursor(132 + (56 - w)/2, 196 + (36 - h)/2);
+  tft.setCursor((tft.width() - w)/2, tft.height() - margin - h);
   tft.print(souls);
 
   // Right: altitude / vertical
-  tft.setTextSize(2);
+  tft.setTextSize(1);
   tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
-  char vdir = g.vertical_rate_fpm > 0 ? '+' : (g.vertical_rate_fpm < 0 ? '-' : ' ');
   char arrow = g.vertical_rate_fpm > 0 ? '^' : (g.vertical_rate_fpm < 0 ? 'v' : ' ');
   int vmag = g.vertical_rate_fpm >= 0 ? g.vertical_rate_fpm : -g.vertical_rate_fpm;
   char right2[64];
@@ -296,91 +286,14 @@ static inline void drawOverview() {
   String vvs = fmtIntComma(vmag);
   snprintf(right2, sizeof(right2), "%s ft  %c +%s fpm", alt.c_str(), arrow, vvs.c_str());
   tft.getTextBounds(right2, 0, 0, &x1, &y1, &w, &h);
-  tft.setCursor(tft.width() - 8 - w, 196 + 8);
+  tft.setCursor(tft.width() - margin - w, tft.height() - margin - h);
   tft.print(right2);
 }
 
-static inline void drawGallery() {
-  tft.fillScreen(ILI9341_BLACK);
-  tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
-  tft.setTextSize(2);
-  tft.setCursor(8, 8);
-  tft.print("← Back    Gallery / History");
-  tft.setTextSize(2);
-  tft.setCursor(8, 40);
-  tft.print("Registration / Type / Airline:");
-  tft.setCursor(8, 64);
-  // Limit callsign/hex length to keep within screen width
-  tft.print(ellipsize((g.callsign.length()?g.callsign:String("(hex)")), 16));
-  tft.setCursor(8, 88);
-  tft.print(ellipsize(g.airline_name + " | " + g.aircraft_name, 30));
-  tft.setCursor(8, 120);
-  tft.print("Last flights via HA/MQTT…");
-}
-
-static inline void drawRadar() {
-  tft.fillScreen(ILI9341_BLACK);
-  tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
-  tft.setTextSize(2);
-  tft.setCursor(8, 8);
-  tft.print("← Back");
-  tft.setTextSize(2);
-  tft.setCursor(120, 8);
-  tft.print("RADAR (" + String(g.radar_range_scale_km) + " km)");
-
-  const int cx = 160, cy = 124, R = 96;
-  tft.drawCircle(cx, cy, R, ILI9341_WHITE);
-  tft.drawCircle(cx, cy, (int)(R*0.66f), ILI9341_DARKGREY);
-  tft.drawCircle(cx, cy, (int)(R*0.33f), ILI9341_DARKGREY);
-  tft.drawLine(cx-R, cy, cx+R, cy, ILI9341_DARKGREY);
-  tft.drawLine(cx, cy-R, cx, cy+R, ILI9341_DARKGREY);
-  // Cardinal letters
-  tft.setTextSize(1);
-  tft.setCursor(cx-3, cy-R-10); tft.print("N");
-  tft.setCursor(cx+R+4, cy-3);  tft.print("E");
-  tft.setCursor(cx-3, cy+R+2);  tft.print("S");
-  tft.setCursor(cx-R-8, cy-3);  tft.print("W");
-
-  // Plot target
-  float rng = g.radar_range_km;
-  float scale = max(1, g.radar_range_scale_km);
-  float r = (rng / scale) * R;
-  float ang = (float) g.radar_bearing_deg * 3.1415926f / 180.0f;
-  int tx = cx + (int)(sinf(ang) * r);
-  int ty = cy - (int)(cosf(ang) * r);
-  tft.fillCircle(tx, ty, 3, ILI9341_GREEN);
-
-  // Label box
-  int lx = tx - 70;
-  int ly = ty + 10;
-  tft.drawLine(tx, ty, lx + 70, ly - 10, ILI9341_DARKGREY);
-  tft.fillRect(lx - 2, ly - 2, 146, 42, ILI9341_BLACK);
-  tft.drawRect(lx - 2, ly - 2, 146, 42, ILI9341_DARKGREY);
-  tft.setTextSize(1);
-  tft.setCursor(lx, ly);
-  tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
-  {
-    char line[48];
-    snprintf(line, sizeof(line), "BRG %d  R %.1f km", g.radar_bearing_deg, g.radar_range_km);
-    tft.print(line);
-  }
-  tft.setCursor(lx, ly + 12);
-  char rel[32];
-  char arrow = g.radar_rel_vertical_fpm > 0 ? '^' : (g.radar_rel_vertical_fpm < 0 ? 'v' : ' ');
-  snprintf(rel, sizeof(rel), "REL ALT %c%d fpm", arrow, abs(g.radar_rel_vertical_fpm));
-  tft.print(rel);
-  tft.setCursor(lx, ly + 24);
-  {
-    char line2[48];
-    snprintf(line2, sizeof(line2), "GS %d km/h  HDG %d", g.radar_gs_kmh, g.radar_heading_deg);
-    tft.print(line2);
-  }
-}
+// Gallery and Radar screens removed
 
 static void draw() {
-  if (currentScreen == 0) drawOverview();
-  else if (currentScreen == 1) drawGallery();
-  else drawRadar();
+  drawOverview();
   invalidate = false;
 }
 
@@ -530,41 +443,7 @@ static void syncTimeOnce() {
   DBG.printf("Time sync: %s\n", timeReady ? "OK" : "not ready");
 }
 
-static void initButtons() {
-  pinMode(btnA.pin, INPUT_PULLUP);
-  pinMode(btnB.pin, INPUT_PULLUP);
-  pinMode(btnBack.pin, INPUT_PULLUP);
-}
-
-static void pollButtons() {
-  auto readBtn = [](Btn &b) {
-    bool raw = digitalRead(b.pin);
-    unsigned long now = millis();
-    if (raw != b.last) {
-      b.lastTs = now;
-      b.last = raw;
-    }
-    if (now - b.lastTs > 25) { // debounce 25ms
-      b.state = raw;
-    }
-  };
-
-  readBtn(btnA);
-  readBtn(btnB);
-  readBtn(btnBack);
-
-  static bool aPrev = true, bPrev = true, backPrev = true;
-  if (!btnA.state && aPrev) { // pressed
-    currentScreen = 1; invalidate = true;
-  }
-  if (!btnB.state && bPrev) {
-    currentScreen = 2; invalidate = true;
-  }
-  if (!btnBack.state && backPrev) {
-    currentScreen = (currentScreen + 1) % 3; invalidate = true;
-  }
-  aPrev = btnA.state; bPrev = btnB.state; backPrev = btnBack.state;
-}
+// No button init or polling
 
 void setup() {
   DBG.begin(115200);
@@ -578,7 +457,7 @@ void setup() {
   tft.setRotation(TFT_ROTATION);
   tft.fillScreen(ILI9341_BLACK);
   tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
-  tft.setTextSize(2);
+  tft.setTextSize(1);
   tft.setCursor(8, 8);
   tft.print("Connecting WiFi…");
 
@@ -598,7 +477,7 @@ void setup() {
   mqtt.setServer(MQTT_HOST, MQTT_PORT);
   mqtt.setCallback(onMqtt);
 
-  initButtons();
+  // No buttons to initialize
 
   // Initial screen
   tft.fillScreen(ILI9341_BLACK);
@@ -614,7 +493,7 @@ void loop() {
   ensureMqtt();
   mqtt.loop();
 
-  pollButtons();
+  // No buttons to poll
 
   // Opportunistically fetch media assets when URLs change
   if (!fetching_logo && g.airline_logo_url.length() && g.airline_logo_url != last_logo_url) {

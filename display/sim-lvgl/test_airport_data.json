@@ -1,0 +1,61 @@
+{
+  "hex": "AA8C86",
+  "registration": "N779XC",
+  "callsign": "N779XC",
+  "flight_no": "N779XC",
+  "aircraft_type": "CC19",
+  "airline_icao": "",
+  "origin_iata": "SEA",
+  "destination_iata": "SFO",
+  "distance_nm": 6.887,
+  "bearing_deg": 289.8,
+  "latitude": 46.207472,
+  "longitude": -123.176239,
+  "ground_speed_kt": 97,
+  "track_deg": 297.62,
+  "altitude_ft": 3400,
+  "vertical_rate_fpm": 0,
+  "on_ground": false,
+  "squawk": "1200",
+  "position_timestamp": 1758068110,
+  "position_age_sec": 1.4000000953674316,
+  "origin_country": "United States",
+  "is_military": false,
+  "souls_on_board_max": 4,
+  "souls_on_board_max_is_estimate": false,
+  "souls_on_board_max_text": "4",
+  "lookups": {
+    "aircraft": {
+      "icao": "CC19",
+      "name": "Cessna Citation CJ1+",
+      "manufacturer": "Cessna",
+      "model": "Citation CJ1+",
+      "seats_max": 4,
+      "iata_aliases": [],
+      "lookup_status": "found"
+    },
+    "airline": {
+      "name": "Private"
+    },
+    "origin_airport": {
+      "name": "Seattle-Tacoma International Airport",
+      "city": "Seattle",
+      "region": "Washington"
+    },
+    "destination_airport": {
+      "name": "San Francisco International Airport",
+      "city": "San Francisco",
+      "region": "California"
+    }
+  },
+  "plane_key": "N779XC",
+  "airline_iata": "",
+  "classification": "general_aviation",
+  "airline_logo_url": "",
+  "airline_logo_path": "",
+  "airline_logo_code": "",
+  "souls_on_board": 4,
+  "remaining_nm": 500.2,
+  "eta_min": 185,
+  "timestamp": "2025-09-17T00:15:15Z"
+}

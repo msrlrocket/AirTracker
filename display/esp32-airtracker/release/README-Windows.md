@@ -1,9 +1,12 @@
-**Windows Flash Guide (ESP32-C3, Single Image)**
+**AirTracker ESP32 Firmware v2.0 (Windows Flash Guide)**
 - Target board: `esp32-c3-devkitm-1` (Arduino framework)
 - Image type: single merged image (`factory.bin`) at offset `0x0`
+- **NEW**: Real-time airline logo and aircraft photo display via HTTP/HTTPS
+- **NEW**: TJpg_Decoder library for JPEG image support
+- **NEW**: Enhanced aircraft data processing with image URLs
 
-**What’s Included**
-- `factory.bin` — single image you can flash at `0x0`
+**What's Included**
+- `factory.bin` — single firmware image with image loading support (1.06MB)
 - `flash_factory.bat` — helper to flash `factory.bin`
 - `erase_flash.bat` — optional full chip erase
 - `SHA256.txt` — checksum of `factory.bin` for verification
@@ -34,12 +37,24 @@
 **After Flashing**
 - Press RESET. The device boots the new firmware.
 - For logs: use PuTTY or `py -3 -m serial.tools.miniterm COM5 115200` (install `pyserial` if prompted).
+- **NEW**: Watch for image loading messages like "Downloaded airline logo" in the serial output.
+
+**New Features in v2.0**
+- **Real-time Image Loading**: Automatically downloads and displays airline logos and aircraft photos
+- **JPEG Support**: Full JPEG decoding using TJpg_Decoder library
+- **HTTP/HTTPS Downloads**: Fetches images from aviation databases and photo sites
+- **Smart Caching**: Images are cached to reduce bandwidth usage
+- **Visual Enhancements**: Rich display with actual airline branding and aircraft photos
 
 **Important**
 - This binary contains the Wi‑Fi and MQTT settings that were compiled at build time. To change them, update `display/esp32-airtracker/include/config.h` and rebuild.
+- **Internet connection required** for image downloading. Device must have internet access via Wi-Fi.
+- Image downloads use HTTPS and may take a few seconds for large aircraft photos.
 
 **Troubleshooting**
 - Stuck at connecting: verify Wi‑Fi credentials and 2.4GHz network.
 - No MQTT data: confirm broker settings and that `airtracker/nearest` is published (retained).
+- No images loading: check internet connectivity and monitor serial output for HTTP errors.
+- Images appear black: JPEG decoder may need more memory - restart device if needed.
 - Wrong board/pins: this image targets `esp32-c3-devkitm-1` with ILI9341 pins as documented in the repo.
 

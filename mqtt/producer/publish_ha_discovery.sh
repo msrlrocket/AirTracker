@@ -57,6 +57,9 @@ fi
 : "${HA_DEVICE_ID:=airtracker}"
 : "${HA_DEVICE_NAME:=AirTracker}"
 : "${MQTT_DEVICE_TRACKER:=0}"
+# Optional prefix applied to all discovered object_ids so entity_ids are predictable.
+# Set to empty string to keep short IDs like sensor.distance_nm
+: "${HA_ENTITY_PREFIX:=airtracker_}"
 
 # Flag defaults (after .env load so env toggles apply), then parse CLI
 DRY_RUN=${HA_DISCOVERY_DRY_RUN:-0}
@@ -110,6 +113,10 @@ publish_config() {
 
 publish_sensor() {
   local object_id="$1"; shift
+  # Apply optional prefix if not already present
+  if [[ -n "$HA_ENTITY_PREFIX" && "$object_id" != ${HA_ENTITY_PREFIX}* ]]; then
+    object_id="${HA_ENTITY_PREFIX}${object_id}"
+  fi
   local name="$1"; shift
   local unit="$1"; shift
   local value_tmpl="$1"; shift
@@ -148,6 +155,9 @@ publish_sensor() {
 
 publish_sensor_attrs() {
   local object_id="$1"; shift
+  if [[ -n "$HA_ENTITY_PREFIX" && "$object_id" != ${HA_ENTITY_PREFIX}* ]]; then
+    object_id="${HA_ENTITY_PREFIX}${object_id}"
+  fi
   local name="$1"; shift
   local unit="$1"; shift
   local value_tmpl="$1"; shift
@@ -192,6 +202,9 @@ publish_sensor_attrs() {
 
 publish_binary_sensor() {
   local object_id="$1"; shift
+  if [[ -n "$HA_ENTITY_PREFIX" && "$object_id" != ${HA_ENTITY_PREFIX}* ]]; then
+    object_id="${HA_ENTITY_PREFIX}${object_id}"
+  fi
   local name="$1"; shift
   local value_tmpl="$1"; shift
   local device_class="${1:-}"; shift || true
@@ -227,6 +240,9 @@ publish_binary_sensor() {
 # Optional: MQTT device_tracker for nearest plane (map + history in HA)
 publish_device_tracker() {
   local object_id="nearest_tracker"
+  if [[ -n "$HA_ENTITY_PREFIX" && "$object_id" != ${HA_ENTITY_PREFIX}* ]]; then
+    object_id="${HA_ENTITY_PREFIX}${object_id}"
+  fi
   local name="AirTracker Nearest (Tracker)"
   local uid="${HA_DEVICE_ID}_${object_id}"
 
@@ -256,7 +272,8 @@ publish_device_tracker() {
     "airline_logo_path": value_json.airline_logo_path,
     "airline_logo_url": value_json.airline_logo_url,
     "media": value_json.media,
-    "history": value_json.history
+    "history": value_json.history,
+    "timestamp": value_json.timestamp
   } | tojson }}'
 
   local state_tmpl
@@ -390,6 +407,9 @@ publish_sensor "aircraft_iata_aliases"   "Aircraft IATA Aliases"  ""       "{{ (
 publish_binary_sensor "on_ground" "On Ground" "{{ value_json.on_ground }}" "" "mdi:airplane-landing"
 publish_binary_sensor "is_military" "Is Military" "{{ value_json.is_military }}" "" "mdi:shield-airplane"
 publish_binary_sensor "souls_on_board_max_is_estimate" "Souls Max Is Estimate" "{{ value_json.souls_on_board_max_is_estimate }}" "" "mdi:account-question"
+
+# Timestamp sensor for tracking MQTT publish time
+publish_sensor "timestamp" "AirTracker Timestamp" "" "{{ value_json.timestamp }}" "" "" "mdi:clock-outline"
 
 # Raw attributes sensor with full JSON attached as attributes
 # State shows the hex or callsign; all fields are available in attributes

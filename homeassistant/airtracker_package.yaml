@@ -1,0 +1,132 @@
+# Optional package: define MQTT sensors for the AirTracker nearest aircraft.
+# Use this if you are not using the MQTT discovery publisher in this repo.
+# Requires that the MQTT integration is configured in Home Assistant.
+
+sensor:
+  # Raw JSON with attributes (media, history, lookups, etc.)
+  - name: "AirTracker Nearest (RAW)"
+    unique_id: airtracker_nearest_raw
+    state_topic: "airtracker/nearest"
+    value_template: "{{ value_json.callsign or value_json.hex or 'plane' }}"
+    json_attributes_topic: "airtracker/nearest"
+
+  # Core telemetry and metrics
+  - name: "AirTracker Distance (nm)"
+    unique_id: airtracker_distance_nm
+    state_topic: "airtracker/nearest"
+    unit_of_measurement: "nm"
+    value_template: "{{ value_json.distance_nm }}"
+
+  - name: "AirTracker Bearing (deg)"
+    unique_id: airtracker_bearing_deg
+    state_topic: "airtracker/nearest"
+    unit_of_measurement: "°"
+    value_template: "{{ value_json.bearing_deg }}"
+
+  - name: "AirTracker Altitude (ft)"
+    unique_id: airtracker_altitude_ft
+    state_topic: "airtracker/nearest"
+    unit_of_measurement: "ft"
+    value_template: "{{ value_json.altitude_ft }}"
+
+  - name: "AirTracker Ground Speed (kt)"
+    unique_id: airtracker_ground_speed_kt
+    state_topic: "airtracker/nearest"
+    unit_of_measurement: "kt"
+    value_template: "{{ value_json.ground_speed_kt }}"
+
+  - name: "AirTracker Track (deg)"
+    unique_id: airtracker_track_deg
+    state_topic: "airtracker/nearest"
+    unit_of_measurement: "°"
+    value_template: "{{ value_json.track_deg }}"
+
+  - name: "AirTracker Vertical Rate (fpm)"
+    unique_id: airtracker_vertical_rate_fpm
+    state_topic: "airtracker/nearest"
+    unit_of_measurement: "fpm"
+    value_template: "{{ value_json.vertical_rate_fpm }}"
+
+  - name: "AirTracker ETA (min)"
+    unique_id: airtracker_eta_min
+    state_topic: "airtracker/nearest"
+    unit_of_measurement: "min"
+    value_template: "{{ value_json.eta_min }}"
+
+  - name: "AirTracker Remaining (nm)"
+    unique_id: airtracker_remaining_nm
+    state_topic: "airtracker/nearest"
+    unit_of_measurement: "nm"
+    value_template: "{{ value_json.remaining_nm }}"
+
+  - name: "AirTracker Position Age (s)"
+    unique_id: airtracker_position_age_sec
+    state_topic: "airtracker/nearest"
+    unit_of_measurement: "s"
+    value_template: "{{ value_json.position_age_sec }}"
+
+  # Identity and route
+  - name: "AirTracker Registration"
+    unique_id: airtracker_registration
+    state_topic: "airtracker/nearest"
+    value_template: "{{ value_json.registration }}"
+
+  - name: "AirTracker Callsign"
+    unique_id: airtracker_callsign
+    state_topic: "airtracker/nearest"
+    value_template: "{{ value_json.callsign }}"
+
+  - name: "AirTracker Flight Number"
+    unique_id: airtracker_flight_no
+    state_topic: "airtracker/nearest"
+    value_template: "{{ value_json.flight_no }}"
+
+  - name: "AirTracker Aircraft Type"
+    unique_id: airtracker_aircraft_type
+    state_topic: "airtracker/nearest"
+    value_template: "{{ value_json.aircraft_type }}"
+
+  - name: "AirTracker Airline ICAO"
+    unique_id: airtracker_airline_icao
+    state_topic: "airtracker/nearest"
+    value_template: "{{ value_json.airline_icao }}"
+
+  - name: "AirTracker Airline Name"
+    unique_id: airtracker_airline_name
+    state_topic: "airtracker/nearest"
+    value_template: "{{ value_json.lookups.airline.name if value_json.lookups and value_json.lookups.airline else '' }}"
+
+  - name: "AirTracker Origin IATA"
+    unique_id: airtracker_origin_iata
+    state_topic: "airtracker/nearest"
+    value_template: "{{ value_json.origin_iata }}"
+
+  - name: "AirTracker Destination IATA"
+    unique_id: airtracker_destination_iata
+    state_topic: "airtracker/nearest"
+    value_template: "{{ value_json.destination_iata }}"
+
+  - name: "AirTracker Origin Country"
+    unique_id: airtracker_origin_country
+    state_topic: "airtracker/nearest"
+    value_template: "{{ value_json.origin_country }}"
+
+  - name: "AirTracker Classification"
+    unique_id: airtracker_classification
+    state_topic: "airtracker/nearest"
+    value_template: "{{ value_json.classification }}"
+
+binary_sensor:
+  - name: "AirTracker On Ground"
+    unique_id: airtracker_on_ground
+    state_topic: "airtracker/nearest"
+    value_template: "{{ value_json.on_ground | default(false) }}"
+    payload_on: "true"
+    payload_off: "false"
+
+  - name: "AirTracker Within Radius"
+    unique_id: airtracker_within_radius
+    state_topic: "airtracker/nearest"
+    value_template: "{{ value_json.within_radius | default(false) }}"
+    payload_on: "true"
+    payload_off: "false"

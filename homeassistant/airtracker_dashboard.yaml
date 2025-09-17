@@ -1,0 +1,269 @@
+# Lovelace dashboard for AirTracker Nearest Flight
+# - Uses sensors created via MQTT Discovery script OR the optional package in this folder
+# - Renders image, key metrics, history, and a map
+
+title: AirTracker
+views:
+  - title: Nearest Flight
+    icon: mdi:airplane
+    path: airtracker
+    badges: []
+    cards:
+      # Header + main image + thumbnails using Markdown (templated)
+      - type: markdown
+        title: ""
+        content: |
+          {% set media   = state_attr('sensor.airtracker_nearest', 'media')
+                          or state_attr('sensor.airtracker_nearest_raw', 'media')
+                          or state_attr('sensor.airtracker_airtracker_nearest_raw_2', 'media')
+                          or state_attr('sensor.nearest', 'media') %}
+          {% set hist    = state_attr('sensor.airtracker_nearest', 'history')
+                          or state_attr('sensor.airtracker_nearest_raw', 'history')
+                          or state_attr('sensor.airtracker_airtracker_nearest_raw_2', 'history')
+                          or state_attr('sensor.airtracker_history_attributes_2', 'history')
+                          or state_attr('sensor.nearest', 'history') %}
+          {% set logo2   = states('sensor.airtracker_airline_logo_url_2') %}
+          {% set logo    = (logo2 if logo2 not in ['unknown','unavailable',''] else
+                             state_attr('sensor.airtracker_nearest', 'airline_logo_url') or
+                             state_attr('sensor.airtracker_nearest_raw', 'airline_logo_url') or
+                             state_attr('sensor.nearest', 'airline_logo_url')) %}
+          {% set callsign2 = states('sensor.airtracker_callsign_2') %}
+          {% set callsign= callsign2 if callsign2 not in ['unknown','unavailable',''] else states('sensor.airtracker_callsign') %}
+          {% set flight2 = states('sensor.airtracker_flight_number_2') %}
+          {% set flight  = flight2 if flight2 not in ['unknown','unavailable',''] else states('sensor.airtracker_flight_no') %}
+          {% set reg2   = states('sensor.airtracker_icao_hex_2') %}
+          {% set reg     = states('sensor.airtracker_registration') if states('sensor.airtracker_registration') not in ['unknown','unavailable',''] else reg2 %}
+          {% set atype2 = states('sensor.airtracker_aircraft_type_2') %}
+          {% set atype   = atype2 if atype2 not in ['unknown','unavailable',''] else states('sensor.airtracker_aircraft_type') %}
+          {% set o2     = states('sensor.airtracker_origin_iata_2') %}
+          {% set route_o = o2 if o2 not in ['unknown','unavailable',''] else (states('sensor.airtracker_origin_iata') if states('sensor.airtracker_origin_iata') not in ['unknown','unavailable',''] else states('sensor.airtracker_last_origin_2')) %}
+          {% set d2     = states('sensor.airtracker_destination_iata_2') %}
+          {% set route_d = d2 if d2 not in ['unknown','unavailable',''] else (states('sensor.airtracker_destination_iata') if states('sensor.airtracker_destination_iata') not in ['unknown','unavailable',''] else states('sensor.airtracker_last_destination_2')) %}
+          {% set plane_img2 = states('sensor.airtracker_plane_image_url_2') %}
+          {% set img     = (
+                             plane_img2 if plane_img2 not in ['unknown','unavailable',''] else
+                             (media.plane_image if media is defined and media and ('plane_image' in media))
+                           ) or '' %}
+
+          <div style="display:flex; align-items:center; gap: 12px; margin-bottom: 4px;">
+            {% if logo %}
+              <img src="{{ logo }}" style="height:40px; border-radius:4px; box-shadow: var(--ha-card-box-shadow);"><span></span>
+            {% endif %}
+            <h1 style="margin:0;">{{ callsign or flight or 'Nearest Flight' }}</h1>
+          </div>
+          <div style="margin: 0 0 8px 0; color: var(--secondary-text-color);">
+            {{ reg }} • {{ atype }} • {{ route_o }} → {{ route_d }}
+          </div>
+          {% if img %}
+            <img src="{{ img }}" style="width: 100%; border-radius: 10px; box-shadow: var(--ha-card-box-shadow);">
+          {% endif %}
+          {% if media is defined and media and ('thumbnails' in media) and media.thumbnails %}
+            <div style="display:flex; gap:8px; margin-top: 8px; overflow-x:auto;">
+              {% for t in media.thumbnails %}
+                <img src="{{ t }}" style="height:74px; border-radius: 8px; box-shadow: var(--ha-card-box-shadow);">
+              {% endfor %}
+            </div>
+          {% endif %}
+
+      # Key metrics at-a-glance
+      # Snapshot (original entities)
+      - type: conditional
+        conditions:
+          - entity: sensor.airtracker_distance_nm
+            state_not: unavailable
+        card:
+          type: glance
+          title: Flight Snapshot
+          show_state: true
+          columns: 4
+          entities:
+            - entity: sensor.airtracker_distance_nm
+              name: Distance
+            - entity: sensor.airtracker_bearing_deg
+              name: Bearing
+            - entity: sensor.airtracker_altitude_ft
+              name: Altitude
+            - entity: sensor.airtracker_ground_speed_kt
+              name: Ground Speed
+            - entity: sensor.airtracker_vertical_rate_fpm
+              name: Vertical Rate
+            - entity: sensor.airtracker_eta_min
+              name: ETA
+            - entity: binary_sensor.airtracker_on_ground
+              name: On Ground
+            - entity: binary_sensor.airtracker_within_radius
+              name: Within Radius
+
+      # Snapshot (_2 alias entities)
+      - type: conditional
+        conditions:
+          - entity: sensor.airtracker_callsign_2
+            state_not: unavailable
+        card:
+          type: glance
+          title: Flight Snapshot
+          show_state: true
+          columns: 4
+          entities:
+            - entity: sensor.airtracker_altitude_2
+              name: Altitude
+            - entity: sensor.airtracker_ground_speed_2
+              name: Ground Speed
+            - entity: sensor.airtracker_eta_2
+              name: ETA
+            - entity: binary_sensor.airtracker_is_military_2
+              name: Military
+            - entity: sensor.airtracker_classification_2
+              name: Classification
+            - entity: sensor.airtracker_destination_iata_2
+              name: Dest IATA
+
+      # Map (shown when device_tracker is present)
+      - type: conditional
+        conditions:
+          - entity: device_tracker.airtracker_nearest_tracker
+            state_not: unavailable
+        card:
+          type: map
+          title: Live Position
+          default_zoom: 7
+          entities:
+            - device_tracker.airtracker_nearest_tracker
+
+      # Alternate map: fallback entity id without prefix
+      - type: conditional
+        conditions:
+          - entity: device_tracker.nearest_tracker
+            state_not: unavailable
+        card:
+          type: map
+          title: Live Position
+          default_zoom: 7
+          entities:
+            - device_tracker.nearest_tracker
+
+      # Friendly hint when map entity is missing
+      - type: conditional
+        conditions:
+          - entity: device_tracker.airtracker_nearest_tracker
+            state: unavailable
+        card:
+          type: markdown
+          content: |
+            Live map is unavailable. If you’re using the provided MQTT discovery, enable the device tracker so Home Assistant gets GPS coordinates:
+            
+            - Run the discovery with `MQTT_DEVICE_TRACKER=1` (see repository README under `mqtt/producer/publish_ha_discovery.sh`).
+            - After enabling, the entity `device_tracker.airtracker_nearest_tracker` will appear and the map will show the live position.
+
+      # Route and identity details
+      # Flight Details (original entities)
+      - type: conditional
+        conditions:
+          - entity: sensor.airtracker_callsign
+            state_not: unavailable
+        card:
+          type: entities
+          title: Flight Details
+          entities:
+            - sensor.airtracker_registration
+            - sensor.airtracker_callsign
+            - sensor.airtracker_flight_no
+            - sensor.airtracker_aircraft_type
+            - sensor.airtracker_airline_icao
+            - sensor.airtracker_airline_name
+            - type: divider
+            - sensor.airtracker_origin_iata
+            - sensor.airtracker_destination_iata
+            - sensor.airtracker_remaining_nm
+            - sensor.airtracker_position_age_sec
+            - sensor.airtracker_origin_country
+            - sensor.airtracker_classification
+
+      # Flight Details (_2 alias entities)
+      - type: conditional
+        conditions:
+          - entity: sensor.airtracker_callsign_2
+            state_not: unavailable
+        card:
+          type: entities
+          title: Flight Details
+          entities:
+            - sensor.airtracker_icao_hex_2
+            - sensor.airtracker_callsign_2
+            - sensor.airtracker_flight_number_2
+            - sensor.airtracker_aircraft_type_2
+            - sensor.airtracker_airline_icao_2
+            - sensor.airtracker_airline_name_2
+            - sensor.airtracker_airline_callsign_2
+            - type: divider
+            - sensor.airtracker_destination_iata_2
+            - sensor.airtracker_destination_city_2
+            - sensor.airtracker_destination_region_2
+            - sensor.airtracker_destination_airport_country_2
+            - sensor.airtracker_destination_country_code_2
+            - type: divider
+            - sensor.airtracker_classification_2
+            - binary_sensor.airtracker_is_military_2
+
+      # Recent flights pulled via --nearest-scrape (FlightRadar)
+      - type: markdown
+        title: Recent Flights
+        content: |
+          {% set hist = state_attr('sensor.airtracker_nearest', 'history')
+                        or state_attr('sensor.airtracker_nearest_raw', 'history')
+                        or state_attr('sensor.airtracker_airtracker_nearest_raw_2', 'history')
+                        or state_attr('sensor.airtracker_history_attributes_2', 'history')
+                        or state_attr('sensor.nearest', 'history') %}
+          {% if hist %}
+          <div style="overflow-x: auto;">
+            <table style="min-width: 900px; width: 100%; border-collapse: collapse; table-layout: auto;">
+              <tr style="border-bottom: 1px solid var(--divider-color);">
+                <th style="text-align:left; padding: 8px 6px;">Date</th>
+                <th style="text-align:left; padding: 8px 6px;">Flight</th>
+                <th style="text-align:left; padding: 8px 6px;">From</th>
+                <th style="text-align:left; padding: 8px 6px;">To</th>
+                <th style="text-align:left; padding: 8px 6px;">Sched</th>
+              </tr>
+              {% for r in hist %}
+              <tr style="border-bottom: 1px solid rgba(127,127,127,0.15);">
+                <td style="padding: 8px 6px; white-space: nowrap;">{{ r.date_yyyy_mm_dd }}</td>
+                <td style="padding: 8px 6px; white-space: nowrap;">{{ r.flight }}</td>
+                <td style="padding: 8px 6px; white-space: nowrap;">{{ r.origin }}</td>
+                <td style="padding: 8px 6px; white-space: nowrap;">{{ r.destination }}</td>
+                <td style="padding: 8px 6px; white-space: nowrap;">{{ r.arr_or_eta_hhmm }}</td>
+              </tr>
+              {% endfor %}
+            </table>
+          </div>
+          {% else %}
+          <div style="color: var(--secondary-text-color);">No recent flight history available.</div>
+          {% endif %}
+      # Trend graphs
+      # Graphs (original entities)
+      - type: conditional
+        conditions:
+          - entity: sensor.airtracker_altitude_ft
+            state_not: unavailable
+        card:
+          type: history-graph
+          title: Altitude / Speed / Distance
+          hours_to_show: 24
+          refresh_interval: 30
+          entities:
+            - sensor.airtracker_altitude_ft
+            - sensor.airtracker_ground_speed_kt
+            - sensor.airtracker_distance_nm
+
+      # Graphs (_2 alias entities)
+      - type: conditional
+        conditions:
+          - entity: sensor.airtracker_altitude_2
+            state_not: unavailable
+        card:
+          type: history-graph
+          title: Altitude / Speed
+          hours_to_show: 24
+          refresh_interval: 30
+          entities:
+            - sensor.airtracker_altitude_2
+            - sensor.airtracker_ground_speed_2

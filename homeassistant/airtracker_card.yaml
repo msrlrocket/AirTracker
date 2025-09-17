@@ -1,0 +1,119 @@
+# Paste this into a Lovelace dashboard as a Manual card to get a compact AirTracker panel.
+type: vertical-stack
+cards:
+  - type: markdown
+    content: |
+      {% set media   = state_attr('sensor.airtracker_nearest', 'media')
+                      or state_attr('sensor.airtracker_nearest_raw', 'media')
+                      or state_attr('sensor.airtracker_airtracker_nearest_raw_2', 'media')
+                      or state_attr('sensor.nearest', 'media') %}
+      {% set logo2   = states('sensor.airtracker_airline_logo_url_2') %}
+      {% set logo    = (logo2 if logo2 not in ['unknown','unavailable',''] else
+                        state_attr('sensor.airtracker_nearest', 'airline_logo_url') or
+                        state_attr('sensor.airtracker_nearest_raw', 'airline_logo_url') or
+                        state_attr('sensor.nearest', 'airline_logo_url')) %}
+      {% set callsign2 = states('sensor.airtracker_callsign_2') %}
+      {% set callsign= callsign2 if callsign2 not in ['unknown','unavailable',''] else states('sensor.airtracker_callsign') %}
+      {% set flight2 = states('sensor.airtracker_flight_number_2') %}
+      {% set flight  = flight2 if flight2 not in ['unknown','unavailable',''] else states('sensor.airtracker_flight_no') %}
+      {% set reg2   = states('sensor.airtracker_icao_hex_2') %}
+      {% set reg     = states('sensor.airtracker_registration') if states('sensor.airtracker_registration') not in ['unknown','unavailable',''] else reg2 %}
+      {% set atype2 = states('sensor.airtracker_aircraft_type_2') %}
+      {% set atype   = atype2 if atype2 not in ['unknown','unavailable',''] else states('sensor.airtracker_aircraft_type') %}
+      {% set o2     = states('sensor.airtracker_origin_iata_2') %}
+      {% set route_o = o2 if o2 not in ['unknown','unavailable',''] else (states('sensor.airtracker_origin_iata') if states('sensor.airtracker_origin_iata') not in ['unknown','unavailable',''] else states('sensor.airtracker_last_origin_2')) %}
+      {% set d2     = states('sensor.airtracker_destination_iata_2') %}
+      {% set route_d = d2 if d2 not in ['unknown','unavailable',''] else (states('sensor.airtracker_destination_iata') if states('sensor.airtracker_destination_iata') not in ['unknown','unavailable',''] else states('sensor.airtracker_last_destination_2')) %}
+      {% set plane_img2 = states('sensor.airtracker_plane_image_url_2') %}
+      {% set img     = (
+                         plane_img2 if plane_img2 not in ['unknown','unavailable',''] else
+                         (media.plane_image if media is defined and media and ('plane_image' in media))
+                       ) or '' %}
+
+      <div style="display:flex; align-items:center; gap: 10px; margin-bottom: 4px;">
+        {% if logo %}<img src="{{ logo }}" style="height:34px; border-radius:4px; box-shadow: var(--ha-card-box-shadow);">{% endif %}
+        <h2 style="margin:0;">{{ callsign or flight or 'Nearest Flight' }}</h2>
+      </div>
+      <div style="margin: 0 0 8px 0; color: var(--secondary-text-color);">
+        {{ reg }} • {{ atype }} • {{ route_o }} → {{ route_d }}
+      </div>
+      {% if img %}
+        <img src="{{ img }}" style="width: 100%; border-radius: 10px; box-shadow: var(--ha-card-box-shadow);">
+      {% endif %}
+
+  # Snapshot (original entities)
+  - type: conditional
+    conditions:
+      - entity: sensor.airtracker_distance_nm
+        state_not: unavailable
+    card:
+      type: glance
+      columns: 4
+      show_state: true
+      entities:
+        - entity: sensor.airtracker_distance_nm
+          name: Distance
+        - entity: sensor.airtracker_bearing_deg
+          name: Bearing
+        - entity: sensor.airtracker_altitude_ft
+          name: Altitude
+        - entity: sensor.airtracker_ground_speed_kt
+          name: Speed
+        - entity: sensor.airtracker_vertical_rate_fpm
+          name: V/S
+        - entity: sensor.airtracker_eta_min
+          name: ETA
+        - entity: binary_sensor.airtracker_on_ground
+          name: On Ground
+        - entity: binary_sensor.airtracker_within_radius
+          name: In Radius
+
+  # Snapshot (_2 alias entities)
+  - type: conditional
+    conditions:
+      - entity: sensor.airtracker_callsign_2
+        state_not: unavailable
+    card:
+      type: glance
+      columns: 4
+      show_state: true
+      entities:
+        - entity: sensor.airtracker_altitude_2
+          name: Altitude
+        - entity: sensor.airtracker_ground_speed_2
+          name: Speed
+        - entity: sensor.airtracker_eta_2
+          name: ETA
+        - entity: binary_sensor.airtracker_is_military_2
+          name: Military
+        - entity: sensor.airtracker_classification_2
+          name: Classification
+        - entity: sensor.airtracker_destination_iata_2
+          name: Dest IATA
+
+  # Graphs (original entities)
+  - type: conditional
+    conditions:
+      - entity: sensor.airtracker_altitude_ft
+        state_not: unavailable
+    card:
+      type: history-graph
+      hours_to_show: 24
+      refresh_interval: 30
+      entities:
+        - sensor.airtracker_altitude_ft
+        - sensor.airtracker_ground_speed_kt
+        - sensor.airtracker_distance_nm
+
+  # Graphs (_2 alias entities)
+  - type: conditional
+    conditions:
+      - entity: sensor.airtracker_altitude_2
+        state_not: unavailable
+    card:
+      type: history-graph
+      hours_to_show: 24
+      refresh_interval: 30
+      entities:
+        - sensor.airtracker_altitude_2
+        - sensor.airtracker_ground_speed_2

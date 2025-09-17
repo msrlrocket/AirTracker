@@ -7,9 +7,8 @@
 #  - <prefix>/planes  (retained) every N cycles
 #
 # Requirements on the host running this script:
-#  - python3
+#  - python3 with paho-mqtt (pip install paho-mqtt)
 #  - jq
-#  - mosquitto_pub (from the Mosquitto clients package)
 #
 # Configure via env vars or inline edits below.
 
@@ -17,11 +16,13 @@ set -u -o pipefail
 
 # Load repository .env if present (exports vars)
 ROOT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
-if [[ -f "$ROOT_DIR/.env" ]]; then
+ENV_FILE="${ENV_FILE:-$ROOT_DIR/.env}"
+if [[ -f "$ENV_FILE" ]]; then
   set -a
   # shellcheck source=/dev/null
-  . "$ROOT_DIR/.env"
+  . "$ENV_FILE"
   set +a
+  echo "Loaded config from: $ENV_FILE"
 fi
 
 # ---------- Configuration ----------
@@ -66,11 +67,12 @@ need() { command -v "$1" >/dev/null 2>&1 || { echo "Missing required command: $1
 
 need python3
 need jq
-need mosquitto_pub
 
-mosq_args=( -h "$MQTT_HOST" -p "$MQTT_PORT" )
-[[ -n "${MQTT_USER}" ]] && mosq_args+=( -u "$MQTT_USER" )
-[[ -n "${MQTT_PASS}" ]] && mosq_args+=( -P "$MQTT_PASS" )
+# Use Python MQTT publisher instead of mosquitto_pub
+MQTT_PUB_CMD="python3 \"$(dirname "$0")/mqtt_publish.py\""
+mosq_args=( --host "$MQTT_HOST" --port "$MQTT_PORT" )
+[[ -n "${MQTT_USER}" ]] && mosq_args+=( --username "$MQTT_USER" )
+[[ -n "${MQTT_PASS}" ]] && mosq_args+=( --password "$MQTT_PASS" )
 
 merge_flags=( --json-stdout )
 [[ "${MERGE_MINIFY}" == "1" || "${MERGE_MINIFY}" == "true" ]] && merge_flags+=( --minify )
@@ -81,8 +83,7 @@ if [[ "${MERGE_ENRICH_ALL:-}" == "1" || "${MERGE_ENRICH_ALL:-}" == "true" ]]; th
 elif [[ "${MERGE_ENRICH_IN_RADIUS:-}" == "1" || "${MERGE_ENRICH_IN_RADIUS:-}" == "true" ]]; then
   merge_flags+=( --enrich-in-radius )
 fi
-:
-"${MERGE_DATASETS:=$ROOT_DIR/datasets}"
+: "${MERGE_DATASETS:=$ROOT_DIR/mqtt/producer/datasets}"
 [[ -n "${MERGE_DATASETS:-}" ]] && merge_flags+=( --datasets "$MERGE_DATASETS" )
 [[ -n "${MERGE_PREFER:-}" ]] && merge_flags+=( --prefer "$MERGE_PREFER" )
 
@@ -147,6 +148,14 @@ run_fetch() {
   if [[ -n "$out" ]]; then
     payload="$out"
     last_fetch_ts=$(date +%s)
+
+    # Extract and log plane count
+    local plane_count
+    plane_count=$(printf '%s' "$payload" | jq '.merged | length' 2>/dev/null || echo "0")
+    local nearest_hex
+    nearest_hex=$(printf '%s' "$payload" | jq -r '.nearest.hex // "none"' 2>/dev/null || echo "none")
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Fetched $plane_count planes, nearest: $nearest_hex"
+
   if [[ -n "${WRITE_JSON_PATH}" ]]; then
       local dest="$WRITE_JSON_PATH"
       if [[ "$dest" != /* ]]; then
@@ -165,6 +174,8 @@ run_fetch() {
       fi
       printf '%s\n' "$payload" | jq '.' > "$pretty_dest" 2>/dev/null || true
     fi
+  else
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Fetch failed - no data received"
   fi
   compute_next_fetch
 }
@@ -172,17 +183,21 @@ run_fetch() {
 publish_nearest() {
   [[ -z "$payload" ]] && return 0
   printf '%s' "$payload" \
-    | jq ${jq_flags+"${jq_flags[@]}"} '.nearest' \
-    | mosquitto_pub -t "${MQTT_PREFIX}/nearest" -r -s "${mosq_args[@]}"
+    | jq ${jq_flags+"${jq_flags[@]}"} '.nearest | . + {"timestamp": now | strftime("%Y-%m-%dT%H:%M:%SZ")}' \
+    | eval "$MQTT_PUB_CMD" --topic "${MQTT_PREFIX}/nearest" --retain --stdin "${mosq_args[@]}"
   last_nearest_pub_ts=$(date +%s)
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] Published nearest to MQTT"
 }
 
 publish_planes() {
   [[ -z "$payload" ]] && return 0
+  local plane_count
+  plane_count=$(printf '%s' "$payload" | jq '.merged | length' 2>/dev/null || echo "0")
   printf '%s' "$payload" \
     | jq ${jq_flags+"${jq_flags[@]}"} '.merged' \
-    | mosquitto_pub -t "${MQTT_PREFIX}/planes" -r -s "${mosq_args[@]}"
+    | eval "$MQTT_PUB_CMD" --topic "${MQTT_PREFIX}/planes" --retain --stdin "${mosq_args[@]}"
   last_planes_pub_ts=$(date +%s)
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] Published $plane_count planes to MQTT"
 }
 
 if [[ "$RUN_ONCE" == "1" || "$RUN_ONCE" == "true" ]]; then
