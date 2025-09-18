@@ -247,3 +247,25 @@ display/esp32-airtracker/.clang_complete
 display/esp32-airtracker/.gcc-flags.json
 # Firmware local config (keep secrets out of VCS)
 display/esp32-airtracker/include/config.h
+
+# ESP-IDF build artifacts and generated files
+display/esp32-idf-airtracker/build/
+display/esp32-idf-airtracker/sdkconfig
+display/esp32-idf-airtracker/sdkconfig.old
+display/esp32-idf-airtracker/managed_components/
+display/esp32-idf-airtracker/dependencies.lock
+
+# LVGL simulator build artifacts
+display/sim-lvgl/build/
+
+# Temporary/runtime data files (these change frequently and contain live aircraft data)
+display/sim-lvgl/sim_data.json
+display/sim-lvgl/*_data.json
+display/sim-lvgl/data/
+
+# Test data files that change frequently
+*test_data.json
+*_test_data.json
+
+# AirTracker data cache and runtime files
+*.zip

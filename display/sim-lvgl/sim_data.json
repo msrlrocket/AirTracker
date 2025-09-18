@@ -1,26 +1,26 @@
 {
-  "hex": "A79735",
-  "registration": "N5889B",
-  "callsign": "N5889B",
-  "flight_no": "",
+  "hex": "A7412B",
+  "registration": "N567CP",
+  "callsign": "CAP3667",
+  "flight_no": "CAP3667",
   "aircraft_type": "C182",
-  "airline_icao": "",
-  "origin_iata": "",
+  "airline_icao": "CAP",
+  "origin_iata": "PDX",
   "destination_iata": "",
-  "distance_nm": 4.666,
-  "bearing_deg": 133.1,
-  "latitude": 46.1156,
-  "longitude": -122.9384,
-  "ground_speed_kt": 107,
-  "track_deg": 102,
-  "altitude_ft": 775,
-  "vertical_rate_fpm": -128,
+  "distance_nm": 6.102,
+  "bearing_deg": 141.8,
+  "latitude": 46.088745,
+  "longitude": -122.929777,
+  "ground_speed_kt": 138,
+  "track_deg": 122.31,
+  "altitude_ft": 1825,
+  "vertical_rate_fpm": 128,
   "on_ground": false,
-  "squawk": null,
-  "position_timestamp": 1758135921,
-  "position_age_sec": 2,
+  "squawk": "1200",
+  "position_timestamp": 1758226834,
+  "position_age_sec": 0.2999999523162842,
   "origin_country": null,
-  "is_military": null,
+  "is_military": false,
   "souls_on_board_max": 4,
   "souls_on_board_max_is_estimate": false,
   "souls_on_board_max_text": "4",
@@ -35,17 +35,76 @@
       "lookup_status": "found"
     },
     "airline": {
-      "name": ""
+      "icao": "CAP",
+      "iata": "",
+      "name": "U.S. Air Force Auxiliary/Civil Air Patrol",
+      "callsign": "Cap",
+      "country_code": "US",
+      "country_name": "United States"
+    },
+    "origin_airport": {
+      "iata": "PDX",
+      "name": "Portland International Airport",
+      "city": "Portland",
+      "region": "OR",
+      "country_code": "US",
+      "country_name": "United States",
+      "lat": 45.58869934,
+      "lon": -122.5979996,
+      "elevation_ft": 31
     }
   },
+  "airline_logo_code": "CAP",
+  "airline_logo_path": "datasets/airline_logos/airline_logo_CAP.png",
+  "airline_logo_url": "https://raw.githubusercontent.com/rzeldent/esp32-flightradar24-ttgo/main/images/airline_logos/airline_logo_CAP.png",
   "classification": "Private",
-  "plane_key": "N5889B",
+  "history": [
+    {
+      "flight": "CAP3667",
+      "origin": "Portland International Airport",
+      "destination": "Unknown",
+      "date_yyyy_mm_dd": "18 Sep 2025",
+      "block_time_hhmm": null,
+      "arr_or_eta_hhmm": "ETA 11:46"
+    },
+    {
+      "flight": "CAP3667",
+      "origin": "Portland Hillsboro Airport",
+      "destination": "Portland International Airport",
+      "date_yyyy_mm_dd": "18 Sep 2025",
+      "block_time_hhmm": "00:11",
+      "arr_or_eta_hhmm": "ETA 10:42"
+    },
+    {
+      "flight": "CAP3667",
+      "origin": "Portland Hillsboro Airport",
+      "destination": "Unknown",
+      "date_yyyy_mm_dd": "15 Sep 2025",
+      "block_time_hhmm": "01:01",
+      "arr_or_eta_hhmm": "ETA 18:18"
+    },
+    {
+      "flight": "CAP3667",
+      "origin": "Eugene Airport",
+      "destination": "Portland Hillsboro Airport",
+      "date_yyyy_mm_dd": "15 Sep 2025",
+      "block_time_hhmm": "00:56",
+      "arr_or_eta_hhmm": "ETA 14:44"
+    },
+    {
+      "flight": "CAP3667",
+      "origin": "Eugene Airport",
+      "destination": "Eugene Airport",
+      "date_yyyy_mm_dd": "15 Sep 2025",
+      "block_time_hhmm": "00:52",
+      "arr_or_eta_hhmm": "ETA 13:04"
+    }
+  ],
+  "airline_key": "CAP",
+  "plane_key": "N567CP",
   "airline_iata": "",
-  "airline_logo_url": "",
-  "airline_logo_path": "",
-  "airline_logo_code": "",
   "souls_on_board": 0,
   "remaining_nm": 0,
   "eta_min": 0,
-  "timestamp": "2025-09-17T19:05:24Z"
+  "timestamp": "2025-09-18T20:20:35Z"
 }
