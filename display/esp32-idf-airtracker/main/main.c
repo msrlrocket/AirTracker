@@ -13,13 +13,29 @@
 #include <esp_http_client.h>
 #include <esp_crt_bundle.h>
 #include <nvs_flash.h>
-#include "jpeg_decoder.h"
+// Removed JPEG decoder - using BMP only
 #include "wifi_config.h"
 
 static const char* TAG = "AirTracker";
 
+/*
+ * WORKING VERSION MILESTONE - September 2025
+ *
+ * This version successfully implements:
+ * - BMP image download and decoding (JPEG removed for simplicity)
+ * - Proper RGB565 color display on ILI9341
+ * - Clean aircraft image display without overlay text
+ * - WiFi-based image downloading from GitHub
+ * - Colors are slightly off but acceptable for aircraft identification
+ *
+ * Key working components:
+ * - download_and_decode_bmp(): Downloads and decodes BMP images
+ * - draw_image(): Displays RGB565 images with correct byte order
+ * - display_downloaded_image(): Clean display without SUCCESS box
+ */
+
 // Global error tracking
-int last_jpeg_error = 0;
+int last_bmp_error = 0;
 
 // WiFi event group
 static EventGroupHandle_t s_wifi_event_group;
@@ -290,7 +306,7 @@ void ili9341_init(void) {
     vTaskDelay(pdMS_TO_TICKS(500));
 
     spi_write_cmd(ILI9341_COLMOD);
-    spi_write_data(0x55);
+    spi_write_data(0x55); // 16-bit RGB565 format
 
     spi_write_cmd(ILI9341_MADCTL);
     spi_write_data(0x20); // Landscape orientation
@@ -694,10 +710,10 @@ void draw_airtracker_ui(void) {
                     snprintf(decode_status, sizeof(decode_status), "%dx%d", decoded_width, decoded_height);
                     draw_text(decode_status, 165, 229, COLOR_WHITE, COLOR_GREEN);
                 } else {
-                    // Show last JPEG error code on screen
-                    extern int last_jpeg_error;
+                    // Show last BMP error code on screen
+                    extern int last_bmp_error;
                     char err_status[16];
-                    snprintf(err_status, sizeof(err_status), "E:0x%X", last_jpeg_error);
+                    snprintf(err_status, sizeof(err_status), "E:0x%X", last_bmp_error);
                     draw_text(err_status, 165, 229, COLOR_WHITE, COLOR_RED);
                 }
             } else {
@@ -711,101 +727,13 @@ void draw_airtracker_ui(void) {
     ESP_LOGI(TAG, "Enhanced AirTracker UI complete!");
 }
 
-// Decode JPEG image and store in RGB565 format
-bool decode_jpeg_image() {
-    if (image_size == 0) {
-        ESP_LOGE(TAG, "No image data to decode");
-        last_jpeg_error = ESP_ERR_INVALID_ARG;
-        return false;
-    }
+// Forward declarations
+bool download_and_decode_bmp();
+uint16_t swap_rgb565_bytes(uint16_t color);
 
-    ESP_LOGI(TAG, "🔄 Starting decode: %lu bytes", (unsigned long)image_size);
-
-    // Check if data looks like JPEG (starts with FF D8)
-    if (image_size < 2 || image_buffer[0] != 0xFF || image_buffer[1] != 0xD8) {
-        ESP_LOGE(TAG, "❌ Not valid JPEG data - header: %02X %02X %02X %02X",
-                 image_size > 0 ? image_buffer[0] : 0,
-                 image_size > 1 ? image_buffer[1] : 0,
-                 image_size > 2 ? image_buffer[2] : 0,
-                 image_size > 3 ? image_buffer[3] : 0);
-        last_jpeg_error = ESP_ERR_INVALID_ARG;
-
-        // For debugging: try to decode as text instead
-        if (image_size > 10) {
-            char text_sample[16] = {0};
-            for (int i = 0; i < 15 && i < image_size; i++) {
-                text_sample[i] = (image_buffer[i] >= 32 && image_buffer[i] < 127) ? image_buffer[i] : '.';
-            }
-            ESP_LOGI(TAG, "First 15 chars as text: '%s'", text_sample);
-        }
-        return false;
-    }
-
-    ESP_LOGI(TAG, "✅ JPEG header valid, proceeding with esp_jpeg decode...");
-
-    // Try to get image info first (safer)
-    esp_jpeg_image_cfg_t jpeg_cfg_info = {
-        .indata = image_buffer,
-        .indata_size = image_size,
-        .outbuf = NULL,
-        .outbuf_size = 0,
-        .out_format = JPEG_IMAGE_FORMAT_RGB565,
-        .out_scale = JPEG_IMAGE_SCALE_1_2,
-    };
-
-    esp_jpeg_image_output_t img_info;
-    esp_err_t ret = esp_jpeg_get_image_info(&jpeg_cfg_info, &img_info);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "❌ JPEG get_info failed: %s (0x%x)", esp_err_to_name(ret), ret);
-        last_jpeg_error = ret;
-        return false;
-    }
-
-    ESP_LOGI(TAG, "📏 JPEG info: %dx%d pixels, will output %lu bytes",
-             img_info.width, img_info.height, (unsigned long)img_info.output_len);
-
-    // Check if output will fit in our buffer
-    if (img_info.output_len > sizeof(decoded_image)) {
-        ESP_LOGE(TAG, "❌ Output too large: %lu bytes (max %u)",
-                 (unsigned long)img_info.output_len, sizeof(decoded_image));
-        last_jpeg_error = ESP_ERR_NO_MEM;
-        return false;
-    }
-
-    // Now do the actual decode
-    esp_jpeg_image_cfg_t jpeg_cfg = {
-        .indata = image_buffer,
-        .indata_size = image_size,
-        .outbuf = (uint8_t*)decoded_image,
-        .outbuf_size = sizeof(decoded_image),
-        .out_format = JPEG_IMAGE_FORMAT_RGB565,
-        .out_scale = JPEG_IMAGE_SCALE_1_2,  // Scale down by 2 to fit buffer
-        .flags = {
-            .swap_color_bytes = 0,  // Keep RGB565 native format
-        }
-    };
-
-    esp_jpeg_image_output_t outimg;
-    ret = esp_jpeg_decode(&jpeg_cfg, &outimg);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "❌ JPEG decode failed: %s (0x%x)", esp_err_to_name(ret), ret);
-        last_jpeg_error = ret;
-        return false;
-    }
-
-    // Store decoded dimensions
-    decoded_width = outimg.width;
-    decoded_height = outimg.height;
-
-    // Ensure we don't exceed our buffer limits
-    if (decoded_width > MAX_DECODED_WIDTH) decoded_width = MAX_DECODED_WIDTH;
-    if (decoded_height > MAX_DECODED_HEIGHT) decoded_height = MAX_DECODED_HEIGHT;
-
-    ESP_LOGI(TAG, "✅ JPEG decode successful: %dx%d pixels, %lu bytes output",
-             decoded_width, decoded_height, (unsigned long)outimg.output_len);
-
-    last_jpeg_error = ESP_OK;
-    return true;
+// Decode BMP image and store in RGB565 format
+bool decode_bmp_image() {
+    return download_and_decode_bmp();
 }
 
 // Draw RGB565 image data to screen
@@ -817,24 +745,11 @@ void draw_image(uint16_t x, uint16_t y, uint16_t width, uint16_t height, const u
     gpio_set_level(TFT_DC, 1);  // Data mode
     gpio_set_level(TFT_CS, 0);  // Select display
 
-    // Send pixel data in chunks to avoid SPI buffer overflow
-    const size_t chunk_size = 256;  // 256 pixels at a time
-    size_t total_pixels = width * height;
-
-    for (size_t i = 0; i < total_pixels; i += chunk_size) {
-        size_t pixels_to_send = (i + chunk_size < total_pixels) ? chunk_size : (total_pixels - i);
-
-        spi_transaction_t t = {
-            .length = pixels_to_send * 16,  // 16 bits per pixel
-            .tx_buffer = &image_data[i],
-            .flags = 0
-        };
-
-        esp_err_t ret = spi_device_polling_transmit(spi, &t);
-        if (ret != ESP_OK) {
-            ESP_LOGE(TAG, "Failed to send image chunk: %s", esp_err_to_name(ret));
-            break;
-        }
+    // Send pixel data one pixel at a time to ensure correct byte order
+    for (size_t i = 0; i < width * height; i++) {
+        uint16_t pixel = image_data[i];
+        // Keep original byte order - swapping caused color blur
+        spi_write_data16(pixel);
     }
 
     gpio_set_level(TFT_CS, 1);  // Deselect display
@@ -842,47 +757,62 @@ void draw_image(uint16_t x, uint16_t y, uint16_t width, uint16_t height, const u
 
 // Function declarations
 bool download_raw_rgb565_test();
-bool download_and_decode_bmp();
+uint16_t rgb888_to_rgb565(uint8_t r, uint8_t g, uint8_t b);
 
 // Generate a simple test pattern instead of decoding
 void generate_test_pattern() {
     decoded_width = 64;
     decoded_height = 48;
 
-    // Generate a simple aircraft-like pattern
+    // Generate a colorful test pattern to validate RGB565 colors
     for (int y = 0; y < decoded_height; y++) {
         for (int x = 0; x < decoded_width; x++) {
             uint16_t color = COLOR_BLACK;
 
-            // Create a simple aircraft silhouette
-            int center_x = decoded_width / 2;
-            int center_y = decoded_height / 2;
+            // Create different colored sections for testing
+            if (y < 12) {
+                // Top row: primary colors
+                if (x < 16) color = COLOR_RED;
+                else if (x < 32) color = COLOR_GREEN;
+                else if (x < 48) color = COLOR_BLUE;
+                else color = COLOR_WHITE;
+            } else if (y < 24) {
+                // Second row: secondary colors
+                if (x < 16) color = COLOR_YELLOW;
+                else if (x < 32) color = COLOR_CYAN;
+                else if (x < 48) color = COLOR_MAGENTA;
+                else color = rgb888_to_rgb565(128, 128, 128); // Gray
+            } else {
+                // Bottom section: aircraft silhouette in white
+                int center_x = decoded_width / 2;
+                int center_y = decoded_height - 12; // Lower center
 
-            // Fuselage (horizontal line)
-            if (y >= center_y - 2 && y <= center_y + 2 && x >= 10 && x <= 54) {
-                color = COLOR_WHITE;
-            }
+                // Fuselage (horizontal line)
+                if (y >= center_y - 2 && y <= center_y + 2 && x >= 16 && x <= 48) {
+                    color = COLOR_WHITE;
+                }
 
-            // Wings (vertical line)
-            if (x >= center_x - 2 && x <= center_x + 2 && y >= 15 && y <= 33) {
-                color = COLOR_WHITE;
-            }
+                // Wings (vertical line)
+                if (x >= center_x - 2 && x <= center_x + 2 && y >= 28 && y <= 44) {
+                    color = COLOR_WHITE;
+                }
 
-            // Tail (small vertical line at back)
-            if (x >= 50 && x <= 54 && y >= center_y - 6 && y <= center_y + 6) {
-                color = COLOR_WHITE;
-            }
+                // Tail (small vertical line at back)
+                if (x >= 44 && x <= 48 && y >= center_y - 4 && y <= center_y + 4) {
+                    color = COLOR_WHITE;
+                }
 
-            // Nose (triangle-ish)
-            if (x >= 8 && x <= 12 && abs(y - center_y) <= (x - 8)) {
-                color = COLOR_WHITE;
+                // Nose (triangle-ish)
+                if (x >= 14 && x <= 18 && abs(y - center_y) <= (x - 14)) {
+                    color = COLOR_WHITE;
+                }
             }
 
             decoded_image[y * decoded_width + x] = color;
         }
     }
 
-    ESP_LOGI(TAG, "✅ Generated test aircraft pattern: %dx%d", decoded_width, decoded_height);
+    ESP_LOGI(TAG, "✅ Generated colorful test pattern with aircraft: %dx%d", decoded_width, decoded_height);
 }
 
 // Download and decode raw RGB565 test data
@@ -953,19 +883,25 @@ uint16_t rgb888_to_rgb565(uint8_t r, uint8_t g, uint8_t b) {
     return ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
 }
 
+// Swap RGB565 byte order (fix endianness issues)
+uint16_t swap_rgb565_bytes(uint16_t color) {
+    return ((color & 0xFF) << 8) | ((color >> 8) & 0xFF);
+}
+
 // Download and decode a real BMP image
 bool download_and_decode_bmp() {
     ESP_LOGI(TAG, "Downloading real BMP image...");
 
-    // Try to download a test BMP file
-    // You can replace this URL with your own BMP file
-    if (!download_image("https://www.w3.org/People/mimasa/test/imgformat/img/w3c_home.bmp")) {
+    // Try to download your airplane BMP file from GitHub
+    if (!download_image("https://raw.githubusercontent.com/msrlrocket/AirTracker/main/display/esp32-idf-airtracker/airplane_64x48.bmp")) {
         ESP_LOGE(TAG, "Failed to download BMP image");
+        last_bmp_error = ESP_ERR_NOT_FOUND;
         return false;
     }
 
     if (image_size < sizeof(bmp_header_t)) {
         ESP_LOGE(TAG, "Downloaded data too small for BMP: %lu bytes", (unsigned long)image_size);
+        last_bmp_error = ESP_ERR_INVALID_SIZE;
         return false;
     }
 
@@ -992,17 +928,20 @@ bool download_and_decode_bmp() {
             sample[i] = (image_buffer[i] >= 32 && image_buffer[i] < 127) ? image_buffer[i] : '.';
         }
         ESP_LOGI(TAG, "First %d bytes as text: '%s'", sample_len, sample);
+        last_bmp_error = ESP_ERR_INVALID_ARG;
         return false;
     }
 
     // Check if we support this format
     if (bmp->compression != 0) {
         ESP_LOGE(TAG, "❌ Compressed BMP not supported (compression: %lu)", (unsigned long)bmp->compression);
+        last_bmp_error = ESP_ERR_NOT_SUPPORTED;
         return false;
     }
 
     if (bmp->bits_per_pixel != 24 && bmp->bits_per_pixel != 16) {
         ESP_LOGE(TAG, "❌ Only 16-bit and 24-bit BMP supported (got %d-bit)", bmp->bits_per_pixel);
+        last_bmp_error = ESP_ERR_NOT_SUPPORTED;
         return false;
     }
 
@@ -1030,6 +969,7 @@ bool download_and_decode_bmp() {
     if (image_size < expected_data_size) {
         ESP_LOGE(TAG, "❌ Not enough pixel data: got %lu, need %lu",
                  (unsigned long)image_size, (unsigned long)expected_data_size);
+        last_bmp_error = ESP_ERR_INVALID_SIZE;
         return false;
     }
 
@@ -1066,6 +1006,7 @@ bool download_and_decode_bmp() {
     }
 
     ESP_LOGI(TAG, "✅ BMP decode successful: %dx%d pixels", decoded_width, decoded_height);
+    last_bmp_error = ESP_OK;
     return true;
 }
 
@@ -1073,13 +1014,13 @@ bool download_and_decode_bmp() {
 void display_downloaded_image(uint16_t x, uint16_t y, uint16_t max_width, uint16_t max_height) {
     // Check if we have a valid decoded image
     if (decoded_width > 0 && decoded_height > 0) {
-        // Display the decoded image (either RGB565 test or aircraft pattern)
+        // Display the decoded image cleanly without overlay text
         uint16_t img_x = x + (max_width - decoded_width) / 2;
         uint16_t img_y = y + (max_height - decoded_height) / 2;
 
-        draw_rounded_rect(x, y, max_width, max_height, 5, COLOR_GREEN);
+        // Clear background with black
+        draw_rounded_rect(x, y, max_width, max_height, 5, COLOR_BLACK);
         draw_image(img_x, img_y, decoded_width, decoded_height, decoded_image);
-        draw_text("SUCCESS", x + 5, y + 5, COLOR_BLACK, COLOR_GREEN);
         return;
     }
 
@@ -1097,16 +1038,16 @@ void display_downloaded_image(uint16_t x, uint16_t y, uint16_t max_width, uint16
         return;
     }
 
-    // Try to decode the JPEG image
+    // Try to decode the BMP image
     if (decoded_width == 0 || decoded_height == 0) {
         // Image not decoded yet, try to decode it
-        if (!decode_jpeg_image()) {
+        if (!decode_bmp_image()) {
             // Decoding failed, show detailed error and try test pattern
             draw_rounded_rect(x, y, max_width, max_height, 5, COLOR_RED);
 
-            extern int last_jpeg_error;
+            extern int last_bmp_error;
             char err_text[32];
-            snprintf(err_text, sizeof(err_text), "ERR:0x%X", last_jpeg_error);
+            snprintf(err_text, sizeof(err_text), "BMP:0x%X", last_bmp_error);
             draw_text(err_text, x + 5, y + 5, COLOR_WHITE, COLOR_RED);
 
             char size_text[32];
