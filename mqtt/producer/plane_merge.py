@@ -705,9 +705,9 @@ def _airline_logo_fields(airline_icao: Optional[str],
         out["airline_logo_path"] = rel_path
         base_url = os.getenv(
             "AIRLINE_LOGO_BASE_URL",
-            "https://raw.githubusercontent.com/rzeldent/esp32-flightradar24-ttgo/main/images/airline_logos",
+            "https://zip.spacegeese.com/raw",
         ).rstrip("/")
-        out["airline_logo_url"] = f"{base_url}/airline_logo_{code}.png"
+        out["airline_logo_url"] = f"{base_url}/airline_logo_{code}.bmp"
     return out
 
 # ---------- main ----------

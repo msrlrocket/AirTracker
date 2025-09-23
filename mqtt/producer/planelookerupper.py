@@ -29,7 +29,11 @@ from typing import Any, Dict, List, Optional, Tuple
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.ssl_ import create_urllib3_context
+import urllib3
 import ssl
+
+# Disable SSL warnings for compatibility
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 # =================
@@ -78,9 +82,12 @@ def get_session(timeout_s: int = 10) -> requests.Session:
             "Cache-Control": "no-cache",
         }
     )
-    s.mount("https://", TLSAdapter())
+    # Use standard HTTP adapters for compatibility
+    s.mount("https://", HTTPAdapter())
     s.mount("http://", HTTPAdapter())
     s.request_timeout = timeout_s
+    # Start with SSL verification disabled for compatibility
+    s.verify = False
     return s
 
 

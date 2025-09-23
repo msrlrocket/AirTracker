@@ -16,7 +16,7 @@ void model_init(model_t* m) {
   strcpy(m->airline_name, "Alaska Airlines");
   strcpy(m->aircraft_name, "Boeing 737-800");
   strcpy(m->callsign, "ASA345");
-  strcpy(m->airline_logo_url, "https://example.com/logos/alaska_airlines.png");
+  strcpy(m->airline_logo_url, "https://zip.spacegeese.com/raw/airline_logo_ASA.bmp");
   strcpy(m->aircraft_photo_url, "https://example.com/photos/boeing_737_800.jpg");
 
   // Overview metrics

@@ -1,0 +1,4 @@
+# Image processing dependencies for AirTracker
+Pillow>=10.0.0
+requests>=2.25.0
+python-dotenv>=1.0.0

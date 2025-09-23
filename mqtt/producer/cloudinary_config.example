@@ -1,0 +1,11 @@
+# Cloudinary Configuration Example
+# Copy this to .env or set as environment variables
+
+# Get these from your Cloudinary dashboard: https://cloudinary.com/console
+export CLOUDINARY_CLOUD_NAME="your_cloud_name"
+export CLOUDINARY_API_KEY="your_api_key"
+export CLOUDINARY_API_SECRET="your_api_secret"
+
+# Usage:
+# source cloudinary_config.env
+# python3 image_processor.py --url "https://example.com/aircraft.jpg"
