@@ -423,10 +423,45 @@ def _private_threshold_default() -> int:
         return 8
 
 
+def is_military_aircraft_type(aircraft_type: str) -> bool:
+    """Check if aircraft type code indicates military aircraft"""
+    if not aircraft_type:
+        return False
+
+    aircraft_type = aircraft_type.upper().strip()
+
+    # Known military aircraft type codes
+    military_types = {
+        # US Military helicopters
+        'H60', 'UH60', 'HH60', 'MH60', 'SH60',  # Blackhawk variants
+        'UH1', 'UH1N', 'UH1Y',  # Huey variants
+        'AH64', 'AH6',  # Apache, Little Bird
+        'CH47', 'CH53',  # Chinook, Stallion
+        'MV22', 'CV22',  # Osprey variants
+
+        # US Military fixed wing
+        'C130', 'C17', 'C5', 'KC135', 'KC46',  # Transport/tanker
+        'F16', 'F18', 'F22', 'F35',  # Fighters
+        'A10', 'B52', 'B1', 'B2',  # Attack/bombers
+        'E3', 'E2', 'P3', 'P8',  # AWACS/patrol
+        'U2', 'RQ4',  # Reconnaissance
+
+        # Other common military designations
+        'T6', 'T38', 'T45',  # Trainers
+    }
+
+    return aircraft_type in military_types
+
+
 def classify_aircraft(row: Dict[str, Any], private_threshold: Optional[int] = None) -> Optional[str]:
     """Classify aircraft as Military, Private, or Commercial."""
     try:
         if row.get("is_military") is True:
+            return "Military"
+
+        # Check for known military aircraft types
+        aircraft_type = _clean_str(row.get("aircraft_type"))
+        if aircraft_type and is_military_aircraft_type(aircraft_type):
             return "Military"
 
         # Determine seat count preference: explicit souls_on_board_max else heuristic by type
@@ -664,12 +699,14 @@ def _country_flag_fields(aircraft_lookups: Dict) -> Dict[str, str]:
 
 
 class MilCache:
-    """Military aircraft cache using ADSB.lol API"""
+    """Cache for military aircraft detection using ADSB.lol /v2/mil endpoint"""
 
-    def __init__(self, cache_path: str, ttl: int = 21600):
+    def __init__(self, cache_path: str, ttl: int = 3600):  # 1 hour cache for military database
         self.cache_path = cache_path
         self.ttl = ttl
         self.cache = self._load_cache()
+        self.military_hex_set = set()
+        self._load_military_database()
 
     def _load_cache(self) -> Dict:
         """Load existing cache from file"""
@@ -687,45 +724,108 @@ class MilCache:
         with open(self.cache_path, 'w') as f:
             json.dump(self.cache, f, indent=2)
 
+    def _load_military_database(self):
+        """Load military aircraft database from ADSB.lol API"""
+        now = time.time()
+
+        # Check if we have a recent cached military database
+        last_update = self.cache.get('_military_db_update', 0)
+        cache_age_hours = (now - last_update) / 3600
+
+        if now - last_update < self.ttl and '_military_hex_list' in self.cache:
+            self.military_hex_set = set(self.cache['_military_hex_list'])
+            count = len(self.military_hex_set)
+            print(f"📡 Using cached military database: {count} aircraft (age: {cache_age_hours:.1f}h)")
+            return
+
+        # Fetch fresh military database
+        try:
+            print(f"📡 Fetching fresh military database from ADSB.lol...")
+            url = f"{ADSB_API_BASE}/v2/mil"
+            response = requests.get(url, timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                military_aircraft = data.get('ac', [])
+
+                # Extract hex codes from military aircraft
+                military_hex_codes = []
+                for aircraft in military_aircraft:
+                    hex_code = aircraft.get('hex')
+                    if hex_code:
+                        military_hex_codes.append(hex_code.upper())
+
+                # Update cache and memory
+                self.military_hex_set = set(military_hex_codes)
+                self.cache['_military_hex_list'] = military_hex_codes
+                self.cache['_military_db_update'] = now
+                self.cache['_military_db_count'] = len(military_hex_codes)
+
+                # Add timestamp for human readability
+                self.cache['_military_db_update_readable'] = datetime.now().isoformat()
+
+                self._save_cache()
+
+                print(f"📡 Updated military database: {len(military_hex_codes)} aircraft")
+
+                # Debug output if enabled
+                if os.getenv('MILITARY_CACHE_DEBUG', '0') == '1':
+                    self._write_debug_file(military_aircraft)
+
+        except Exception as e:
+            print(f"⚠️  Failed to fetch military database: {e}")
+            # Use cached data if available
+            if '_military_hex_list' in self.cache:
+                self.military_hex_set = set(self.cache['_military_hex_list'])
+                count = len(self.military_hex_set)
+                print(f"📡 Using stale cached military database: {count} aircraft (age: {cache_age_hours:.1f}h)")
+
+    def _write_debug_file(self, military_aircraft):
+        """Write debug file with full military aircraft details"""
+        try:
+            debug_file = os.path.join(os.path.dirname(self.cache_path), 'military_aircraft_debug.json')
+            debug_data = {
+                'timestamp': time.time(),
+                'timestamp_readable': datetime.now().isoformat(),
+                'aircraft_count': len(military_aircraft),
+                'aircraft': military_aircraft,
+                'hex_codes': [aircraft.get('hex', '').upper() for aircraft in military_aircraft if aircraft.get('hex')]
+            }
+
+            with open(debug_file, 'w') as f:
+                json.dump(debug_data, f, indent=2)
+
+            print(f"📝 Military database debug file written: {debug_file}")
+
+        except Exception as e:
+            print(f"⚠️  Failed to write military debug file: {e}")
+
     def check_hex(self, hex_code: str) -> Optional[bool]:
-        """Check if aircraft is military, using cache with TTL"""
+        """Check if aircraft is military using cached military database"""
         if not hex_code:
             return None
 
         hex_upper = hex_code.upper()
+
+        # Refresh military database if needed
         now = time.time()
+        last_update = self.cache.get('_military_db_update', 0)
+        if now - last_update >= self.ttl:
+            self._load_military_database()
 
-        # Check cache
-        if hex_upper in self.cache:
-            entry = self.cache[hex_upper]
-            if now - entry.get('ts', 0) < self.ttl:
-                return entry.get('mil')
+        # Check if hex is in military database
+        return hex_upper in self.military_hex_set
 
-        # Fetch from API
-        try:
-            url = f"{ADSB_API_BASE}/v2/hex/{hex_upper}"
-            response = requests.get(url, timeout=5)
-            if response.status_code == 200:
-                data = response.json()
-                is_mil = data.get('mil', False)
-            else:
-                is_mil = None
-
-            # Update cache
-            self.cache[hex_upper] = {'mil': is_mil, 'ts': now}
-            self._save_cache()
-            return is_mil
-
-        except Exception:
-            return None
+    def get_military_count(self) -> int:
+        """Get count of military aircraft in database"""
+        return self.cache.get('_military_db_count', 0)
 
 
 class AirTrackerComplete:
     """Complete aircraft tracking pipeline in a single class"""
 
-    def __init__(self, config: Optional[Dict] = None):
+    def __init__(self, config: Optional[Dict] = None, custom_env_file: Optional[str] = None):
         """Initialize with configuration"""
-        self.config = self._load_config(config)
+        self.config = self._load_config(config, custom_env_file)
         self.mqtt_client = None
         self.setup_logging()
         self.mil_cache = MilCache(
@@ -742,12 +842,19 @@ class AirTrackerComplete:
         # Initialize image processor for Zipline uploads
         self.image_processor = AircraftImageProcessor(self.config)
 
-    def _load_config(self, override_config: Optional[Dict] = None) -> Dict:
+    def _load_config(self, override_config: Optional[Dict] = None, custom_env_file: Optional[str] = None) -> Dict:
         """Load configuration from environment variables and overrides"""
 
         # Load .env file if it exists
-        env_file = os.path.join(os.path.dirname(__file__), '.env')
+        if custom_env_file:
+            # Use custom env file if provided
+            env_file = custom_env_file
+        else:
+            # Use default env file location
+            env_file = os.path.join(os.path.dirname(__file__), '.env')
+
         if os.path.exists(env_file):
+            print(f"📄 Loading environment from: {env_file}")
             with open(env_file, 'r') as f:
                 for line in f:
                     line = line.strip()
@@ -770,6 +877,10 @@ class AirTrackerComplete:
             # Timing settings
             'fetch_interval_min': int(os.getenv('FETCH_INTERVAL_MIN_SEC', '80')),
             'fetch_interval_max': int(os.getenv('FETCH_INTERVAL_MAX_SEC', '100')),
+
+            # Debug options
+            'dump_raw': os.getenv('DUMP_RAW', '0') == '1',
+            'military_cache_debug': os.getenv('MILITARY_CACHE_DEBUG', '0') == '1',
 
             # Provider toggles
             'skip_opensky': os.getenv('SKIP_OPENSKY', '0') == '1',
@@ -840,6 +951,26 @@ class AirTrackerComplete:
                     return False
 
             full_topic = f"{self.config['mqtt_prefix']}/{topic}"
+            result = self.mqtt_client.publish(full_topic, payload, retain=retain)
+
+            if result.rc == 0:
+                self.logger.debug(f"📤 Published to {full_topic}: {len(payload)} bytes")
+                return True
+            else:
+                self.logger.error(f"❌ MQTT publish failed: {result.rc}")
+                return False
+
+        except Exception as e:
+            self.logger.error(f"❌ MQTT publish error: {e}")
+            return False
+
+    def publish_mqtt_raw(self, full_topic: str, payload: str, retain: bool = True) -> bool:
+        """Publish message to MQTT with full topic path (no prefix)"""
+        try:
+            if not self.mqtt_client:
+                if not self.setup_mqtt():
+                    return False
+
             result = self.mqtt_client.publish(full_topic, payload, retain=retain)
 
             if result.rc == 0:
@@ -1019,9 +1150,35 @@ class AirTrackerComplete:
         all_aircraft = []
 
         # Fetch from all providers
-        all_aircraft.extend(self.fetch_opensky())
-        all_aircraft.extend(self.fetch_adsb_lol())
-        all_aircraft.extend(self.fetch_fr24())
+        opensky_data = self.fetch_opensky()
+        adsb_data = self.fetch_adsb_lol()
+        fr24_data = self.fetch_fr24()
+
+        all_aircraft.extend(opensky_data)
+        all_aircraft.extend(adsb_data)
+        all_aircraft.extend(fr24_data)
+
+        # Dump raw data if requested
+        if self.config.get('dump_raw'):
+            print("\n" + "="*80)
+            print("🔍 RAW PROVIDER DATA DUMP")
+            print("="*80)
+
+            print(f"\n📡 OpenSky Network ({len(opensky_data)} aircraft):")
+            for i, aircraft in enumerate(opensky_data, 1):
+                print(f"  [{i}] {json.dumps(aircraft, indent=4)}")
+
+            print(f"\n📡 ADSB.lol ({len(adsb_data)} aircraft):")
+            for i, aircraft in enumerate(adsb_data, 1):
+                print(f"  [{i}] {json.dumps(aircraft, indent=4)}")
+
+            print(f"\n📡 FlightRadar24 ({len(fr24_data)} aircraft):")
+            for i, aircraft in enumerate(fr24_data, 1):
+                print(f"  [{i}] {json.dumps(aircraft, indent=4)}")
+
+            print("\n" + "="*80)
+            print(f"🔍 TOTAL: {len(all_aircraft)} aircraft from all providers")
+            print("="*80 + "\n")
 
         self.logger.info(f"✅ Retrieved {len(all_aircraft)} aircraft from providers")
         return all_aircraft
@@ -1113,6 +1270,9 @@ class AirTrackerComplete:
                 classification = classify_aircraft(aircraft)
                 if classification:
                     aircraft["classification"] = classification
+                    # Update is_military flag if classification is Military
+                    if classification == "Military":
+                        aircraft["is_military"] = True
 
                 # Add airline logo URLs for any aircraft with airline data
                 if aircraft.get("airline_icao") or (enriched.get("lookups", {}).get("airline", {}).get("iata")):
@@ -1397,16 +1557,16 @@ class AirTrackerComplete:
                 if enriched_nearest.get(key) is None:
                     enriched_nearest[key] = default_value
 
-        # Enrich nearest interesting (commercial/military) aircraft
+        # Enrich nearest commercial aircraft (exclude military)
         enriched_nearest_commercial = {}
-        if nearest_interesting:
-            enriched_nearest_commercial = dict(nearest_interesting)
+        if nearest_commercial:
+            enriched_nearest_commercial = dict(nearest_commercial)
 
             # Add enrichment lookups if they exist
-            if "lookups" in nearest_interesting:
+            if "lookups" in nearest_commercial:
                 # Extract airline IATA for convenience
                 try:
-                    airline_lookup = nearest_interesting.get("lookups", {}).get("airline", {})
+                    airline_lookup = nearest_commercial.get("lookups", {}).get("airline", {})
                     if isinstance(airline_lookup, dict) and airline_lookup.get("iata"):
                         enriched_nearest_commercial["airline_iata"] = airline_lookup["iata"]
                 except Exception:
@@ -1564,6 +1724,10 @@ class AirTrackerComplete:
                 if enriched_nearest_commercial.get(key) is None:
                     enriched_nearest_commercial[key] = default_value
 
+        # Set nearest_commercial to "NONE" if no commercial aircraft found
+        if not enriched_nearest_commercial:
+            enriched_nearest_commercial = "NONE"
+
         return {
             "timestamp": int(time.time()),
             "stats": {
@@ -1580,10 +1744,163 @@ class AirTrackerComplete:
             "nearest_commercial": enriched_nearest_commercial
         }
 
+    def publish_ha_discovery(self, data: Optional[Dict] = None) -> bool:
+        """Publish dynamic Home Assistant MQTT Discovery configs based on actual data"""
+        try:
+            if not self.config.get('mqtt_discovery_on_start'):
+                return True  # Skip if not enabled
+
+            prefix = self.config['mqtt_prefix']
+            discovery_prefix = "homeassistant"
+            device = {
+                "identifiers": [f"airtracker_{prefix}"],
+                "name": "AirTracker",
+                "model": "Aircraft Tracker",
+                "manufacturer": "AirTracker",
+                "sw_version": "1.0"
+            }
+
+            entities = []
+
+            # Always add basic stats sensors
+            entities.extend([
+                {
+                    "type": "sensor", "id": "aircraft_count", "name": "Aircraft Count",
+                    "topic": f"{prefix}/stats", "value_template": "{{ value_json.aircraft_count | default(0) }}",
+                    "unit_of_measurement": "aircraft", "icon": "mdi:counter"
+                },
+                {
+                    "type": "sensor", "id": "runs_total", "name": "Total Runs",
+                    "topic": f"{prefix}/stats", "value_template": "{{ value_json.runs | default(0) }}",
+                    "icon": "mdi:counter"
+                },
+                {
+                    "type": "sensor", "id": "successful_publishes", "name": "Successful Publishes",
+                    "topic": f"{prefix}/stats", "value_template": "{{ value_json.successful_publishes | default(0) }}",
+                    "icon": "mdi:check-circle"
+                }
+            ])
+
+            # Add dynamic sensors based on data structure if data is provided
+            if data:
+                # Add nearest aircraft sensors
+                if data.get('nearest'):
+                    entities.extend(self._create_aircraft_sensors('nearest', 'Nearest Aircraft', f"{prefix}/nearest"))
+
+                # Add nearest commercial sensors
+                if data.get('nearest_commercial') and data['nearest_commercial'] != "NONE":
+                    entities.extend(self._create_aircraft_sensors('nearest_commercial', 'Nearest Commercial Aircraft', f"{prefix}/nearest_commercial"))
+
+            # Clean up old entities first
+            self._cleanup_old_ha_discovery(prefix, discovery_prefix)
+
+            # Publish new entities
+            success = True
+            for entity in entities:
+                config = {
+                    "unique_id": f"{prefix}_{entity['id']}",
+                    "name": entity["name"],
+                    "state_topic": entity["topic"],
+                    "value_template": entity["value_template"],
+                    "icon": entity["icon"],
+                    "device": device,
+                    "availability_topic": f"{prefix}/stats",
+                    "availability_template": "{{ 'online' if value_json.last_update else 'offline' }}"
+                }
+
+                if entity.get("unit_of_measurement"):
+                    config["unit_of_measurement"] = entity["unit_of_measurement"]
+
+                discovery_topic = f"{discovery_prefix}/{entity['type']}/{prefix}/{entity['id']}/config"
+                config_json = json.dumps(config, separators=(',', ':'))
+
+                if not self.publish_mqtt_raw(discovery_topic, config_json, retain=True):
+                    self.logger.error(f"Failed to publish HA discovery config for {entity['id']}")
+                    success = False
+
+            if success:
+                self.logger.info(f"✅ Published {len(entities)} Home Assistant MQTT Discovery configs")
+            else:
+                self.logger.warning("⚠️  Some Home Assistant discovery configs failed to publish")
+
+            return success
+
+        except Exception as e:
+            self.logger.error(f"❌ Home Assistant discovery publishing failed: {e}")
+            return False
+
+    def _create_aircraft_sensors(self, prefix: str, name_prefix: str, topic: str) -> List[Dict]:
+        """Create sensor configurations for aircraft data"""
+        sensors = [
+            {
+                "type": "sensor", "id": f"{prefix}_callsign", "name": f"{name_prefix} Callsign",
+                "topic": topic, "value_template": f"{{% if value_json == 'NONE' %}}N/A{{% else %}}{{{{ value_json.callsign | default('N/A') }}}}{{% endif %}}",
+                "icon": "mdi:airplane"
+            },
+            {
+                "type": "sensor", "id": f"{prefix}_registration", "name": f"{name_prefix} Registration",
+                "topic": topic, "value_template": f"{{% if value_json == 'NONE' %}}N/A{{% else %}}{{{{ value_json.registration | default('N/A') }}}}{{% endif %}}",
+                "icon": "mdi:airplane"
+            },
+            {
+                "type": "sensor", "id": f"{prefix}_distance", "name": f"{name_prefix} Distance",
+                "topic": topic, "value_template": f"{{% if value_json == 'NONE' %}}0{{% else %}}{{{{ value_json.distance_nm | default(0) }}}}{{% endif %}}",
+                "unit_of_measurement": "nm", "icon": "mdi:map-marker-distance"
+            },
+            {
+                "type": "sensor", "id": f"{prefix}_altitude", "name": f"{name_prefix} Altitude",
+                "topic": topic, "value_template": f"{{% if value_json == 'NONE' %}}0{{% else %}}{{{{ value_json.altitude_ft | default(0) }}}}{{% endif %}}",
+                "unit_of_measurement": "ft", "icon": "mdi:airplane-takeoff"
+            },
+            {
+                "type": "sensor", "id": f"{prefix}_aircraft_type", "name": f"{name_prefix} Aircraft Type",
+                "topic": topic, "value_template": f"{{% if value_json == 'NONE' %}}Unknown{{% else %}}{{{{ value_json.aircraft_type | default('Unknown') }}}}{{% endif %}}",
+                "icon": "mdi:airplane"
+            },
+            {
+                "type": "sensor", "id": f"{prefix}_classification", "name": f"{name_prefix} Classification",
+                "topic": topic, "value_template": f"{{% if value_json == 'NONE' %}}Unknown{{% else %}}{{{{ value_json.classification | default('Unknown') }}}}{{% endif %}}",
+                "icon": "mdi:tag"
+            },
+            {
+                "type": "sensor", "id": f"{prefix}_ground_speed", "name": f"{name_prefix} Ground Speed",
+                "topic": topic, "value_template": f"{{% if value_json == 'NONE' %}}0{{% else %}}{{{{ value_json.ground_speed_kt | default(0) }}}}{{% endif %}}",
+                "unit_of_measurement": "kt", "icon": "mdi:speedometer"
+            }
+        ]
+
+        # Add route sensor for aircraft with origin/destination
+        sensors.append({
+            "type": "sensor", "id": f"{prefix}_route", "name": f"{name_prefix} Route",
+            "topic": topic,
+            "value_template": f"{{% if value_json == 'NONE' %}}N/A{{% else %}}{{{{ value_json.origin_iata | default('') }}}}{{% if value_json.origin_iata and value_json.destination_iata %}} → {{% endif %}}{{{{ value_json.destination_iata | default('') }}}}{{% endif %}}",
+            "icon": "mdi:flight"
+        })
+
+        return sensors
+
+    def _cleanup_old_ha_discovery(self, prefix: str, discovery_prefix: str):
+        """Clean up old Home Assistant discovery configs"""
+        # Send empty retained messages to remove old configs
+        # This is a simplified cleanup - in a full implementation you'd track which entities were created
+        old_entity_patterns = [
+            'nearest_callsign', 'nearest_distance', 'nearest_altitude', 'nearest_aircraft_type', 'nearest_classification',
+            'nearest_commercial_callsign', 'nearest_commercial_distance', 'nearest_commercial_route'
+        ]
+
+        for pattern in old_entity_patterns:
+            cleanup_topic = f"{discovery_prefix}/sensor/{prefix}/{pattern}/config"
+            self.publish_mqtt_raw(cleanup_topic, "", retain=True)  # Empty retained message removes entity
+
     def publish_data(self, data: Dict) -> bool:
         """Publish processed data to MQTT topics"""
         try:
             success = True
+
+            # Publish Home Assistant discovery configs if enabled (first time only)
+            if not hasattr(self, '_ha_discovery_published'):
+                self.publish_ha_discovery(data)
+                self._ha_discovery_published = True
 
             # Publish nearest aircraft
             if data.get('nearest'):
@@ -1609,10 +1926,13 @@ class AirTrackerComplete:
                 if self.publish_mqtt('nearest_commercial', nearest_commercial_json):
                     self.stats['successful_publishes'] += 1
                     if self.config.get('log_level') == 'DEBUG':
-                        aircraft_type = data['nearest_commercial'].get('classification', 'Unknown')
-                        callsign = data['nearest_commercial'].get('callsign', 'Unknown')
-                        distance = data['nearest_commercial'].get('distance_nm', 'Unknown')
-                        print(f"📡 Published nearest {aircraft_type.lower()} aircraft ({callsign}) at {distance}nm to MQTT")
+                        if data['nearest_commercial'] == "NONE":
+                            print(f"📡 Published nearest commercial: NONE (no commercial aircraft found)")
+                        else:
+                            aircraft_type = data['nearest_commercial'].get('classification', 'Unknown')
+                            callsign = data['nearest_commercial'].get('callsign', 'Unknown')
+                            distance = data['nearest_commercial'].get('distance_nm', 'Unknown')
+                            print(f"📡 Published nearest {aircraft_type.lower()} aircraft ({callsign}) at {distance}nm to MQTT")
                 else:
                     success = False
 
@@ -1659,11 +1979,37 @@ class AirTrackerComplete:
         if nearest:
             callsign = nearest.get('callsign', 'Unknown')
             aircraft_type = nearest.get('aircraft_type', 'Unknown')
+            classification = nearest.get('classification', 'Unknown')
             distance = nearest.get('distance_nm', 0)
-            altitude = nearest.get('altitude', 0)
-            print(f"  - 🎯 Nearest aircraft: {callsign} ({aircraft_type}) - {distance:.1f}nm away at {altitude:,}ft")
+            altitude = nearest.get('altitude_ft', nearest.get('altitude', 0))
+            print(f"  - 🎯 Nearest aircraft: {callsign} ({aircraft_type}) - {classification} - {distance:.1f}nm away at {altitude:,}ft")
 
         print(f"  - ✅ Perfect data merge with aircraft appearing in multiple sources")
+
+        # MQTT publishing summary
+        mqtt_feeds_published = []
+        if nearest:
+            mqtt_feeds_published.append("airtracker/nearest")
+        mqtt_feeds_published.append("airtracker/stats")
+
+        if self.config.get('mqtt_publish_all_planes') and planes:
+            mqtt_feeds_published.append(f"airtracker/planes ({len(planes)} aircraft)")
+        elif not self.config.get('mqtt_publish_all_planes'):
+            mqtt_feeds_published.append("airtracker/planes (DISABLED)")
+
+        if self.config.get('mqtt_publish_nearest_commercial'):
+            commercial_data = data.get('nearest_commercial')
+            if commercial_data == "NONE" or not commercial_data:
+                commercial_status = "NONE"
+            else:
+                commercial_status = "FOUND"
+            mqtt_feeds_published.append(f"airtracker/nearest_commercial ({commercial_status})")
+        else:
+            mqtt_feeds_published.append("airtracker/nearest_commercial (DISABLED)")
+
+        print(f"  - 📡 MQTT Feeds Published:")
+        for feed in mqtt_feeds_published:
+            print(f"    • {feed}")
         print(f"  - ✅ MQTT published successfully")
 
         if mil_checked > 0:
@@ -1724,6 +2070,9 @@ class AirTrackerComplete:
             self.logger.error("❌ Cannot start without MQTT connection")
             sys.exit(1)
 
+        # Publish Home Assistant discovery configs if enabled (will be updated with actual data on first publish)
+        self.publish_ha_discovery()
+
         try:
             while True:
                 cycle_start = time.time()
@@ -1768,6 +2117,7 @@ Examples:
   python3 airtracker_complete.py --continuous      # Continuous operation
   python3 airtracker_complete.py --test-mqtt       # Test MQTT connection
   python3 airtracker_complete.py --lat 40.7 --lon -74.0 --radius 15  # Custom location
+  python3 airtracker_complete.py --env-file /path/to/custom.env       # Custom .env file
         """
     )
 
@@ -1793,7 +2143,9 @@ Examples:
 
     # Debug options
     parser.add_argument('--debug', action='store_true', help='Enable debug logging')
+    parser.add_argument('--dump-raw', action='store_true', help='Dump raw provider responses for debugging')
     parser.add_argument('--output-file', help='Write processed JSON to file')
+    parser.add_argument('--env-file', help='Path to custom .env file')
 
     args = parser.parse_args()
 
@@ -1821,9 +2173,11 @@ Examples:
     # Set debug logging
     if args.debug:
         os.environ['LOG_LEVEL'] = 'DEBUG'
+    if args.dump_raw:
+        config_overrides['dump_raw'] = True
 
     # Initialize complete pipeline
-    tracker = AirTrackerComplete(config_overrides)
+    tracker = AirTrackerComplete(config_overrides, args.env_file)
 
     # Handle different operation modes
     if args.test_mqtt:

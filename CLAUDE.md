@@ -6,39 +6,40 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 AirTracker is a multi-component aircraft tracking system with three main parts:
 
-1. **MQTT Producer** (`mqtt/producer/`) - Python scripts that fetch aircraft data from multiple providers (OpenSky, ADSB.lol, FlightRadar24), merge the data, and publish to MQTT
+1. **Unified MQTT Producer** (`mqtt/unified/`) - Single Python script that fetches aircraft data from multiple providers (OpenSky, ADSB.lol, FlightRadar24), merges the data, enriches with datasets, and publishes to MQTT
 2. **ESP32 Display** (`display/esp32-airtracker/`) - Arduino-based firmware for ESP32 devices with LCD displays
 3. **LVGL Simulator** (`display/sim-lvgl/`) - C/CMake desktop simulator for testing the display UI
 
 ### Data Flow Architecture
 
 The recommended architecture is "One Producer, Many Consumers":
-- **Producer**: Runs `plane_retreiver.py` → `plane_merge.py` → publishes to MQTT topics
+- **Producer**: Runs `airtracker_complete.py` → publishes to MQTT topics
 - **Consumers**: ESP32 display and Home Assistant subscribe to MQTT for real-time updates
 - **Topics**: `airtracker/nearest` (retained, tiny JSON) and `airtracker/planes` (retained, full list)
 
 ## Common Development Commands
 
-### Python/MQTT Producer
+### Unified AirTracker Producer
 
 ```bash
 # Install Python dependencies
 pip install requests pandas openpyxl
 
-# Run single retrieval (test)
-python3 mqtt/producer/plane_retreiver.py 46.168689 -123.020309 -r 50
+# Single run (test) with debug output
+cd mqtt/unified
+python3 airtracker_complete.py --debug
 
-# Retrieve and merge in one command
-python3 mqtt/producer/plane_retreiver.py 46.168689 -123.020309 -r 50 --json-stdout --quiet --merge --merge-minify
+# Continuous operation
+python3 airtracker_complete.py --continuous
 
-# Start MQTT publisher (continuous)
-bash mqtt/producer/publish_mqtt.sh
+# Custom location and MQTT publishing
+python3 airtracker_complete.py --lat 46.168689 --lon -123.020309 --radius 25 --mqtt-publish-all --mqtt-publish-commercial
 
-# One-shot MQTT publish (for testing/automation)
-RUN_ONCE=1 bash mqtt/producer/publish_mqtt.sh
+# Test MQTT connection
+python3 airtracker_complete.py --test-mqtt
 
-# Publish Home Assistant discovery configs
-bash mqtt/producer/publish_ha_discovery.sh
+# Output to file only (no MQTT)
+WRITE_JSON_PATH=data/planes_complete.json python3 airtracker_complete.py
 ```
 
 ### ESP32 Development
@@ -78,12 +79,12 @@ make
 
 ## Key File Locations
 
-- **Main scripts**: `mqtt/producer/plane_retreiver.py`, `mqtt/producer/plane_merge.py`
-- **MQTT publisher**: `mqtt/producer/publish_mqtt.sh`
+- **Main script**: `mqtt/unified/airtracker_complete.py` (unified producer)
+- **Configuration**: `mqtt/unified/.env` (environment settings)
 - **ESP32 source**: `display/esp32-airtracker/src/main.cpp`
 - **Simulator source**: `display/sim-lvgl/src/main.c`
-- **Datasets**: `mqtt/producer/datasets/` (aircraft types, airports, airlines, countries)
-- **Data output**: `./data/` directory (JSON files, caches)
+- **Datasets**: `mqtt/unified/datasets/` (aircraft types, airports, airlines, countries)
+- **Data output**: `mqtt/unified/data/` directory (JSON files, caches)
 
 ## Data Processing Pipeline
 
@@ -95,7 +96,8 @@ make
 
 ## Testing and Development
 
-- Use `--dump --debug` flags with retriever for debugging provider responses
-- Test merge logic with: `python3 mqtt/producer/plane_merge.py ./data/planes_combo.json --json-stdout`
+- Use `--dump-raw --debug` flags for debugging provider responses
 - Monitor MQTT topics: `mosquitto_sub -h $MQTT_HOST -t "airtracker/+"`
+- Test military detection: set `MILITARY_CACHE_DEBUG=1` in `.env`
 - ESP32 config must exist: copy `config.example.h` to `config.h` before building
+- Run with environment: `WRITE_JSON_PATH=data/planes_complete.json python3 airtracker_complete.py --debug`
