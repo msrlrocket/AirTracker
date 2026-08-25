@@ -1,0 +1,560 @@
+{
+  "scraped_at": "2025-09-29T12:30:39.484381",
+  "source": "Military.com",
+  "total_aircraft": 16,
+  "aircraft": [
+    {
+      "name": "AH-64 Apache Longbow",
+      "url": "https://www.military.com/equipment/ah-64-apache-longbow",
+      "scraped_at": "2025-09-29T12:30:00.347872",
+      "specifications": {
+        "Manufacturer": "Boeing",
+        "Service": "US Army",
+        "Max Speed": "227 mph",
+        "Range": "300 milesConducts rear, close, and shaping missions including deep precision strike. Conducts distributed operations, precision strikes against relocatable targets, and provides armed reconnaissance when required in day, night, obscured battlefield and adverse weather conditions.",
+        "Armament": "30 mm M230 Chain Gun; Hydra 70 mm and CRV7 70 mm air-to-ground rockets; AGM-114 Hellfire; AIM-92 Stinger",
+        "Crew": "2 (pilot, and co-pilot/gunner)"
+      },
+      "images": [
+        {
+          "original_url": "https://images01.military.com/sites/default/files/media/equipment/military-aircraft/ah-64-apache-longbow/2014/02/ah-64-apache-longbow_001.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "AH-64 Apache Longbow",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:00.722139"
+        },
+        {
+          "original_url": "https://images05.military.com/sites/default/files/media/equipment/military-aircraft/ah-64-apache-longbow/2014/02/ah-64-apache-longbow_002.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "AH-64 Apache Longbow",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:01.377280"
+        }
+      ],
+      "description": "Conducts rear, close, and shaping missions including deep precision strike. Conducts distributed operations, precision strikes against relocatable targets, and provides armed reconnaissance when required in day, night, obscured battlefield and adverse weather conditions.",
+      "aliases": [],
+      "category": "Helicopter"
+    },
+    {
+      "name": "CH-47D Chinook",
+      "url": "https://www.military.com/equipment/ch-47d-chinook",
+      "scraped_at": "2025-09-29T12:30:03.617345",
+      "specifications": {
+        "Manufacturer": "Boeing",
+        "Service": "US Army",
+        "Max Speed": "184 mph",
+        "Range": "400 mi",
+        "Armament": "3x M240 7.62 machine guns"
+      },
+      "images": [
+        {
+          "original_url": "https://images01.military.com/sites/default/files/media/equipment/military-aircraft/ch-47d-chinook/2014/02/ch-47d-chinook_001.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "CH-47D Chinook",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:03.653452"
+        },
+        {
+          "original_url": "https://images02.military.com/sites/default/files/media/equipment/military-aircraft/ch-47d-chinook/2014/02/ch-47d-chinook_002.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "CH-47D Chinook",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:04.270649"
+        }
+      ],
+      "description": "The CH-47D Chinook is the U.S. Army’s primary heavy troop and supply transport aircraft. Originally fielded in the Vietnam War, the CH-47 has undergone a series up upgrades to increase lift and airworthiness in combat environments.",
+      "aliases": [],
+      "category": "Helicopter"
+    },
+    {
+      "name": "Helicopters",
+      "url": "https://www.military.com/equipment/helicopters",
+      "scraped_at": "2025-09-29T12:30:05.864091",
+      "specifications": {},
+      "images": [
+        {
+          "original_url": "https://images04.military.com/sites/default/files/styles/thumbnail_large/public/media/equipment/military-aircraft/uh-60-black-hawk/2014/02/uh-60-black-hawk_001.jpg?itok=EovXXT2n",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "UH-60A/L Black Hawk",
+          "title": "",
+          "width": 200,
+          "height": 133,
+          "processed_at": "2025-09-29T12:30:05.923691"
+        },
+        {
+          "original_url": "https://images01.military.com/sites/default/files/styles/thumbnail_large/public/media/equipment/military-aircraft/ch-47d-chinook/2014/02/ch-47d-chinook_001.jpg?itok=uP8mvXQo",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "CH-47D Chinook",
+          "title": "",
+          "width": 200,
+          "height": 133,
+          "processed_at": "2025-09-29T12:30:06.449305"
+        }
+      ],
+      "description": "Polish navy divers take on the herculean task of defusing the largest unexploded WWII bomb ever found in the country.",
+      "aliases": [],
+      "category": "Helicopter"
+    },
+    {
+      "name": "HH-60G PAVE Hawk",
+      "url": "https://www.military.com/equipment/hh-60g-pave-hawk",
+      "scraped_at": "2025-09-29T12:30:08.488792",
+      "specifications": {
+        "Manufacturer": "Sikorsky",
+        "Service": "USAF",
+        "Range": "504 nm",
+        "Armament": "2x 7.62mm or .50 caliber machineguns",
+        "Crew": "Two pilots, one flight engineer and one gunnerThe HH-60G Pave Hawk is the U.S. Air Force’s primary combat search and rescue helicopter used by Air Force special tactics teams and pararescuemen. The HH-60G is also tasked to perform military operations other than war, including civil search and rescue, medical evacuation, disaster response, humanitarian assistance, security cooperation/aviation advisory, NASA space flight support, and rescue command and control."
+      },
+      "images": [
+        {
+          "original_url": "https://images02.military.com/sites/default/files/media/equipment/military-aircraft/hh-60g-pave-hawk/2014/02/hh-60g-pave-hawk_001.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "HH-60G Pave Hawk",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:08.554576"
+        },
+        {
+          "original_url": "https://images04.military.com/sites/default/files/media/equipment/military-aircraft/hh-60g-pave-hawk/2014/02/hh-60g-pave-hawk_002.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "HH-60G Pave Hawk",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:09.112851"
+        }
+      ],
+      "description": "The HH-60G Pave Hawk is the U.S. Air Force’s primary combat search and rescue helicopter used by Air Force special tactics teams and pararescuemen. The HH-60G is also tasked to perform military operations other than war, including civil search and rescue, medical evacuation, disaster response, humanitarian assistance, security cooperation/aviation advisory, NASA space flight support, and rescue command and control.",
+      "aliases": [],
+      "category": "Helicopter"
+    },
+    {
+      "name": "Marine Corps Helicopters",
+      "url": "https://www.military.com/equipment/marine-corps-helicopters",
+      "scraped_at": "2025-09-29T12:30:10.691710",
+      "specifications": {},
+      "images": [
+        {
+          "original_url": "https://images03.military.com/sites/default/files/styles/thumbnail_large/public/media/equipment/military-aircraft/ch-53d-sea-stallion/2014/02/ch-53d-sea-stallion_006.jpg?itok=iHeX8Smy",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "CH-53D Sea Stallion",
+          "title": "",
+          "width": 200,
+          "height": 133,
+          "processed_at": "2025-09-29T12:30:10.744038"
+        },
+        {
+          "original_url": "https://images01.military.com/sites/default/files/styles/thumbnail_large/public/media/equipment/military-aircraft/vh-60n/2014/02/vh-60n_004.jpg?itok=TzFahKOC",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "VH-60N",
+          "title": "",
+          "width": 200,
+          "height": 133,
+          "processed_at": "2025-09-29T12:30:11.277107"
+        }
+      ],
+      "description": "Polish navy divers take on the herculean task of defusing the largest unexploded WWII bomb ever found in the country.",
+      "aliases": [],
+      "category": "Helicopter"
+    },
+    {
+      "name": "MH-47 Chinook",
+      "url": "https://www.military.com/equipment/mh-47-chinook",
+      "scraped_at": "2025-09-29T12:30:13.279120",
+      "specifications": {
+        "Manufacturer": "Boeing",
+        "Max Speed": "259 kph",
+        "Range": "1382 kmThe MH-47 Chinook and its “E,” “D” and “G” variants are the primary heavy lift transport helicopters for the U.S. Army’s 160th Special Operations Aviation Regiment. The MH-47 differs from its CH-47 sister model with its incorporation of combat systems designed to make the helicopter more survivable on missions deep in enemy territory and during nighttime, low-level flight.",
+        "Armament": "2x M134 7.62mm miniguns; 2x M240D 7.62mm machine gun",
+        "Crew": "Pilot, Co-pilot + 3 crew chiefs/gunners"
+      },
+      "images": [
+        {
+          "original_url": "https://images04.military.com/sites/default/files/media/equipment/military-aircraft/mh-47e-chinook/2014/02/mh-47e-chinook_001.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "MH-47E Chinook",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:13.318736"
+        },
+        {
+          "original_url": "https://images02.military.com/sites/default/files/media/equipment/military-aircraft/mh-47e-chinook/2014/02/mh-47e-chinook_002.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "MH-47E Chinook",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:13.860891"
+        }
+      ],
+      "description": "The MH-47 Chinook and its “E,” “D” and “G” variants are the primary heavy lift transport helicopters for the U.S. Army’s 160th Special Operations Aviation Regiment. The MH-47 differs from its CH-47 sister model with its incorporation of combat systems designed to make the helicopter more survivable on missions deep in enemy territory and during nighttime, low-level flight.",
+      "aliases": [],
+      "category": "Helicopter"
+    },
+    {
+      "name": "MH-6 Little Bird",
+      "url": "https://www.military.com/equipment/mh-6-little-bird",
+      "scraped_at": "2025-09-29T12:30:15.445078",
+      "specifications": {
+        "Manufacturer": "McDonnell Douglas",
+        "Service": "US Army",
+        "Range": "232 nmFlown by the U.S. Army’s elite 160th Special Operations Aviation Regiment, the MH-6 Little Bird is primarily used to insert special operations forces onto rooftops or on narrow roadways. Based on the (Hughes) McDonnell Douglas MD369, the MH-6 Little Bird and its attack variant AH-6 carries three commandos on bench seats mounted to the side doors of the helicopter.",
+        "Armament": "Guns: 1× 30 mm M230 Chain Gun; or 2× .50 cal GAU-19; or 2× 7.62 mm M134 Minigun; 2× LAU-68D/A rocket pods; Hydra 70 rockets; 2× AGM-114 Hellfire; 2× FIM-92 Stinger"
+      },
+      "images": [
+        {
+          "original_url": "https://images04.military.com/sites/default/files/media/equipment/military-aircraft/mh-6-little-bird/2014/02/mh-6-little-bird_001.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "MH-6 Little Bird",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:15.485660"
+        },
+        {
+          "original_url": "https://images02.military.com/sites/default/files/media/equipment/military-aircraft/mh-6-little-bird/2014/02/mh-6-little-bird_002.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "MH-6 Little Bird",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:16.029122"
+        }
+      ],
+      "description": "Flown by the U.S. Army’s elite 160th Special Operations Aviation Regiment, the MH-6 Little Bird is primarily used to insert special operations forces onto rooftops or on narrow roadways. Based on the (Hughes) McDonnell Douglas MD369, the MH-6 Little Bird and its attack variant AH-6 carries three commandos on bench seats mounted to the side doors of the helicopter.",
+      "aliases": [],
+      "category": "Helicopter"
+    },
+    {
+      "name": "MH-60 Jayhawk",
+      "url": "https://www.military.com/equipment/mh-60-jayhawk",
+      "scraped_at": "2025-09-29T12:30:17.611172",
+      "specifications": {
+        "Manufacturer": "Sikorsky",
+        "Service": "USCG",
+        "Max Speed": "180 knots",
+        "Range": "700 nautical milesThe MH-60 is an all weather, medium-range helicopter (specialized for search and recovery) similar to the Navy MH-60R and MH-60S Seahawk, with its basic roots in the Army H-60 Blackhawk. The service began to operate the MH-60J in 1990 as a replacement to the now-retired HH-3F Pelican, and it is typically operated by a crew of four. The last unit operating the MH-60J is CGAS Clearwater. They are currently completing the MH-60J to MH-60T transition which will be completed in May 2013.",
+        "Armament": "1x 7.62mm M240J machine gun; 7.62mm shoulder-fired precision weapon"
+      },
+      "images": [
+        {
+          "original_url": "https://images04.military.com/sites/default/files/media/equipment/military-aircraft/mh-60-jayhawk/2014/02/mh-60-jayhawk_001.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "MH-60 Jayhawk",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:17.661590"
+        },
+        {
+          "original_url": "https://images04.military.com/sites/default/files/media/equipment/military-aircraft/mh-60-jayhawk/2014/02/mh-60-jayhawk_002.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "MH-60 Jayhawk",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:18.208216"
+        }
+      ],
+      "description": "The MH-60 is an all weather, medium-range helicopter (specialized for search and recovery) similar to the Navy MH-60R and MH-60S Seahawk, with its basic roots in the Army H-60 Blackhawk. The service began to operate the MH-60J in 1990 as a replacement to the now-retired HH-3F Pelican, and it is typically operated by a crew of four. The last unit operating the MH-60J is CGAS Clearwater. They are currently completing the MH-60J to MH-60T transition which will be completed in May 2013.",
+      "aliases": [],
+      "category": "Helicopter"
+    },
+    {
+      "name": "MH-60R/S Sea Hawk",
+      "url": "https://www.military.com/equipment/mh-60r-s-sea-hawk",
+      "scraped_at": "2025-09-29T12:30:20.184639",
+      "specifications": {
+        "Range": "245 Nautical Miles",
+        "Crew": "FourThe MH-60R Seahawk missions are Anti-Submarine Warfare, Anti-Surface Warfare, Surveillance, Communications Relay, Combat Search and Rescue, Naval Gunfire Support and logistics support."
+      },
+      "images": [
+        {
+          "original_url": "https://images01.military.com/sites/default/files/media/equipment/military-aircraft/mh-60r-sea-hawk/2014/02/mh-60r-sea-hawk_002.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "MH-60R Sea Hawk",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:20.257209"
+        }
+      ],
+      "description": "The MH-60R Seahawk missions are Anti-Submarine Warfare, Anti-Surface Warfare, Surveillance, Communications Relay, Combat Search and Rescue, Naval Gunfire Support and logistics support.",
+      "aliases": [],
+      "category": "Helicopter"
+    },
+    {
+      "name": "MH-65 Dolphin",
+      "url": "https://www.military.com/equipment/mh-65-dolphin",
+      "scraped_at": "2025-09-29T12:30:22.335149",
+      "specifications": {
+        "Manufacturer": "Eurocopter",
+        "Service": "United States Coast Guard",
+        "Power Plant[^": "Two 853 shp Turbomeca Arriel 2C2-CG turbine engines",
+        "Max Speed": "175 knots (MH-65C)",
+        "Range": "290 nautical miles (MH-65C)",
+        "Armament": "Single 7.62mm M240B/H machine gun, 7.62mm shoulder-fired precision weapon, .50-caliber shoulder-fired precision weapon",
+        "Crew": "2 pilots, 1 flight mechanic, 1 rescue swimmerThe H-65 helicopter built by Eurocopter America is the U.S. Coast Guard's primary rescue helicopter. The Dolphin is certified for operation in all-weather and night-time operations, with the exception of icing conditions. There are 100 H-65s in the inventory. The H-65 is the primary Coast Guard aircraft used aboard certified cutters during deployments."
+      },
+      "images": [
+        {
+          "original_url": "https://images04.military.com/sites/default/files/media/equipment/military-aircraft/mh-65-dolphin/2014/04/mh-65-dolphin-001.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "MH-65 Dolphin Helicopter",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:22.380925"
+        },
+        {
+          "original_url": "https://images02.military.com/sites/default/files/media/equipment/military-aircraft/mh-65-dolphin/2014/04/mh-65-dolphin-002.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "MH-65 Dolphin",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:22.925949"
+        }
+      ],
+      "description": "Armament: Single 7.62mm M240B/H machine gun, 7.62mm shoulder-fired precision weapon, .50-caliber shoulder-fired precision weapon",
+      "aliases": [],
+      "category": "Helicopter"
+    },
+    {
+      "name": "OH-58D Kiowa Warrior",
+      "url": "https://www.military.com/equipment/oh-58d-kiowa-warrior",
+      "scraped_at": "2025-09-29T12:30:24.932994",
+      "specifications": {
+        "Manufacturer": "Bell Helicopter",
+        "Service": "US Army",
+        "Max Speed": "128 mph",
+        "Range": "299 milesThe OH-58 Kiowa Warrior conducts armed reconnaissance, security, target acquisition and designation, command and control, light attack and defensive air combat missions in support of combat and contingency operations. It replaces the AH-1 Cobra attack helicopters (those that function as scouts in air cavalry troops and light attack companies) and OH-58A and C Kiowas in air cavalry troops.",
+        "Armament": "Air-to-air Stinger; .50 caliber machine gun; HYDRA 70 rockets; HELLFIRE missiles"
+      },
+      "images": [
+        {
+          "original_url": "https://images05.military.com/sites/default/files/media/equipment/military-aircraft/oh-58d-kiowa-warrior/2014/02/oh-58d-kiowa-warrior_001.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "OH-58D Kiowa Warrior",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:24.968857"
+        },
+        {
+          "original_url": "https://images03.military.com/sites/default/files/media/equipment/military-aircraft/oh-58d-kiowa-warrior/2014/02/oh-58d-kiowa-warrior_002.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "OH-58D Kiowa Warrior",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:25.529908"
+        }
+      ],
+      "description": "The OH-58 Kiowa Warrior conducts armed reconnaissance, security, target acquisition and designation, command and control, light attack and defensive air combat missions in support of combat and contingency operations. It replaces the AH-1 Cobra attack helicopters (those that function as scouts in air cavalry troops and light attack companies) and OH-58A and C Kiowas in air cavalry troops.",
+      "aliases": [],
+      "category": "Helicopter"
+    },
+    {
+      "name": "RC-135S Cobra Ball",
+      "url": "https://www.military.com/equipment/rc-135s-cobra-ball",
+      "scraped_at": "2025-09-29T12:30:27.495490",
+      "specifications": {
+        "Service": "United States Air Force",
+        "Power Plant[^": "Four CFM International F108-CF-201 high bypass turbofan engines",
+        "Crew": "(minimum) Three electronic warfare officers, two airborne systems engineers, and two airborne mission specialists"
+      },
+      "images": [
+        {
+          "original_url": "https://images02.military.com/sites/default/files/2018-02/rc-135_s_cobra_ball_.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "RC-135 S Cobra Ball",
+          "title": "",
+          "width": 662,
+          "height": 519,
+          "processed_at": "2025-09-29T12:30:27.523566"
+        }
+      ],
+      "description": "Mission flight crew: (minimum) Three electronic warfare officers, two airborne systems engineers, and two airborne mission specialists",
+      "aliases": [],
+      "category": "Helicopter"
+    },
+    {
+      "name": "TH-57 Sea Ranger",
+      "url": "https://www.military.com/equipment/th-57-sea-ranger",
+      "scraped_at": "2025-09-29T12:30:29.531478",
+      "specifications": {
+        "Service": "United States Navy",
+        "Range": "368 nautical miles (420 statute miles, 676 km)",
+        "Crew": "One pilot, four studentsThe TH-57 is a derivative of the commercial Bell Jet Ranger 206. Although primarily used for training, these aircraft are also used for photo, chase and utility missions."
+      },
+      "images": [
+        {
+          "original_url": "https://images03.military.com/sites/default/files/media/equipment/military-aircraft/th-57-sea-ranger/2014/03/th-57-sea-ranger-001.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "TH-57 Sea Ranger",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:29.567417"
+        },
+        {
+          "original_url": "https://images04.military.com/sites/default/files/media/equipment/military-aircraft/th-57-sea-ranger/2014/03/th-57-sea-ranger-002.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "TH-57 Sea Ranger",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:30.122482"
+        }
+      ],
+      "description": "The TH-57 is a derivative of the commercial Bell Jet Ranger 206. Although primarily used for training, these aircraft are also used for photo, chase and utility missions.",
+      "aliases": [],
+      "category": "Helicopter"
+    },
+    {
+      "name": "Bell UH-1N Iroquois",
+      "url": "https://www.military.com/equipment/uh-1n-iroquois",
+      "scraped_at": "2025-09-29T12:30:32.228679",
+      "specifications": {
+        "Manufacturer": "Bell Helicopter",
+        "Service": "USAF",
+        "Range": "300 miles",
+        "Crew": "Pilot with co-pilot and flight engineer, depending upon missionThe Bell UH-1N Iroquois is a light-lift utility helicopter used to support various missions. The primary missions include: airlift of emergency security forces, security and surveillance of off-base nuclear weapons convoys, and distinguished visitor airlift. Other uses include: disaster response operations, search and rescue, medical evacuation, airborne cable inspections, support to aircrew survival school, aerial testing, routine missile site support and transport."
+      },
+      "images": [
+        {
+          "original_url": "https://images05.military.com/sites/default/files/media/equipment/military-aircraft/uh-1n-iroquois/2014/02/uh-1n-iroquois_001.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "UH-1N Iroquois",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:32.271864"
+        },
+        {
+          "original_url": "https://images05.military.com/sites/default/files/media/equipment/military-aircraft/uh-1n-iroquois/2014/02/uh-1n-iroquois_002.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "UH-1N Iroquois",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:32.824096"
+        }
+      ],
+      "description": "The Bell UH-1N Iroquois is a light-lift utility helicopter used to support various missions. The primary missions include: airlift of emergency security forces, security and surveillance of off-base nuclear weapons convoys, and distinguished visitor airlift. Other uses include: disaster response operations, search and rescue, medical evacuation, airborne cable inspections, support to aircrew survival school, aerial testing, routine missile site support and transport.",
+      "aliases": [],
+      "category": "Helicopter"
+    },
+    {
+      "name": "UH-60A/L Black Hawk Helicopter",
+      "url": "https://www.military.com/equipment/uh-60a-l-black-hawk",
+      "scraped_at": "2025-09-29T12:30:34.727669",
+      "specifications": {
+        "Manufacturer": "Sikorsky",
+        "Service": "US Army",
+        "Range": "320 nm",
+        "Armament": "2x 7.62mm machine guns",
+        "Crew": "4 (2 pilots; 2 crew chiefs)"
+      },
+      "images": [
+        {
+          "original_url": "https://images04.military.com/sites/default/files/media/equipment/military-aircraft/uh-60-black-hawk/2014/02/uh-60-black-hawk_001.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "UH-60A/L Black Hawk",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:34.761087"
+        },
+        {
+          "original_url": "https://images04.military.com/sites/default/files/media/equipment/military-aircraft/uh-60-black-hawk/2014/02/uh-60-black-hawk_002.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "UH-60 Black Hawk",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:35.307342"
+        }
+      ],
+      "description": "The UH-60 Black Hawk helicopter is the U.S. Army’s primary medium-lift utility transport and air assault aircraft. It is a twin-engined medium-lift utility helicopter. It is equipped with a single 4-bladed rotor and a single 4-bladed tail rotor. The basic crew complement for the UH-60A is three: pilot, co-pilot and crew chief. The titanium-cored rotor blades are resistant to AAA (anti-aircraft artillery) fire up to 23mm and are equipped with pressurized sensors capable of detecting loss of rotor pressurization (damage).",
+      "aliases": [],
+      "category": "Helicopter"
+    },
+    {
+      "name": "UH-72A Lakota",
+      "url": "https://www.military.com/equipment/uh-72a-lakota",
+      "scraped_at": "2025-09-29T12:30:37.295246",
+      "specifications": {
+        "Manufacturer": "Eurocopter",
+        "Service": "Army National Guard",
+        "Range": "426 miThe UH-72A is a twin-engined light duty helicopter. It is equipped with a single 4-bladed main rotor and a single 2-bladed tail rotor mounted on the left-hand side of the tail assembly. The helicopters tail unit is mounted high with a pair of non-moving horizontal stabilizers mounted below the tail rotor. In addition, there are twin vertical stabilizers mounted on the outside edges of the horizontal stabilizers, thus effectively boxing in the tail rotor, enabling the safe loading and unloading of the cargo area. Basic crew consists of a pilot and co-pilot.",
+        "Crew": "2 pilots"
+      },
+      "images": [
+        {
+          "original_url": "https://images01.military.com/sites/default/files/media/equipment/military-aircraft/uh-72a-lakota/2014/02/uh-72a-lakota_001.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "UH-72A Lakota",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:37.369294"
+        },
+        {
+          "original_url": "https://images03.military.com/sites/default/files/media/equipment/military-aircraft/uh-72a-lakota/2014/02/uh-72a-lakota_002.jpg",
+          "original_zipline_url": null,
+          "esp32_bmp_zipline_url": null,
+          "alt_text": "UH-72A Lakota",
+          "title": "",
+          "width": 1200,
+          "height": 800,
+          "processed_at": "2025-09-29T12:30:37.966788"
+        }
+      ],
+      "description": "The UH-72A is a twin-engined light duty helicopter. It is equipped with a single 4-bladed main rotor and a single 2-bladed tail rotor mounted on the left-hand side of the tail assembly. The helicopters tail unit is mounted high with a pair of non-moving horizontal stabilizers mounted below the tail rotor. In addition, there are twin vertical stabilizers mounted on the outside edges of the horizontal stabilizers, thus effectively boxing in the tail rotor, enabling the safe loading and unloading of the cargo area. Basic crew consists of a pilot and co-pilot.",
+      "aliases": [],
+      "category": "Helicopter"
+    }
+  ]
+}

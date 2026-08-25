@@ -1,0 +1,27 @@
+{
+  "scraped_at": "2025-09-29T12:25:30.516815",
+  "source": "Military.com",
+  "total_aircraft": 2,
+  "aircraft": [
+    {
+      "name": "Helicopters",
+      "url": "https://www.military.com/equipment/helicopters",
+      "scraped_at": "2025-09-29T12:25:28.095616",
+      "specifications": {},
+      "images": [],
+      "description": "Polish navy divers take on the herculean task of defusing the largest unexploded WWII bomb ever found in the country.",
+      "aliases": [],
+      "category": "Helicopter"
+    },
+    {
+      "name": "Marine Corps Helicopters",
+      "url": "https://www.military.com/equipment/marine-corps-helicopters",
+      "scraped_at": "2025-09-29T12:25:29.501049",
+      "specifications": {},
+      "images": [],
+      "description": "Polish navy divers take on the herculean task of defusing the largest unexploded WWII bomb ever found in the country.",
+      "aliases": [],
+      "category": "Helicopter"
+    }
+  ]
+}

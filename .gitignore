@@ -255,3 +255,6 @@ display/sim-lvgl/data/
 
 # AirTracker data cache and runtime files
 *.zip
+
+# Local assistant configuration
+**/.claude/settings.local.json

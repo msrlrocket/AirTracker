@@ -493,3 +493,4 @@
 {"icao": "YK40", "name": "Yakovlev Yak-40", "seats": 32, "manufacturer": "Yakovlev", "model": "Yak-40", "iata": ["YK4"]}
 {"icao": "YK42", "name": "Yakovlev Yak-42", "seats": 120, "manufacturer": "Yakovlev", "model": "Yak-42", "iata": ["YK2"]}
 {"icao": "YS11", "name": "NAMC YS-11", "seats": 64, "manufacturer": "NAMC", "model": "YS-11", "iata": []}
+{"icao": "RV7", "name": "Van's Aircraft RV-7", "seats": 2, "manufacturer": "Van's Aircraft", "model": "RV-7", "iata": []}

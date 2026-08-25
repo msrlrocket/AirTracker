@@ -19,22 +19,22 @@ cp .env.example .env
 # Edit .env with your location, MQTT broker, and API credentials
 
 # Single run (test)
-python3 airtracker_complete.py
+python3 airtracker.py
 
 # Continuous operation
-python3 airtracker_complete.py --continuous
+python3 airtracker.py --continuous
 
 # Custom location with MQTT publishing
-python3 airtracker_complete.py --lat 46.168689 --lon -123.020309 --radius 25 --mqtt-publish-all --mqtt-publish-commercial
+python3 airtracker.py --lat 46.168689 --lon -123.020309 --radius 25 --mqtt-publish-all --mqtt-publish-commercial
 
 # Debug mode
-python3 airtracker_complete.py --debug --dump-raw
+python3 airtracker.py --debug --dump-raw
 ```
 
 ## Architecture: One Producer, Many Consumers
 
 **Unified Producer:**
-- Single `airtracker_complete.py` script handles everything:
+- Single `airtracker.py` script handles everything:
   - Fetches from OpenSky, ADSB.lol, FlightRadar24
   - Merges data by ICAO hex code
   - Enriches with aircraft types, airlines, airports
@@ -110,24 +110,24 @@ FETCH_INTERVAL_MAX_SEC=100
 
 ```bash
 # Operation modes
-python3 airtracker_complete.py                    # Single run
-python3 airtracker_complete.py --continuous       # Continuous loop
-python3 airtracker_complete.py --test-mqtt        # Test MQTT connection
+python3 airtracker.py                    # Single run
+python3 airtracker.py --continuous       # Continuous loop
+python3 airtracker.py --test-mqtt        # Test MQTT connection
 
 # Location override
-python3 airtracker_complete.py --lat 40.7 --lon -74.0 --radius 15
+python3 airtracker.py --lat 40.7 --lon -74.0 --radius 15
 
 # Configuration file
-python3 airtracker_complete.py --env-file /path/to/custom.env
+python3 airtracker.py --env-file /path/to/custom.env
 
 # MQTT publishing
-python3 airtracker_complete.py --mqtt-publish-all --mqtt-publish-commercial
+python3 airtracker.py --mqtt-publish-all --mqtt-publish-commercial
 
 # Output options
-python3 airtracker_complete.py --output-file data/custom_output.json
+python3 airtracker.py --output-file data/custom_output.json
 
 # Debug and development
-python3 airtracker_complete.py --debug --dump-raw
+python3 airtracker.py --debug --dump-raw
 ```
 
 ## Automation & Cron
@@ -137,13 +137,13 @@ python3 airtracker_complete.py --debug --dump-raw
 Add to crontab (`crontab -e`):
 ```bash
 # Run every 2 minutes
-*/2 * * * * cd /path/to/AirTracker/mqtt/unified && /usr/bin/python3 airtracker_complete.py --mqtt-publish-all --mqtt-publish-commercial
+*/2 * * * * cd /path/to/AirTracker/mqtt/unified && /usr/bin/python3 airtracker.py --mqtt-publish-all --mqtt-publish-commercial
 
 # Run every minute (high frequency)
-* * * * * cd /path/to/AirTracker/mqtt/unified && /usr/bin/python3 airtracker_complete.py --mqtt-publish-all --mqtt-publish-commercial
+* * * * * cd /path/to/AirTracker/mqtt/unified && /usr/bin/python3 airtracker.py --mqtt-publish-all --mqtt-publish-commercial
 
 # With logging
-*/2 * * * * cd /path/to/AirTracker/mqtt/unified && /usr/bin/python3 airtracker_complete.py --mqtt-publish-all --mqtt-publish-commercial >> /var/log/airtracker.log 2>&1
+*/2 * * * * cd /path/to/AirTracker/mqtt/unified && /usr/bin/python3 airtracker.py --mqtt-publish-all --mqtt-publish-commercial >> /var/log/airtracker.log 2>&1
 ```
 
 ### Option 2: Continuous Mode with Systemd
@@ -159,7 +159,7 @@ Type=simple
 User=pi
 WorkingDirectory=/path/to/AirTracker/mqtt/unified
 Environment=PATH=/usr/local/bin:/usr/bin:/bin
-ExecStart=/usr/bin/python3 airtracker_complete.py --continuous --mqtt-publish-all --mqtt-publish-commercial
+ExecStart=/usr/bin/python3 airtracker.py --continuous --mqtt-publish-all --mqtt-publish-commercial
 Restart=always
 RestartSec=10
 
@@ -179,7 +179,7 @@ sudo systemctl status airtracker.service
 Add to Home Assistant `configuration.yaml`:
 ```yaml
 shell_command:
-  airtracker_update: "cd /path/to/AirTracker/mqtt/unified && python3 airtracker_complete.py --mqtt-publish-all --mqtt-publish-commercial"
+  airtracker_update: "cd /path/to/AirTracker/mqtt/unified && python3 airtracker.py --mqtt-publish-all --mqtt-publish-commercial"
 
 automation:
   - alias: "AirTracker Update"
@@ -192,29 +192,64 @@ automation:
 
 ### Option 4: Unraid User Scripts
 
-**Method 1: Using Environment Variables**
+**Quick Unraid Setup:**
+
+1. **Create directories:**
+   ```bash
+   mkdir -p /mnt/user/appdata/airtracker/data
+   mkdir -p /mnt/user/appdata/airtracker/datasets
+   ```
+
+2. **Copy files to `/mnt/user/appdata/airtracker/`:**
+   - `airtracker.py` (main script)
+   - `run_airtracker.sh` (bash runner script)
+   - `.env.unraid` → `.env` (edit with your settings)
+   - `datasets/` folder (aircraft/airline/airport data)
+
+3. **Make executable:**
+   ```bash
+   chmod +x /mnt/user/appdata/airtracker/run_airtracker.sh
+   ```
+
+**Method 1: Using Bash Runner Script (Recommended for Unraid)**
+
+**Unraid User Script:**
+```bash
+#!/bin/bash
+# AirTracker Unraid User Script
+cd /mnt/user/appdata/airtracker
+./run_airtracker.sh
+```
+
+**For continuous mode:**
+```bash
+#!/bin/bash
+cd /mnt/user/appdata/airtracker
+./run_airtracker.sh continuous
+```
+
+**Schedule:** Every 2 minutes: `*/2 * * * *` or for continuous: At startup only
+
+**Method 2: Direct Python Call**
 ```bash
 #!/bin/bash
 # Set custom environment
 export MQTT_HOST=192.168.1.100
 export LAT=46.168689
 export LON=-123.020309
-export WRITE_JSON_PATH=/mnt/user/appdata/airtracker/planes_complete.json
+export WRITE_JSON_PATH=/mnt/user/appdata/airtracker/data/planes_complete.json
 
 # Run AirTracker
-cd /mnt/user/appdata/AirTracker/mqtt/unified
-python3 airtracker_complete.py --mqtt-publish-all --mqtt-publish-commercial
+cd /mnt/user/appdata/airtracker
+python3 airtracker.py --mqtt-publish-all --mqtt-publish-commercial
 ```
 
-**Method 2: Using Custom .env File (Recommended for Unraid)**
+**Method 3: Using Custom .env File**
 ```bash
 #!/bin/bash
-# Create custom .env file for Unraid paths
-ENV_FILE="/mnt/user/appdata/airtracker/config.env"
-
 # Run AirTracker with custom env file
-cd /mnt/user/appdata/AirTracker/mqtt/unified
-python3 airtracker_complete.py --env-file "$ENV_FILE" --mqtt-publish-all --mqtt-publish-commercial
+cd /mnt/user/appdata/airtracker
+python3 airtracker.py --env-file "/mnt/user/appdata/airtracker/custom.env" --mqtt-publish-all --mqtt-publish-commercial
 ```
 
 **Sample Unraid .env file (`/mnt/user/appdata/airtracker/config.env`):**
@@ -383,7 +418,7 @@ python3 plane_retreiver.py ... | python3 plane_merge.py ...
 
 **NEW (unified):**
 ```bash
-python3 airtracker_complete.py
+python3 airtracker.py
 ```
 
 The unified script handles everything the old scripts did, plus:
@@ -397,18 +432,18 @@ The unified script handles everything the old scripts did, plus:
 
 **MQTT Connection Issues:**
 ```bash
-python3 airtracker_complete.py --test-mqtt
+python3 airtracker.py --test-mqtt
 ```
 
 **Debug Provider Responses:**
 ```bash
-python3 airtracker_complete.py --debug --dump-raw
+python3 airtracker.py --debug --dump-raw
 ```
 
 **Check Military Cache:**
 ```bash
 # Set in .env: MILITARY_CACHE_DEBUG=1
-python3 airtracker_complete.py --debug
+python3 airtracker.py --debug
 # Check: data/military_aircraft_debug.json
 ```
 
@@ -416,6 +451,21 @@ python3 airtracker_complete.py --debug
 ```bash
 mosquitto_sub -h your-broker -t "airtracker/+"
 ```
+
+**Missing Dependencies (Unraid/Docker):**
+```bash
+pip install paho-mqtt requests pandas openpyxl python-dotenv
+```
+
+**Permission Issues:**
+```bash
+chmod +x /mnt/user/appdata/airtracker/run_airtracker.sh
+```
+
+**No Aircraft Data:**
+1. Check LAT/LON coordinates in `.env`
+2. Increase RADIUS_NM if in remote area
+3. Run with `--debug` flag to see provider responses
 
 ## License
 

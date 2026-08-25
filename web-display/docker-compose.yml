@@ -1,0 +1,44 @@
+# AirTracker Web Display - Docker Compose for local testing
+version: '3.8'
+
+services:
+  airtracker-web:
+    build: .
+    container_name: airtracker-web-display
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_SECRET_KEY=airtracker-web-display-secret-dev
+      - MQTT_HOST=${MQTT_HOST:-localhost}
+      - MQTT_PORT=${MQTT_PORT:-1883}
+      - MQTT_USER=${MQTT_USER:-}
+      - MQTT_PASS=${MQTT_PASS:-}
+      - FLASK_DEBUG=${FLASK_DEBUG:-false}
+    networks:
+      - airtracker-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:5000/api/status', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Local MQTT broker for testing
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: airtracker-mosquitto
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    networks:
+      - airtracker-net
+    restart: unless-stopped
+    profiles:
+      - testing
+
+networks:
+  airtracker-net:
+    driver: bridge

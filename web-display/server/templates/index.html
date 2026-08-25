@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>AirTracker Display</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header with hamburger menu -->
+    <header class="header">
+        <div class="header-content">
+            <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+
+            <h1 class="title" id="pageTitle">
+                <span class="title-icon">✈️</span>
+                <span class="title-text">Nearest Aircraft</span>
+            </h1>
+
+            <div class="status-indicator" id="connectionStatus">
+                <div class="status-dot"></div>
+                <span class="status-text">Connecting...</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Slide-out navigation menu -->
+    <nav class="nav-menu" id="navMenu">
+        <div class="nav-header">
+            <h2>AirTracker Views</h2>
+            <button class="nav-close" id="navClose">&times;</button>
+        </div>
+        <ul class="nav-list">
+            <li><a href="/" data-view="nearest" class="nav-link">
+                <span class="nav-icon">🎯</span>
+                <span class="nav-text">Nearest Aircraft</span>
+            </a></li>
+            <li><a href="/commercial" data-view="commercial" class="nav-link">
+                <span class="nav-icon">✈️</span>
+                <span class="nav-text">Nearest Commercial</span>
+            </a></li>
+            <li><a href="/military" data-view="military" class="nav-link">
+                <span class="nav-icon">🪖</span>
+                <span class="nav-text">Military Aircraft</span>
+            </a></li>
+            <li><a href="/radar" data-view="radar" class="nav-link">
+                <span class="nav-icon">📡</span>
+                <span class="nav-text">Radar View</span>
+            </a></li>
+            <li><a href="/planes" data-view="planes" class="nav-link">
+                <span class="nav-icon">📋</span>
+                <span class="nav-text">All Aircraft</span>
+            </a></li>
+        </ul>
+    </nav>
+
+    <!-- Overlay for menu -->
+    <div class="nav-overlay" id="navOverlay"></div>
+
+    <!-- Main content area -->
+    <main class="main-content" id="mainContent">
+        <!-- Nearest Aircraft View -->
+        <div class="view nearest-view active" id="nearestView">
+            <div class="aircraft-card" id="nearestCard">
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <p>Waiting for aircraft data...</p>
+                </div>
+
+                <!-- Aircraft Display Template (hidden by default) -->
+                <div class="aircraft-display" id="aircraftDisplay" style="display: none;">
+                    <!-- Header with airline logo, callsign, and country flag -->
+                    <div class="aircraft-header">
+                        <div class="header-left">
+                            <div class="flight-info">
+                                <div class="registration" id="callsign">-</div>
+                                <div class="airline-name" id="airlineName">-</div>
+                            </div>
+                            <img class="airline-logo" id="airlineLogo" src="" alt="Airline" />
+                        </div>
+                        <div class="header-right">
+                            <img class="country-flag" id="countryFlag" src="" alt="Country" />
+                            <div class="distance-info">
+                                <div class="distance" id="distance">-</div>
+                                <div class="bearing" id="bearing">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main aircraft image -->
+                    <div class="aircraft-image-container">
+                        <img class="aircraft-image" id="aircraftImage" src="" alt="Aircraft" />
+                        <div class="aircraft-type-overlay">
+                            <span id="aircraftType">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Route information -->
+                    <div class="route-section">
+                        <div class="route-header">
+                            <span class="route-label">Route</span>
+                            <div class="route-progress">
+                                <span id="routeEta">ETA: -</span>
+                                <span id="routeRemaining">- nm remaining</span>
+                            </div>
+                        </div>
+                        <div class="route-display">
+                            <div class="airport origin">
+                                <div class="airport-code" id="originCode">-</div>
+                                <div class="airport-name" id="originName">-</div>
+                            </div>
+                            <div class="route-line">
+                                <div class="route-progress-bar">
+                                    <div class="progress-fill" id="routeProgressBar"></div>
+                                    <div class="aircraft-icon">✈️</div>
+                                </div>
+                            </div>
+                            <div class="airport destination">
+                                <div class="airport-code" id="destCode">-</div>
+                                <div class="airport-name" id="destName">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live data grid -->
+                    <div class="data-grid">
+                        <div class="data-tile altitude">
+                            <div class="data-label">Altitude</div>
+                            <div class="data-value" id="altitude">-</div>
+                            <div class="data-unit">ft</div>
+                        </div>
+                        <div class="data-tile speed">
+                            <div class="data-label">Speed</div>
+                            <div class="data-value" id="speed">-</div>
+                            <div class="data-unit">kt</div>
+                        </div>
+                        <div class="data-tile vertical-rate">
+                            <div class="data-label">V/Rate</div>
+                            <div class="data-value" id="verticalRate">-</div>
+                            <div class="data-unit">fpm</div>
+                        </div>
+                        <div class="data-tile track">
+                            <div class="data-label">Track</div>
+                            <div class="data-value" id="track">-</div>
+                            <div class="data-unit">°</div>
+                        </div>
+                    </div>
+
+                    <!-- Additional details - horizontal layout -->
+                    <div class="details-section">
+                        <div class="detail-item">
+                            <span class="detail-label">Reg:</span>
+                            <span class="detail-value" id="registration">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Pax:</span>
+                            <span class="detail-value" id="passengers">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Squawk:</span>
+                            <span class="detail-value" id="squawk">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Media navigation -->
+                    <div class="media-nav" id="mediaNav" style="display: none;">
+                        <button class="media-btn" id="prevMedia">‹</button>
+                        <span class="media-indicator" id="mediaIndicator">1/1</span>
+                        <button class="media-btn" id="nextMedia">›</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Image Gallery Shadowbox -->
+        <div class="shadowbox" id="imageShadowbox" style="display: none;">
+            <div class="shadowbox-content">
+                <div class="shadowbox-header">
+                    <h3>Aircraft Images</h3>
+                    <button class="shadowbox-close" id="imageCloseBtn">&times;</button>
+                </div>
+                <div class="shadowbox-body">
+                    <div class="image-gallery" id="imageGallery">
+                        <!-- Images will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flight History Shadowbox -->
+        <div class="shadowbox" id="historyShadowbox" style="display: none;">
+            <div class="shadowbox-content">
+                <div class="shadowbox-header">
+                    <h3>Flight History</h3>
+                    <button class="shadowbox-close" id="historyCloseBtn">&times;</button>
+                </div>
+                <div class="shadowbox-body">
+                    <div class="flight-history" id="flightHistory">
+                        <!-- History will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Commercial Aircraft View -->
+        <div class="view commercial-view" id="commercialView">
+            <div class="aircraft-card" id="commercialCard">
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <p>Waiting for commercial aircraft data...</p>
+                </div>
+
+                <!-- Aircraft Display Template (hidden by default) -->
+                <div class="aircraft-display" id="commercialAircraftDisplay" style="display: none;">
+                    <!-- Header with airline logo, callsign, and country flag -->
+                    <div class="aircraft-header">
+                        <div class="header-left">
+                            <div class="flight-info">
+                                <div class="registration" id="commercialCallsign">-</div>
+                                <div class="airline-name" id="commercialAirlineName">-</div>
+                            </div>
+                            <img class="airline-logo" id="commercialAirlineLogo" src="" alt="Airline" />
+                        </div>
+                        <div class="header-right">
+                            <img class="country-flag" id="commercialCountryFlag" src="" alt="Country" />
+                            <div class="distance-info">
+                                <div class="distance" id="commercialDistance">-</div>
+                                <div class="bearing" id="commercialBearing">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main aircraft image -->
+                    <div class="aircraft-image-container">
+                        <img class="aircraft-image" id="commercialAircraftImage" src="" alt="Aircraft" />
+                        <div class="aircraft-type-overlay">
+                            <span id="commercialAircraftType">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Route information -->
+                    <div class="route-section">
+                        <div class="route-header">
+                            <span class="route-label">Route</span>
+                            <div class="route-progress">
+                                <span id="commercialRouteEta">ETA: -</span>
+                                <span id="commercialRouteRemaining">- nm remaining</span>
+                            </div>
+                        </div>
+                        <div class="route-display">
+                            <div class="airport origin">
+                                <div class="airport-code" id="commercialOriginCode">-</div>
+                                <div class="airport-name" id="commercialOriginName">-</div>
+                            </div>
+                            <div class="route-line">
+                                <div class="route-progress-bar">
+                                    <div class="progress-fill" id="commercialRouteProgressBar"></div>
+                                    <div class="aircraft-icon">✈️</div>
+                                </div>
+                            </div>
+                            <div class="airport destination">
+                                <div class="airport-code" id="commercialDestCode">-</div>
+                                <div class="airport-name" id="commercialDestName">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live data grid -->
+                    <div class="data-grid">
+                        <div class="data-tile altitude">
+                            <div class="data-label">Altitude</div>
+                            <div class="data-value" id="commercialAltitude">-</div>
+                            <div class="data-unit">ft</div>
+                        </div>
+                        <div class="data-tile speed">
+                            <div class="data-label">Speed</div>
+                            <div class="data-value" id="commercialSpeed">-</div>
+                            <div class="data-unit">kt</div>
+                        </div>
+                        <div class="data-tile vertical-rate">
+                            <div class="data-label">V/Rate</div>
+                            <div class="data-value" id="commercialVerticalRate">-</div>
+                            <div class="data-unit">fpm</div>
+                        </div>
+                        <div class="data-tile track">
+                            <div class="data-label">Track</div>
+                            <div class="data-value" id="commercialTrack">-</div>
+                            <div class="data-unit">°</div>
+                        </div>
+                    </div>
+
+                    <!-- Additional details - horizontal layout -->
+                    <div class="details-section">
+                        <div class="detail-item">
+                            <span class="detail-label">Reg:</span>
+                            <span class="detail-value" id="commercialRegistration">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Pax:</span>
+                            <span class="detail-value" id="commercialPassengers">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Squawk:</span>
+                            <span class="detail-value" id="commercialSquawk">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Media navigation -->
+                    <div class="media-nav" id="commercialMediaNav" style="display: none;">
+                        <button class="media-btn" id="commercialPrevMedia">‹</button>
+                        <span class="media-indicator" id="commercialMediaIndicator">1/1</span>
+                        <button class="media-btn" id="commercialNextMedia">›</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Military Aircraft View -->
+        <div class="view military-view" id="militaryView">
+            <div class="aircraft-card" id="militaryCard">
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <p>Waiting for military aircraft data...</p>
+                </div>
+
+                <!-- Aircraft Display Template (hidden by default) -->
+                <div class="aircraft-display" id="militaryAircraftDisplay" style="display: none;">
+                    <!-- Header with airline logo, callsign, and country flag -->
+                    <div class="aircraft-header">
+                        <div class="header-left">
+                            <div class="flight-info">
+                                <div class="registration" id="militaryCallsign">-</div>
+                                <div class="airline-name" id="militaryAirlineName">-</div>
+                            </div>
+                            <img class="airline-logo" id="militaryAirlineLogo" src="" alt="Airline" />
+                        </div>
+                        <div class="header-right">
+                            <img class="country-flag" id="militaryCountryFlag" src="" alt="Country" />
+                            <div class="distance-info">
+                                <div class="distance" id="militaryDistance">-</div>
+                                <div class="bearing" id="militaryBearing">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main aircraft image -->
+                    <div class="aircraft-image-container">
+                        <img class="aircraft-image" id="militaryAircraftImage" src="" alt="Aircraft" />
+                        <div class="aircraft-type-overlay">
+                            <span id="militaryAircraftType">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Route information -->
+                    <div class="route-section">
+                        <div class="route-header">
+                            <span class="route-label">Route</span>
+                            <div class="route-progress">
+                                <span id="militaryRouteEta">ETA: -</span>
+                                <span id="militaryRouteRemaining">- nm remaining</span>
+                            </div>
+                        </div>
+                        <div class="route-display">
+                            <div class="airport origin">
+                                <div class="airport-code" id="militaryOriginCode">-</div>
+                                <div class="airport-name" id="militaryOriginName">-</div>
+                            </div>
+                            <div class="route-line">
+                                <div class="route-progress-bar">
+                                    <div class="progress-fill" id="militaryRouteProgressBar"></div>
+                                    <div class="aircraft-icon">✈️</div>
+                                </div>
+                            </div>
+                            <div class="airport destination">
+                                <div class="airport-code" id="militaryDestCode">-</div>
+                                <div class="airport-name" id="militaryDestName">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live data grid -->
+                    <div class="data-grid">
+                        <div class="data-tile altitude">
+                            <div class="data-label">Altitude</div>
+                            <div class="data-value" id="militaryAltitude">-</div>
+                            <div class="data-unit">ft</div>
+                        </div>
+                        <div class="data-tile speed">
+                            <div class="data-label">Speed</div>
+                            <div class="data-value" id="militarySpeed">-</div>
+                            <div class="data-unit">kt</div>
+                        </div>
+                        <div class="data-tile vertical-rate">
+                            <div class="data-label">V/Rate</div>
+                            <div class="data-value" id="militaryVerticalRate">-</div>
+                            <div class="data-unit">fpm</div>
+                        </div>
+                        <div class="data-tile track">
+                            <div class="data-label">Track</div>
+                            <div class="data-value" id="militaryTrack">-</div>
+                            <div class="data-unit">°</div>
+                        </div>
+                    </div>
+
+                    <!-- Additional details - horizontal layout -->
+                    <div class="details-section">
+                        <div class="detail-item">
+                            <span class="detail-label">Reg:</span>
+                            <span class="detail-value" id="militaryRegistration">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Pax:</span>
+                            <span class="detail-value" id="militaryPassengers">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Squawk:</span>
+                            <span class="detail-value" id="militarySquawk">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Media navigation -->
+                    <div class="media-nav" id="militaryMediaNav" style="display: none;">
+                        <button class="media-btn" id="militaryPrevMedia">‹</button>
+                        <span class="media-indicator" id="militaryMediaIndicator">1/1</span>
+                        <button class="media-btn" id="militaryNextMedia">›</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Radar View (Placeholder) -->
+        <div class="view radar-view" id="radarView">
+            <div class="placeholder-card">
+                <div class="placeholder-icon">📡</div>
+                <h2>Radar View</h2>
+                <p>Coming Soon!</p>
+                <p class="placeholder-desc">This view will display a radar-style visualization of nearby aircraft positions.</p>
+            </div>
+        </div>
+
+        <!-- All Planes View -->
+        <div class="view planes-view" id="planesView">
+            <div class="planes-list" id="planesList">
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <p>Loading aircraft list...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <span class="last-updated" id="lastUpdated">Last updated: Never</span>
+            <span class="aircraft-count" id="aircraftCount">0 aircraft tracked</span>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+    <script>
+        // Pass initial view from Flask to JavaScript
+        window.AIRTRACKER_CONFIG = {
+            currentView: '{{ view }}',
+            socketNamespace: '/'
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+{
+  "name": "MH-65 Dolphin",
+  "url": "https://www.military.com/equipment/mh-65-dolphin",
+  "scraped_at": "2025-09-29T12:24:33.060761",
+  "specifications": {
+    "Manufacturer": "Eurocopter",
+    "Service": "United States Coast Guard",
+    "Power Plant[^": "Two 853 shp Turbomeca Arriel 2C2-CG turbine engines",
+    "Max Speed": "175 knots (MH-65C)",
+    "Range": "290 nautical miles (MH-65C)",
+    "Armament": "Single 7.62mm M240B/H machine gun, 7.62mm shoulder-fired precision weapon, .50-caliber shoulder-fired precision weapon",
+    "Crew": "2 pilots, 1 flight mechanic, 1 rescue swimmerThe H-65 helicopter built by Eurocopter America is the U.S. Coast Guard's primary rescue helicopter. The Dolphin is certified for operation in all-weather and night-time operations, with the exception of icing conditions. There are 100 H-65s in the inventory. The H-65 is the primary Coast Guard aircraft used aboard certified cutters during deployments."
+  },
+  "images": [
+    {
+      "original_url": "https://images04.military.com/sites/default/files/media/equipment/military-aircraft/mh-65-dolphin/2014/04/mh-65-dolphin-001.jpg",
+      "original_zipline_url": "https://zip.spacegeese.com/u/Ga3I5D.jpg",
+      "esp32_bmp_zipline_url": "https://zip.spacegeese.com/u/mQJj4A.bmp",
+      "alt_text": "MH-65 Dolphin Helicopter",
+      "title": "",
+      "width": 1200,
+      "height": 800,
+      "processed_at": "2025-09-29T12:24:33.219184"
+    },
+    {
+      "original_url": "https://images02.military.com/sites/default/files/media/equipment/military-aircraft/mh-65-dolphin/2014/04/mh-65-dolphin-002.jpg",
+      "original_zipline_url": "https://zip.spacegeese.com/u/5ymuOn.jpg",
+      "esp32_bmp_zipline_url": "https://zip.spacegeese.com/u/74F9Pn.bmp",
+      "alt_text": "MH-65 Dolphin",
+      "title": "",
+      "width": 1200,
+      "height": 800,
+      "processed_at": "2025-09-29T12:24:34.025377"
+    }
+  ],
+  "description": "Armament: Single 7.62mm M240B/H machine gun, 7.62mm shoulder-fired precision weapon, .50-caliber shoulder-fired precision weapon",
+  "aliases": [],
+  "category": "Helicopter"
+}

@@ -1,42 +1,71 @@
-# Zipline Airline Logo Uploader
+# AirTracker Scripts Directory
 
-One-time script to upload all airline BMP files to your Zipline instance.
+This directory contains utility scripts for managing AirTracker datasets and resources.
 
-## Setup
+## Active Scripts
 
-1. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+### Core Dataset Management
+- **`military_aircraft_scraper.py`** - Scrapes military aircraft data and images from military.com and updates datasets
+- **`update_airlines_with_zipline_urls.py`** - Updates airlines dataset with PNG logo URLs from successful Zipline uploads
+- **`upload_airline_pngs_corrected.py`** - Uploads airline PNG logos to Zipline (corrected version that works)
 
-2. **The script includes your Zipline token by default** (from the example you provided)
+### InfluxDB Management
+- **`../mqtt/unified/influx_db_test.py`** - InfluxDB demo, query tool, and database management utility
 
-3. **Test with dry run:**
-   ```bash
-   python3 upload_airline_logos_zipline.py --folder "/Users/mattlindsay/Downloads/esp32-flightradar24-ttgo-main 2/images/airline_logos" --dry-run
-   ```
+## Data Files
+- **`airline_png_upload_results_corrected.json`** - Results from successful airline PNG uploads
+- **`fast_airline_logo_results.json`** - Fast airline logo check results
+- **`test_*.json`** - Sample aircraft data for testing
 
-4. **Upload all logos:**
-   ```bash
-   python3 upload_airline_logos_zipline.py --folder "/Users/mattlindsay/Downloads/esp32-flightradar24-ttgo-main 2/images/airline_logos"
-   ```
+## Archive Directory
+The `archive/` directory contains scripts that were used for one-time dataset creation and are no longer needed for regular operations:
 
-## Configuration
+- Image scraping utilities (completed)
+- Dataset enrichment scripts (completed)
+- Military dataset creation scripts (completed)
+- Airline logo checking and uploading (completed)
+- Zipline URL extraction tools (completed)
 
-The script defaults to:
-- **Zipline URL**: `https://zip.spacegeese.com`
-- **Auth Token**: Your token from the example script
-- **Upload delay**: 0.5 seconds between files
+## Usage
 
-You can override these with command line arguments or environment variables.
+### Update Military Aircraft Dataset
+```bash
+cd scripts
+python3 military_aircraft_scraper.py --debug --output ../mqtt/unified/datasets/military_aircraft_complete.json
+```
 
-## Features
+### Query InfluxDB Data
+```bash
+cd mqtt/unified
+# Show demo and available aircraft
+python3 influx_db_test.py
 
-- ✅ **Batch upload** all BMP files in a folder
-- ✅ **Rate limiting** to avoid overwhelming the server
-- ✅ **Progress tracking** with detailed output
-- ✅ **Error handling** and retry logic
-- ✅ **Dry run mode** to preview what will be uploaded
-- ✅ **Environment variable** support for credentials
+# Show nearest aircraft data
+python3 influx_db_test.py -nearest
 
-Perfect for uploading your 2,664 airline logos! ✈️
+# Search specific aircraft
+python3 influx_db_test.py N431AS
+
+# Wipe database (requires confirmation)
+python3 influx_db_test.py --wipe
+```
+
+### InfluxDB Test Features
+The `influx_db_test.py` script provides:
+- **Historical aircraft tracking** - Shows aircraft timeline and flight patterns
+- **Rich metadata display** - Images, airlines, routes, military detection
+- **Analytics capabilities** - Min/max stats, hourly averages
+- **Query examples** - Shows how to filter by airline, aircraft type, altitude, etc.
+- **Database management** - Wipe/reset capabilities
+- **Multi-bucket support** - View nearest, commercial, and all planes data
+
+The script uses **pivot queries** to show single-row aircraft data instead of the default InfluxDB field-per-row format.
+
+## Environment Requirements
+Scripts require:
+- Python 3.x
+- Environment variables in `.env` file
+- InfluxDB client library for database scripts
+- Zipline credentials for upload scripts
+
+Most scripts in the archive directory are no longer needed but are preserved for reference.
